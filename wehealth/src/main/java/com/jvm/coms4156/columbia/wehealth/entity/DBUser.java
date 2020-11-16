@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.jvm.coms4156.columbia.wehealth.Utility.Utility;
 @Entity( name = "user")
 @NoArgsConstructor
 @Data
@@ -48,7 +47,7 @@ public class DBUser {
   public DBUser( String username,  String lookup_token) {
     this.username = username;
     this.lookup_token = lookup_token;
-    createdTime = Utility.getStringOfCurrentDateTime();
+    createdTime = com.jvm.coms4156.columbia.wehealth.Utility.Utility.getStringOfCurrentDateTime();
   }
 
   public void setPassword(String clearTextPassword) {
