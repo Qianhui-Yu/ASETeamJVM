@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Entity
 @Table(schema = "test_schema", name = "test")
 @Data
-public class MyTest implements Serializable{
+public class MyTest implements Serializable {
     @Id
     @Column(name = "test_id")
     private int testId;

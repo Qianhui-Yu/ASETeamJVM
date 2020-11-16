@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * Created by Ethan on 11/04/2020.
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND)
-public class NotFoundException extends Exception {
+public class NotFoundException extends RuntimeException {
   public NotFoundException(String message) {
     super(message);
   }
