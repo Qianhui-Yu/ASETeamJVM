@@ -1,6 +1,7 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AppUserInfo;
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginRequest;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
@@ -59,6 +60,13 @@ public class UserController extends BaseController {
   public LoginResponse verify(@RequestBody String in, HttpServletResponse resp) throws
       NotFoundException {
     LoginResponse out = appUserService.verifyUser(in);
+    resp.addCookie(buildCookie(out.getToken()));
+    return out;
+  }
+
+  @PostMapping(value = "/refreshToken", consumes = "application/json", produces = "application/json")
+  public LoginResponse refreshJwt(HttpServletResponse resp) throws BadAuthExecption {
+    LoginResponse out = appUserService.refreshToken(au());
     resp.addCookie(buildCookie(out.getToken()));
     return out;
   }

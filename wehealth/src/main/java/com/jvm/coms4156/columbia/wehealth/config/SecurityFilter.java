@@ -34,15 +34,13 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
 
     String remoteAddress = getRemoteAddress(req);
 
-
-
     String token = getToken(req);
     AuthenticatedUser user = null;
     if (token != null) {
       try {
         user = decodeAndRefreshJwt(resp, token);
       } catch (BadAuthExecption e) {
-        log.error("Request made with invalid authentication token");
+        log.error("Auth token is invalid");
       }
     }
 

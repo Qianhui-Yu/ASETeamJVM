@@ -8,6 +8,7 @@ import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
 import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
 import com.jvm.coms4156.columbia.wehealth.entity.Field;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
@@ -82,6 +83,15 @@ public class AppUserService {
     appUserDao.save(user);
 
     return new AppUserInfo(user);
+  }
+
+  @Transactional
+  public LoginResponse refreshToken(AuthenticatedUser au) throws BadAuthExecption {
+    DBUser user = appUserDao.findByUserId(au.getUserId());
+    if (user == null || !StringUtils.isEmpty(user.getLookup_token())) {
+      throw new BadAuthExecption();
+    }
+    return logUserIn(user);
   }
 
   @Transactional
