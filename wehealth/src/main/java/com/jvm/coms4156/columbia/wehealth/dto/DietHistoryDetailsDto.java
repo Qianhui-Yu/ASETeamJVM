@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class DietHistoryDetailsDto {
     private Integer dietHistoryId;
+    private Integer dietTypeId;
     private String dietTypeName;
     private Double weight;
     private String unit;

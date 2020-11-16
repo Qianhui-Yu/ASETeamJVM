@@ -58,6 +58,7 @@ public class DietService {
         dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());
         dietHistory.setDietType(dietType.get());
 
+
         // In diet_history table, the default unit of weight is gram
         dietHistory.setUnit(GRAM);
 
@@ -123,7 +124,7 @@ public class DietService {
                                                  Optional<String> unit, Optional<Integer> length) {
         Optional<DBUser> user = dbUserRepo.findByUserId(userIdDto.getUserId());
         if (user.isEmpty()) {
-            throw new NotFoundException("User not found with provided user id.");
+            throw new BadRequestException("User not found with provided user id.");
         }
 
         String timeUnit = unit.orElse(ALL); // Default: find all diet history
@@ -154,6 +155,7 @@ public class DietService {
     private DietHistoryDetailsDto getDietHistoryDetails(DietHistory dietHistory) {
         DietHistoryDetailsDto dietHistoryDetailsDto = new DietHistoryDetailsDto();
         dietHistoryDetailsDto.setDietHistoryId(dietHistory.getDietHistoryId());
+        dietHistoryDetailsDto.setDietTypeId(dietHistory.getDietType().getDietTypeId());
         dietHistoryDetailsDto.setDietTypeName(dietHistory.getDietType().getDietTypeName());
         dietHistoryDetailsDto.setWeight(dietHistory.getWeight());
         dietHistoryDetailsDto.setUnit(dietHistory.getUnit()); // default: gram
@@ -181,5 +183,65 @@ public class DietService {
             }
         }
         return dietHistoryDetailsDto;
+    }
+
+    @Transactional
+    public void updateDietHistory(Integer recordId, DietRecordDto dietRecordDto) {
+        // Check and get the old record
+        Optional<DietHistory> dietHistory = dietHistoryRepo.findByDietHistoryId(recordId);
+        if (dietHistory.isEmpty()) {
+            throw new BadRequestException("Invalid recordId.");
+        }
+        // Check and get the user
+        Optional<DBUser> user = dbUserRepo.findByUserId(dietRecordDto.getUserId());
+        if (user.isEmpty()) {
+            throw new BadRequestException("User not found with provided user id.");
+        }
+        if (!dietHistory.get().getUser().getUser_id().equals(user.get().getUser_id())) {
+            throw new BadRequestException("You can't update other user's diet record.");
+        }
+
+        // Check if need to update diet type
+        DietType dietType = dietHistory.get().getDietType();
+        if (dietType.getDietTypeId() != dietRecordDto.getDietTypeId()
+                && !dietType.getDietTypeName().equals(dietRecordDto.getDietTypeName())) {
+            // Update diet type for this record
+            // Check if the new diet type exists
+            Optional<DietType> newDietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());
+            if (newDietType.isEmpty()) {
+                // add new diet type to diet_type table
+                addDietType(dietRecordDto.getDietTypeId(), dietRecordDto.getDietTypeName());
+                // add 4 nutrients' info to diet_nutrient_mapping table
+                addAllNutrientsInfoToDietNutrientMapping(dietRecordDto);
+            }
+            newDietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());
+            dietHistory.get().setDietType(newDietType.get());
+        }
+
+        // should also check weight and unit, but...
+        dietHistory.get().setWeight(dietRecordDto.getWeight());
+        dietHistory.get().setUnit(dietRecordDto.getUnit());
+        dietHistory.get().setUpdatedBy(user.get().getUsername());
+        dietHistory.get().setUpdatedTime(Utility.getStringOfCurrentDateTime());
+        dietHistoryRepo.save(dietHistory.get());
+    }
+
+    @Transactional
+    public void deleteDietHistory(Integer recordId, UserIdDto userIdDto) {
+        // Check and get the old record
+        Optional<DietHistory> dietHistory = dietHistoryRepo.findByDietHistoryId(recordId);
+        if (dietHistory.isEmpty()) {
+            throw new BadRequestException("Invalid recordId.");
+        }
+        // Check and get the user
+        Optional<DBUser> user = dbUserRepo.findByUserId(userIdDto.getUserId());
+        if (user.isEmpty()) {
+            throw new BadRequestException("User not found with provided user id.");
+        }
+        if (!dietHistory.get().getUser().getUser_id().equals(user.get().getUser_id())) {
+            throw new BadRequestException("You can't delete other user's diet record.");
+        }
+        // delete the diet record
+        dietHistoryRepo.delete(dietHistory.get());
     }
 }
