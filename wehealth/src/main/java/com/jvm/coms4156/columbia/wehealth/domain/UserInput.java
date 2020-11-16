@@ -12,9 +12,11 @@ public class UserInput {
   private String currentPassword;
   private String newPassword;
 
+  /*
   public UserInput(String username, String currentPassword, String newPassword) {
     this.username = username;
     this.currentPassword = currentPassword;
     this.newPassword = newPassword;
   }
+  */
 }
