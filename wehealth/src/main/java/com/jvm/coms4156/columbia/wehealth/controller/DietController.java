@@ -18,7 +18,7 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 
 @RestController
 @Log4j2
-public class DietController {
+public class DietController extends BaseController {
     @Autowired
     private DietService dietService;
 
@@ -26,14 +26,16 @@ public class DietController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addDietRecord(@RequestBody DietRecordDto dietRecordDto) {
         log.info("New Diet Record: {}", dietRecordDto.toString());
+        //AuthenticatedUser user = au();
         dietService.addDietRecordToDB(dietRecordDto);
+
         log.info("Successfully added a new diet record.");
         return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
     }
 
     @GetMapping(path = "/diet/records", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DietHistoryResponseDto> getDietRecords(
+    public ResponseEntity<DietHistoryResponseDto> getDietRecords (
             @RequestParam Optional<String> unit,
             @RequestParam Optional<Integer> length,
             @RequestBody UserIdDto userIdDto) {
@@ -48,6 +50,7 @@ public class DietController {
                                                    @RequestBody DietRecordDto dietRecordDto) {
         log.info("Updating diet record {}", recordId);
         dietService.updateDietHistory(recordId, dietRecordDto);
+        log.info("Successfully updated diet record {}", recordId);
         return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
     }
 
@@ -57,8 +60,8 @@ public class DietController {
                                                    @RequestBody UserIdDto userIdDto) {
         log.info("Deleting diet record {}", recordId);
         dietService.deleteDietHistory(recordId, userIdDto);
+        log.info("Successfully deleted diet record {}", recordId);
         return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
     }
-
 
 }

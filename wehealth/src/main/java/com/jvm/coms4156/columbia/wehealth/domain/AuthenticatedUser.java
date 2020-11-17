@@ -18,6 +18,14 @@ import java.util.List;
 public class AuthenticatedUser extends UsernamePasswordAuthenticationToken{
   private long userId;
   private int userType;
+  private String username;
+
+  public AuthenticatedUser(long userId, int userType, String username) {
+    super(null, buildGrantedAuthority(userType));
+    this.username = username;
+    this.userId = userId;
+    this.userType = userType;
+  }
 
   public AuthenticatedUser(long userId, int userType) {
     super(null, buildGrantedAuthority(userType));

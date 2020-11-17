@@ -3,6 +3,7 @@ package com.jvm.coms4156.columbia.wehealth.entity;
 import java.util.UUID;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.criteria.CriteriaBuilder;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -10,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.jvm.coms4156.columbia.wehealth.utility.Utility;
+
 @Entity( name = "user")
 @NoArgsConstructor
 @Data
@@ -21,7 +24,7 @@ public class DBUser {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id", unique = true)
-  private Long user_id;
+  private Long userId;
 
   @Column(name = "username", nullable = false, unique = true)
   private String username;
@@ -35,7 +38,7 @@ public class DBUser {
   @Column(name = "salt", nullable = false)
   private String salt;
 
-  @Column(name = "lookup_token", nullable = false)
+  @Column(name = "lookup_token")
   private String lookup_token;
 
   @Column(name = "created_time", nullable = false)
@@ -44,10 +47,10 @@ public class DBUser {
   @Column(name = "updated_time")
   private String updateTime;
 
-  public DBUser( String username,  String lookup_token) {
+  public DBUser(String username,  String lookup_token) {
     this.username = username;
     this.lookup_token = lookup_token;
-    createdTime = com.jvm.coms4156.columbia.wehealth.Utility.Utility.getStringOfCurrentDateTime();
+    this.createdTime = Utility.getStringOfCurrentDateTime();
   }
 
   public void setPassword(String clearTextPassword) {

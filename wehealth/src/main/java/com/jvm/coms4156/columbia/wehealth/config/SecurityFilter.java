@@ -1,7 +1,7 @@
 package com.jvm.coms4156.columbia.wehealth.config;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
 import com.jvm.coms4156.columbia.wehealth.service.JwtService;
 import java.io.IOException;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
     if (token != null) {
       try {
         user = decodeAndRefreshJwt(resp, token);
-      } catch (BadAuthExecption e) {
+      } catch (BadAuthException e) {
         log.error("Auth token is invalid");
       }
     }
@@ -57,7 +57,7 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
     }
   }
 
-  private AuthenticatedUser decodeAndRefreshJwt(HttpServletResponse resp, String token) throws AuthenticationException , BadAuthExecption{
+  private AuthenticatedUser decodeAndRefreshJwt(HttpServletResponse resp, String token) throws AuthenticationException , BadAuthException {
     AuthenticatedUser user = jwtService.verify(token);
     SecurityContextHolder.getContext().setAuthentication(user);
 

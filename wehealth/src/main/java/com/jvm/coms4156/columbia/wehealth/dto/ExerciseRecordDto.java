@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserIdDto {
+public class ExerciseRecordDto {
     private Long userId;
+    private String exerciseTypeName;
+    private Double duration;
 }

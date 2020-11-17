@@ -9,12 +9,12 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class DietHistoryResponseDto {
+public class ExerciseHistoryResponseDto {
 
-    private List<DietHistoryDetailsDto> dietHistoryList;
+    private List<ExerciseHistoryDetailsDto> exerciseHistoryList;
 
-    public DietHistoryResponseDto() {
-        this.dietHistoryList = new ArrayList<>();
+    public ExerciseHistoryResponseDto() {
+        this.exerciseHistoryList = new ArrayList<>();
     }
 
 }

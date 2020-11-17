@@ -9,6 +9,7 @@ public class Constants {
   public static final String DEVELOPER = "developer";
   public static final String GRAM = "gram";
   public static final String POUND = "pound";
+  public static final int UNIT = 100;
   public static final int PROTEIN = 203;
   public static final int FAT = 204;
   public static final int CARBS = 205;
