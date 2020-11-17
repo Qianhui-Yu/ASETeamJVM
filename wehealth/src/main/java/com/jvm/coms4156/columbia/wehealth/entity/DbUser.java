@@ -46,6 +46,12 @@ public class DbUser implements Serializable {
   @Column(name = "updated_time")
   private String updateTime;
 
+  /**
+   * DbUser constructor.
+
+   * @param username String
+   * @param lookupToken String
+   */
   public DbUser(String username, String lookupToken) {
     this.username = username;
     this.lookupToken = lookupToken;
