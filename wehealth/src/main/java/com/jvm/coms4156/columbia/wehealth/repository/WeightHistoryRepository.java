@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface WeightHistoryRepository extends JpaRepository<WeightHistory, Integer> {
     List<WeightHistory> findAllByUser(DBUser user);
     List<WeightHistory> findAllByUserAndCreatedTimeAfter(DBUser user, String startDateTime);
-    Optional<WeightHistory> findByWeightHistoryId(String weightHistoryId);
+    Optional<WeightHistory> findByWeightHistoryId(Integer weightHistoryId);
 }

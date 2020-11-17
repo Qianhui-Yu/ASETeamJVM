@@ -45,7 +45,7 @@ public class WeightController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> editWeightRecord(
-            @PathVariable String weightId,
+            @PathVariable Integer weightId,
             @RequestBody WeightRecordDto weightRecordDto) {
         log.info("Edit Weight Record ID: {}. Result Record: {}", weightId, weightRecordDto.toString());
         weightService.editWeightRecord(weightId, weightRecordDto);
@@ -57,7 +57,7 @@ public class WeightController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteWeightRecord(
-            @PathVariable String weightId,
+            @PathVariable Integer weightId,
             @RequestBody UserIdDto userIdDto) {
         log.info("Delete Weight Record ID: {}.", weightId);
         weightService.deleteWeightRecord(weightId, userIdDto);

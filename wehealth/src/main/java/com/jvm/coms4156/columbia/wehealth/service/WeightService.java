@@ -108,7 +108,7 @@ public class WeightService {
     }
 
     @Transactional
-    public void editWeightRecord(String weightId, WeightRecordDto weightRecordDto) {
+    public void editWeightRecord(Integer weightId, WeightRecordDto weightRecordDto) {
         Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
         if(weightHistory.isEmpty()) {
             throw new NotFoundException("Weight record not found with provided weight record id.");
@@ -127,7 +127,7 @@ public class WeightService {
     }
 
     @Transactional
-    public void deleteWeightRecord(String weightId, UserIdDto userIdDto) {
+    public void deleteWeightRecord(Integer weightId, UserIdDto userIdDto) {
         Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
         if(weightHistory.isEmpty()) {
             throw new NotFoundException("Weight record not found with provided weight record id.");

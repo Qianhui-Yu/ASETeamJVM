@@ -157,76 +157,76 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordInvalidWeightIdTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
                 .thenReturn(invalidHistoryId());
         Assertions.assertThrows(NotFoundException.class, () -> {
-            weightService.editWeightRecord("1", new WeightRecordDto());
+            weightService.editWeightRecord(1, new WeightRecordDto());
         });
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordNotBelongedTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
                 .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         dbUser.setUserId((long) 2);
         WeightRecordDto weightRecordDto = new WeightRecordDto();
         weightRecordDto.setUserId(dbUser.getUserId());
         Assertions.assertThrows(BadRequestException.class, () -> {
-            weightService.editWeightRecord("1", weightRecordDto);
+            weightService.editWeightRecord(1, weightRecordDto);
         });
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
                 .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         WeightRecordDto weightRecordDto = new WeightRecordDto(dbUser.getUserId(),
                 60000.0,
                 Constants.GRAM);
-        weightService.editWeightRecord("1", weightRecordDto);
+        weightService.editWeightRecord(1, weightRecordDto);
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordInvalidWeightIdTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
                 .thenReturn(invalidHistoryId());
         DBUser dbUser = getValidUser();
         dbUser.setUserId((long) 2);
         UserIdDto userIdDto = new UserIdDto();
         userIdDto.setUserId(dbUser.getUserId());
         Assertions.assertThrows(NotFoundException.class, () -> {
-            weightService.deleteWeightRecord("1", userIdDto);
+            weightService.deleteWeightRecord(1, userIdDto);
         });
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordNotBelongedTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
                 .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         dbUser.setUserId((long) 2);
         UserIdDto userIdDto = new UserIdDto();
         userIdDto.setUserId(dbUser.getUserId());
         Assertions.assertThrows(BadRequestException.class, () -> {
-            weightService.deleteWeightRecord("1", userIdDto);
+            weightService.deleteWeightRecord(1, userIdDto);
         });
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
                 .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         UserIdDto userIdDto = new UserIdDto();
         userIdDto.setUserId(dbUser.getUserId());
-        weightService.deleteWeightRecord("1", userIdDto);
+        weightService.deleteWeightRecord(1, userIdDto);
     }
 
 
