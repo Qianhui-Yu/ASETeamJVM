@@ -1,20 +1,31 @@
 package com.jvm.coms4156.columbia.wehealth.service;
 
-import static com.jvm.coms4156.columbia.wehealth.common.Constants.*;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.CALORIES;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.CARBS;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.FAT;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.PROTEIN;
 import static org.mockito.Mockito.when;
 
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
-import com.jvm.coms4156.columbia.wehealth.entity.*;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import com.jvm.coms4156.columbia.wehealth.entity.DietHistory;
+import com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping;
+import com.jvm.coms4156.columbia.wehealth.entity.DietType;
+import com.jvm.coms4156.columbia.wehealth.entity.NutrientType;
 import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
-import com.jvm.coms4156.columbia.wehealth.repository.*;
+import com.jvm.coms4156.columbia.wehealth.repository.DbUserRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietHistoryRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietNutrientMappingRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietTypeRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.NutrientTypeRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
