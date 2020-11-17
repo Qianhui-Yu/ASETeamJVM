@@ -7,12 +7,11 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 
 /**
@@ -24,7 +23,8 @@ public class JwtService {
   private final String secret;
   private final long expiration;
 
-  public JwtService(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") int expiration){
+  public JwtService(@Value("${jwt.secret}") String secret,
+                    @Value("${jwt.expiration}") int expiration) {
     this.secret = secret;
     this.expiration = expiration;
   }
@@ -33,7 +33,7 @@ public class JwtService {
     return System.currentTimeMillis() + (expiration * 60L * 1000L);
   }
 
-  public String generate( Long id, int userType, long exp) {
+  public String generate(Long id, int userType, long exp) {
     return JWT.create()
         .withClaim("userId", id)
         .withClaim("userType", userType)
@@ -46,7 +46,8 @@ public class JwtService {
       DecodedJWT jwt = JWT.require(Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8)))
           .build()
           .verify(token);
-      return new AuthenticatedUser(jwt.getClaim("userId").asLong(), jwt.getClaim("userType").asInt());
+      return new AuthenticatedUser(jwt.getClaim("userId").asLong(),
+              jwt.getClaim("userType").asInt());
     } catch (TokenExpiredException e) {
       log.error("Expired token");
       throw new BadAuthException();

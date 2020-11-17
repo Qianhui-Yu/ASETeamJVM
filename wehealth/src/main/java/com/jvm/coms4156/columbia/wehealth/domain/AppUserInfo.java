@@ -1,6 +1,6 @@
 package com.jvm.coms4156.columbia.wehealth.domain;
 
-import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AppUserInfo {
-  private long user_id;
+  private long userId;
   private String username;
-  private int user_type;
+  private int userType;
   private String lookupToken;
 
-  public AppUserInfo(DBUser user) {
+  public AppUserInfo(DbUser user) {
 
-    this(user.getUserId(), user.getUsername(), user.getUser_type(), user.getLookup_token());
+    this(user.getUserId(), user.getUsername(), user.getUserType(), user.getLookupToken());
   }
 }

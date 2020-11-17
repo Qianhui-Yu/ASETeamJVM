@@ -28,7 +28,9 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
   }
 
   @Override
-  public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+  public void doFilter(ServletRequest servletRequest,
+                       ServletResponse servletResponse,
+                       FilterChain filterChain) throws IOException, ServletException {
     HttpServletRequest req = (HttpServletRequest) servletRequest;
     HttpServletResponse resp = (HttpServletResponse) servletResponse;
 
@@ -47,21 +49,27 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
     try {
       filterChain.doFilter(servletRequest, servletResponse);
       resp.addHeader("X-XSS-Protection", "1");
-      log.info(String.format("Request %s %s %s %d ", remoteAddress, req.getRequestURI(), user == null ? "Anonymous" : user.getName(), resp.getStatus()));
+      log.info(String.format("Request %s %s %s %d", remoteAddress, req.getRequestURI(),
+              user == null ? "Anonymous" : user.getName(), resp.getStatus()));
     } catch (ServletException | IOException e) {
-      log.error(String.format("Request %s %s %s %d ", remoteAddress, req.getRequestURI(), user == null ? "Anonymous" : user.getName(), resp.getStatus(), e.toString()), e);
+      log.error(String.format("Request %s %s %s %d %s", remoteAddress, req.getRequestURI(),
+              user == null ? "Anonymous" : user.getName(), resp.getStatus(), e.toString()), e);
       throw e;
     } catch (Throwable t) {
-      log.error(String.format("Request %s %s %s %d ", remoteAddress, req.getRequestURI(), user == null ? "Anonymous" : user.getName(), resp.getStatus(), t.toString()), t);
+      log.error(String.format("Request %s %s %s %d %s", remoteAddress, req.getRequestURI(),
+              user == null ? "Anonymous" : user.getName(), resp.getStatus(), t.toString()), t);
       throw new ServletException(t);
     }
   }
 
-  private AuthenticatedUser decodeAndRefreshJwt(HttpServletResponse resp, String token) throws AuthenticationException , BadAuthException {
+  private AuthenticatedUser decodeAndRefreshJwt(HttpServletResponse resp,
+                                                String token)
+          throws AuthenticationException, BadAuthException {
     AuthenticatedUser user = jwtService.verify(token);
     SecurityContextHolder.getContext().setAuthentication(user);
 
-    Cookie cookie = new Cookie("authToken", jwtService.generate( user.getUserId(), user.getUserType(), jwtService.getExpiration()));
+    Cookie cookie = new Cookie("authToken", jwtService.generate(user.getUserId(),
+            user.getUserType(), jwtService.getExpiration()));
     cookie.setPath("/");
     cookie.setHttpOnly(true);
     resp.addCookie(cookie);
@@ -75,7 +83,8 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
       token = header.replace("Bearer ", "");
     }
     if (token == null && req.getCookies() != null) {
-      token = Arrays.stream(req.getCookies()).filter(c -> "authToken".equals(c.getName())).map(Cookie::getValue).findFirst().orElse(null);
+      token = Arrays.stream(req.getCookies()).filter(c -> "authToken".equals(c.getName()))
+              .map(Cookie::getValue).findFirst().orElse(null);
     }
     return token;
   }

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExerciseRecordDto {
-    private Long userId;
-    private String exerciseTypeName;
-    private Double duration;
+  private Long userId;
+  private String exerciseTypeName;
+  private Double duration;
 }

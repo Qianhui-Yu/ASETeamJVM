@@ -1,22 +1,21 @@
 package com.jvm.coms4156.columbia.wehealth.entity;
 
+import com.jvm.coms4156.columbia.wehealth.utility.Utility;
+import java.io.Serializable;
 import java.util.UUID;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.criteria.CriteriaBuilder;
-import lombok.Data;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.jvm.coms4156.columbia.wehealth.utility.Utility;
 
-@Entity( name = "user")
+@Entity(name = "user")
 @NoArgsConstructor
 @Data
-public class DBUser {
+public class DbUser implements Serializable {
 
   public static final int ADMIN = 1;
   public static final int USER = 0;
@@ -30,16 +29,16 @@ public class DBUser {
   private String username;
 
   @Column(name = "user_type", nullable = false)
-  private int user_type;
+  private int userType;
 
   @Column(name = "password_hash", nullable = false)
-  private String password_hash;
+  private String passwordHash;
 
   @Column(name = "salt", nullable = false)
   private String salt;
 
   @Column(name = "lookup_token")
-  private String lookup_token;
+  private String lookupToken;
 
   @Column(name = "created_time", nullable = false)
   private String createdTime;
@@ -47,15 +46,15 @@ public class DBUser {
   @Column(name = "updated_time")
   private String updateTime;
 
-  public DBUser(String username,  String lookup_token) {
+  public DbUser(String username, String lookupToken) {
     this.username = username;
-    this.lookup_token = lookup_token;
+    this.lookupToken = lookupToken;
     this.createdTime = Utility.getStringOfCurrentDateTime();
   }
 
   public void setPassword(String clearTextPassword) {
     salt = UUID.randomUUID().toString();
-    password_hash = new BCryptPasswordEncoder().encode(salt + "&&" + clearTextPassword);
+    passwordHash = new BCryptPasswordEncoder().encode(salt + "&&" + clearTextPassword);
   }
 
 }

@@ -1,6 +1,5 @@
 package com.jvm.coms4156.columbia.wehealth.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

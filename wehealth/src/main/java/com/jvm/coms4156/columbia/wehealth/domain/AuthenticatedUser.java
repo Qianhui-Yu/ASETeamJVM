@@ -1,21 +1,21 @@
 package com.jvm.coms4156.columbia.wehealth.domain;
 
 
-import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import lombok.Data;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by Ethan on 11/04/2020.
  */
 @Data
-public class AuthenticatedUser extends UsernamePasswordAuthenticationToken{
+public class AuthenticatedUser extends UsernamePasswordAuthenticationToken {
   private long userId;
   private int userType;
   private String username;
@@ -41,7 +41,7 @@ public class AuthenticatedUser extends UsernamePasswordAuthenticationToken{
   private static Collection<? extends GrantedAuthority> buildGrantedAuthority(int userType) {
     List<GrantedAuthority> out = new ArrayList<>();
     out.add(new SimpleGrantedAuthority("ROLE_USER"));
-    if (userType == DBUser.ADMIN) {
+    if (userType == DbUser.ADMIN) {
       out.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
     return out;

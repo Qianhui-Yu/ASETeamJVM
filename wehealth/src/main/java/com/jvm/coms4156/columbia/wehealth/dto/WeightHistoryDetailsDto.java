@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeightHistoryDetailsDto {
-    private Integer weightHistoryId;
-    private Double weight;
-    private String unit;
-    private String time;
+  private Integer weightHistoryId;
+  private Double weight;
+  private String unit;
+  private String time;
 }
