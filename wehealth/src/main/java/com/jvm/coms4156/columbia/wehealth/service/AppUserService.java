@@ -53,7 +53,7 @@ public class AppUserService {
    * Log in user and refresh jwt.
    *
    * @param user DbUser
-   * @return
+   * @return Response for login objcet
    */
   private LoginResponse logUserIn(DbUser user) {
     long exp = jwtService.getExpiration();
@@ -112,7 +112,7 @@ public class AppUserService {
    * @param password String
    * @param username String
    * @param userType int
-   * @return
+   * @return Created user
    */
   public DbUser saveUser(String lookupToken, String password, String username, int userType) {
     DbUser user = new DbUser(username, lookupToken);
