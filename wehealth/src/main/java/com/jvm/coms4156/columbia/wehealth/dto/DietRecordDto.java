@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DietRecordDto {
-    private Integer userId;
+    private Long userId;
     //private String time;
     private Integer dietTypeId;
     private String dietTypeName;

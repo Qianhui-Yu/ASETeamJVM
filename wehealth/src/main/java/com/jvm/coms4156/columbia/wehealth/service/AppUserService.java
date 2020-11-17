@@ -49,7 +49,7 @@ public class AppUserService {
 
   private LoginResponse logUserIn(DBUser user) {
     long exp = jwtService.getExpiration();
-    String token = jwtService.generate(user.getUser_id(), user.getUser_type(), exp);
+    String token = jwtService.generate(user.getUserId(), user.getUser_type(), exp);
 
     return new LoginResponse(new AppUserInfo(user), token, exp);
   }

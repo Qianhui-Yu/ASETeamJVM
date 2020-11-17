@@ -33,9 +33,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     http.cors().and().csrf().disable()
         .authorizeRequests()
         .antMatchers(HttpMethod.POST, "/api/appUser/**").permitAll()
+        .antMatchers(HttpMethod.GET,  "/diet/**").permitAll()
+        .antMatchers(HttpMethod.PUT,  "/diet/**").permitAll()
+        .antMatchers(HttpMethod.POST,  "/diet/**").permitAll()
+        .antMatchers(HttpMethod.DELETE,  "/diet/**").permitAll()
         .anyRequest().fullyAuthenticated()
         .and()
-        .addFilter(new SecurityFilter(jwtService))
+        //.addFilter(new SecurityFilter(jwtService))
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     ;
   }

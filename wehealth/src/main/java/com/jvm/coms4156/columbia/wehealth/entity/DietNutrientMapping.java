@@ -10,11 +10,13 @@ import java.time.ZonedDateTime;
 @Data
 public class DietNutrientMapping {
     @Id
+    @Column(name = "diet_nutrient_mapping_id")
+    private int dietNutrientMappingId;
+
     @JoinColumn(name = "diet_type_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private DietType dietType;
 
-    @Id
     @JoinColumn(name = "nutrient_type_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private NutrientType nutrientType;

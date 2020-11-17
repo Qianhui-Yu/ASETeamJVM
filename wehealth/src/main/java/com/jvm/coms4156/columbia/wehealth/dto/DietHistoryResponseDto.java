@@ -4,13 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
 public class DietHistoryResponseDto {
 
     private List<DietHistoryDetailsDto> dietHistoryList;
+
+    public DietHistoryResponseDto() {
+        this.dietHistoryList = new ArrayList<>();
+    }
 
 }

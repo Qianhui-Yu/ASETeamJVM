@@ -17,6 +17,6 @@ public class AppUserInfo {
   private int user_type;
 
   public AppUserInfo(DBUser user) {
-    this(user.getUser_id(), user.getUsername(), user.getUser_type());
+    this(user.getUserId(), user.getUsername(), user.getUser_type());
   }
 }

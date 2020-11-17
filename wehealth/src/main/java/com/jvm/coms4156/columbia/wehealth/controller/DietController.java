@@ -1,5 +1,6 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
@@ -26,6 +27,7 @@ public class DietController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addDietRecord(@RequestBody DietRecordDto dietRecordDto) {
         log.info("New Diet Record: {}", dietRecordDto.toString());
+        //AuthenticatedUser user = au();
         dietService.addDietRecordToDB(dietRecordDto);
         log.info("Successfully added a new diet record.");
         return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
@@ -48,6 +50,7 @@ public class DietController {
                                                    @RequestBody DietRecordDto dietRecordDto) {
         log.info("Updating diet record {}", recordId);
         dietService.updateDietHistory(recordId, dietRecordDto);
+        log.info("Successfully updated diet record {}", recordId);
         return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
     }
 
@@ -57,6 +60,7 @@ public class DietController {
                                                    @RequestBody UserIdDto userIdDto) {
         log.info("Deleting diet record {}", recordId);
         dietService.deleteDietHistory(recordId, userIdDto);
+        log.info("Successfully deleted diet record {}", recordId);
         return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
     }
 
