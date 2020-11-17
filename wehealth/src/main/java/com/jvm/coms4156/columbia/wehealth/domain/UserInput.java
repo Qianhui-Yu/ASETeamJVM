@@ -10,6 +10,13 @@ public class UserInput {
   private String currentPassword;
   private String newPassword;
 
+  /**
+   * User input construtor.
+   *
+   *  @param username String
+   * @param currentPassword String
+   * @param newPassword String
+   */
   public UserInput(String username, String currentPassword, String newPassword) {
     this.username = username;
     this.currentPassword = currentPassword;
