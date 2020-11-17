@@ -10,6 +10,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Utility {
+  /**
+   * Convert a date to string of format "yyyy-MM-dd HH:mm:ss".
+   *
+   * @param date The date to convert.
+   * @return String containing the formatted date.
+   */
   public static String getStringFromDate(Date date) {
     String pattern = "yyyy-MM-dd HH:mm:ss";
     SimpleDateFormat df = new SimpleDateFormat(pattern);
@@ -21,6 +27,13 @@ public class Utility {
     return getStringFromDate(currentDate);
   }
 
+  /**
+   * Calculate the date that is equal to (current time - timeUnit * timeLength).
+   *
+   * @param timeUnit Unit for time. One of {YEAR, WEEK, MONTH}.
+   * @param timeLength Length of time.
+   * @return String describing the result date.
+   */
   public static String getStringOfStartDateTime(String timeUnit, int timeLength) {
     Date currentDate = new Date();
     Calendar targetDateTime = Calendar.getInstance();
