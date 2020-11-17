@@ -38,6 +38,14 @@ public class ExerciseService {
   @Autowired
   private ExerciseTypeRepository exerciseTypeRepo;
 
+  /**
+   * Check if user with userId exists in the database and retrieve the user object.
+   * If requestUserId is not empty, also check if two userId are the same.
+   *
+   * @param userId userId.
+   * @param requestUserId the id to match with userId.
+   * @return user object retrieved from database.
+   */
   // TODO(Derek Jin): This function should be more suitable for the utility class
   public DbUser validateUser(Long userId, Optional<Long> requestUserId) {
     Optional<DbUser> user = dbUserRepo.findByUserId(userId);
@@ -50,10 +58,18 @@ public class ExerciseService {
     return user.get();
   }
 
+  /**
+   * Add one exercise record to database.
+   *
+   * @param exerciseRecordDto dto that contains the record information
+   */
   @Transactional
   public void addExerciseRecordToDb(ExerciseRecordDto exerciseRecordDto) {
     // add exercise record to exercise_history table
     ExerciseHistory exerciseHistory = new ExerciseHistory();
+    if (exerciseRecordDto.getDuration() <= 0) {
+      throw new BadRequestException("Exercise duration should be larger than zero");
+    }
     DbUser user = validateUser(exerciseRecordDto.getUserId(), Optional.empty());
     exerciseHistory.setUser(user);
 
@@ -74,6 +90,15 @@ public class ExerciseService {
     exerciseHistoryRepo.save(exerciseHistory);
   }
 
+  /**
+   * Get exercise history from database.
+   *
+   * @param userIdDto dto containing requester user's information.
+   * @param unit Unit of time for specific period of history.
+   *             If ALL or empty, retrieve all history.
+   * @param length Length of time to retriev, Ignored if unit is ALL.
+   * @return response dto containing the list of all record for that user in the time period
+   */
   public ExerciseHistoryResponseDto getExerciseHistory(UserIdDto userIdDto,
                                                        Optional<String> unit,
                                                        Optional<Integer> length) {
@@ -117,6 +142,12 @@ public class ExerciseService {
     return exerciseHistoryDetailsDto;
   }
 
+  /**
+   * Edit one exercise record in the database.
+   *
+   * @param recordId the id of the record to be edited.
+   * @param exerciseRecordDto the content of the result to edit to.
+   */
   @Transactional
   public void editExerciseRecordAtDb(Optional<Integer> recordId,
                                      ExerciseRecordDto exerciseRecordDto) {
@@ -124,6 +155,9 @@ public class ExerciseService {
     Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo
             .findByExerciseHistoryId(exerciseRecordId);
     exerciseHistory.map(record -> {
+      if (exerciseRecordDto.getDuration() <= 0) {
+        throw new BadRequestException("Exercise duration should be larger than zero");
+      }
       Optional<ExerciseType> exerciseType = exerciseTypeRepo
               .findByExerciseTypeName(exerciseRecordDto.getExerciseTypeName());
       if (exerciseType.isEmpty()) {
@@ -140,6 +174,12 @@ public class ExerciseService {
     }).orElseThrow(() -> new MissingDataException("Exercise record not found with provided id"));
   }
 
+  /**
+   * delete one exercise record from database.
+   *
+   * @param recordId the id of the record to be deleted.
+   * @param userIdDto dto containing the user id that made this request.
+   */
   @Transactional
   public void deleteExerciseRecordInDb(Optional<Integer> recordId, UserIdDto userIdDto) {
     Integer exerciseRecordId = recordId.orElse(-1);

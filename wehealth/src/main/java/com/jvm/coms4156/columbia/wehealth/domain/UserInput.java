@@ -10,6 +10,13 @@ public class UserInput {
   private String currentPassword;
   private String newPassword;
 
+  /**
+   * Construct a UserInput object.
+   *
+   * @param username username.
+   * @param currentPassword user's current password. For new user it should be same as newPassword.
+   * @param newPassword new password to overwrite current password.
+   */
   public UserInput(String username, String currentPassword, String newPassword) {
     this.username = username;
     this.currentPassword = currentPassword;
