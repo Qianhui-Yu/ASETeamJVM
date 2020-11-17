@@ -4,6 +4,7 @@ import static org.mockito.Mockito.when;
 
 import com.jvm.coms4156.columbia.wehealth.common.Constants;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
+import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
 import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
 import com.jvm.coms4156.columbia.wehealth.entity.WeightHistory;
@@ -19,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.matchers.Null;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,11 +49,14 @@ public class WeHealthWeightServiceTests {
     }
 
     private Optional<DBUser> invalidUser() {
-        return Optional.ofNullable(null);
+        return Optional.empty();
     }
 
-    private List<WeightHistory> getHistories() {
-        List<WeightHistory> list = null;
+    private List<WeightHistory> getHistories(int num) {
+        List<WeightHistory> list = new ArrayList<WeightHistory>();
+        for(int i = 0; i < num; i++) {
+            list.add(new WeightHistory());
+        }
         return list;
     }
 
@@ -62,7 +68,7 @@ public class WeHealthWeightServiceTests {
     }
 
     private Optional<WeightHistory> invalidHistoryId() {
-        return Optional.ofNullable(null);
+        return Optional.empty();
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
@@ -101,8 +107,49 @@ public class WeHealthWeightServiceTests {
     }
 
     @Test
-    public void getWeightHistoryTest() {
+    public void getWeightHistoryInvalidUserTest() {
+        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(invalidUser());
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            weightService.addWeightRecordToDB(new WeightRecordDto());
+        });
+    }
 
+    @Test
+    public void getWeightHistoryInvalidTimeLengthTest() {
+        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
+        UserIdDto userIdDto = new UserIdDto();
+        DBUser dbUser = getValidUser();
+        userIdDto.setUserId(dbUser.getUser_id());
+        Assertions.assertThrows(BadRequestException.class, () -> {
+            weightService.getWeightHistory(userIdDto, Optional.of(Constants.ALL), Optional.of(-1));
+        });
+    }
+
+    @Test
+    public void getWeightHistoryTimeLengthAllTest() {
+        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
+        when(dbWeightHistoryRepoMock.findAllByUser(Mockito.any(DBUser.class)))
+                .thenReturn(getHistories(10));
+        UserIdDto userIdDto = new UserIdDto();
+        DBUser dbUser = getValidUser();
+        userIdDto.setUserId(dbUser.getUser_id());
+        WeightHistoryResponseDto weightHistoryResponseDto =
+                weightService.getWeightHistory(userIdDto, Optional.of(Constants.ALL), Optional.of(1));
+        Assertions.assertEquals(weightHistoryResponseDto.getWeightHistoryList().size(), 10);
+    }
+
+    @Test
+    public void getWeightHistoryTimeLengthNotAllTest() {
+        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
+        when(dbWeightHistoryRepoMock.findAllByUserAndCreatedTimeAfter(
+                Mockito.any(DBUser.class), Mockito.any(String.class)))
+                .thenReturn(getHistories(5));
+        UserIdDto userIdDto = new UserIdDto();
+        DBUser dbUser = getValidUser();
+        userIdDto.setUserId(dbUser.getUser_id());
+        WeightHistoryResponseDto weightHistoryResponseDto =
+                weightService.getWeightHistory(userIdDto, Optional.of(Constants.WEEK), Optional.of(1));
+        Assertions.assertEquals(weightHistoryResponseDto.getWeightHistoryList().size(), 5);
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
