@@ -165,18 +165,24 @@ public class DietService {
                 dietNutrientMappingRepo.findAllByDietTypeOrderByNutrientType(dietHistory.getDietType());
         log.info("**********Set this diet's 4 nutrients' total amount**********");
         for (DietNutrientMapping nutrient: nutrientsList) {
-            double totalAmount = dietHistory.getWeight() * nutrient.getValue();
+            double totalAmount = dietHistory.getWeight() / UNIT * nutrient.getValue();
+            log.info("nutrient: {}, unit amount: {}, total amount: {}",
+                nutrient.getNutrientType().getNutrientTypeName(), nutrient.getValue(), totalAmount);
             if (nutrient.getNutrientType().getNutrientTypeId() == PROTEIN) {
                 dietHistoryDetailsDto.setTotalProtein(totalAmount);
+                log.info("Set totalProtein.");
             }
             else if (nutrient.getNutrientType().getNutrientTypeId() == FAT) {
-                dietHistoryDetailsDto.setTotalProtein(totalAmount);
+                dietHistoryDetailsDto.setTotalFat(totalAmount);
+                log.info("Set totalFat.");
             }
             else if (nutrient.getNutrientType().getNutrientTypeId() == CARBS) {
                 dietHistoryDetailsDto.setTotalCarbs(totalAmount);
+                log.info("Set totalCarbs.");
             }
             else if (nutrient.getNutrientType().getNutrientTypeId() == CALORIES) {
                 dietHistoryDetailsDto.setTotalCalories(totalAmount);
+                log.info("Set totalCalories.");
             }
             else {
                 throw new BadRequestException("Invalid nutrient type.");
@@ -197,7 +203,7 @@ public class DietService {
         if (user.isEmpty()) {
             throw new BadRequestException("User not found with provided user id.");
         }
-        if (dietHistory.get().getUser().getUserId() != user.get().getUserId()) {
+        if (!dietHistory.get().getUser().getUserId().equals(user.get().getUserId())) {
             throw new BadRequestException("You can't update other user's diet record.");
         }
 
@@ -219,8 +225,16 @@ public class DietService {
         }
 
         // should also check weight and unit, but...
-        dietHistory.get().setWeight(dietRecordDto.getWeight());
-        dietHistory.get().setUnit(dietRecordDto.getUnit());
+        if (dietRecordDto.getUnit().equals(POUND)) {
+            dietHistory.get().setWeight(dietRecordDto.getWeight() * POUND_TO_GRAM);
+        }
+        else if (dietRecordDto.getUnit().equals(GRAM)) {
+            dietHistory.get().setWeight(dietRecordDto.getWeight());
+        }
+        else {
+            throw new BadRequestException("Illegal weight unit, please use gram or pound.");
+        }
+        //dietHistory.get().setUnit(dietRecordDto.getUnit());
         dietHistory.get().setUpdatedBy(user.get().getUsername());
         dietHistory.get().setUpdatedTime(Utility.getStringOfCurrentDateTime());
         dietHistoryRepo.save(dietHistory.get());
@@ -238,7 +252,7 @@ public class DietService {
         if (user.isEmpty()) {
             throw new BadRequestException("User not found with provided user id.");
         }
-        if (dietHistory.get().getUser().getUserId() != (user.get().getUserId())) {
+        if (!dietHistory.get().getUser().getUserId().equals(user.get().getUserId())) {
             throw new BadRequestException("You can't delete other user's diet record.");
         }
         // delete the diet record

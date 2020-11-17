@@ -28,7 +28,9 @@ public class DietController extends BaseController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> addDietRecord(@RequestBody DietRecordDto dietRecordDto) {
         log.info("New Diet Record: {}", dietRecordDto.toString());
-//        dietService.addDietRecordToDB(dietRecordDto);
+        //AuthenticatedUser user = au();
+        dietService.addDietRecordToDB(dietRecordDto);
+
         log.info("Successfully added a new diet record.");
         return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
     }
@@ -51,6 +53,7 @@ public class DietController extends BaseController {
                                                    @RequestBody DietRecordDto dietRecordDto) {
         log.info("Updating diet record {}", recordId);
         dietService.updateDietHistory(recordId, dietRecordDto);
+        log.info("Successfully updated diet record {}", recordId);
         return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
     }
 
@@ -60,6 +63,7 @@ public class DietController extends BaseController {
                                                    @RequestBody UserIdDto userIdDto) {
         log.info("Deleting diet record {}", recordId);
         dietService.deleteDietHistory(recordId, userIdDto);
+        log.info("Successfully deleted diet record {}", recordId);
         return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
     }
 

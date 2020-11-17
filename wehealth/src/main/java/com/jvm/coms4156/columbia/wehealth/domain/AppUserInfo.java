@@ -18,6 +18,7 @@ public class AppUserInfo {
   private String lookupToken;
 
   public AppUserInfo(DBUser user) {
+
     this(user.getUserId(), user.getUsername(), user.getUser_type(), user.getLookup_token());
   }
 }
