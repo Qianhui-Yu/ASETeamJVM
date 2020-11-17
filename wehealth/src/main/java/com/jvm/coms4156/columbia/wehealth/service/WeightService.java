@@ -106,13 +106,13 @@ public class WeightService {
 
     @Transactional
     public void editWeightRecord(String weightId, WeightRecordDto weightRecordDto) {
-        Optional<WeightHistory> weightHistory = weightHistoryRepo.findById(weightId);
+        Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
         if(weightHistory.isEmpty()) {
             throw new NotFoundException("Weight record not found with provided weight record id.");
         }
 
         WeightHistory weightHistoryRecord = weightHistory.get();
-        if(weightHistoryRecord.getUser().getUser_id() != weightRecordDto.getUserId()) {
+        if(weightHistoryRecord.getUser().getUserId() != weightRecordDto.getUserId()) {
             throw new BadRequestException("Illegal edit attempt: Record not belong to this user.");
         }
 
@@ -125,17 +125,17 @@ public class WeightService {
 
     @Transactional
     public void deleteWeightRecord(String weightId, UserIdDto userIdDto) {
-        Optional<WeightHistory> weightHistory = weightHistoryRepo.findById(weightId);
+        Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
         if(weightHistory.isEmpty()) {
             throw new NotFoundException("Weight record not found with provided weight record id.");
         }
 
         WeightHistory weightHistoryRecord = weightHistory.get();
-        if(weightHistoryRecord.getUser().getUser_id() != userIdDto.getUserId()) {
+        if(weightHistoryRecord.getUser().getUserId() != userIdDto.getUserId()) {
             throw new BadRequestException("Illegal delete attempt: Record not belong to this user.");
         }
 
-        weightHistoryRepo.deleteById(weightId);
+        weightHistoryRepo.delete(weightHistoryRecord);
     }
 
 }

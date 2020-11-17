@@ -39,7 +39,7 @@ public class WeHealthWeightServiceTests {
 
     private DBUser getValidUser() {
         DBUser dbUser = new DBUser("1", "1");
-        dbUser.setUser_id(1);
+        dbUser.setUserId((long) 1);
         return dbUser;
     }
 
@@ -74,7 +74,7 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void addWeightRecordToDBInvalidUserTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(invalidUser());
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(invalidUser());
         Assertions.assertThrows(NotFoundException.class, () -> {
             weightService.addWeightRecordToDB(new WeightRecordDto());
         });
@@ -83,8 +83,8 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void addWeightRecordToDBInvalidUnitTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
-        WeightRecordDto weightRecordDto = new WeightRecordDto(1, 60000.0, "unit");
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
+        WeightRecordDto weightRecordDto = new WeightRecordDto((long) 1, 60000.0, "unit");
         Assertions.assertThrows(BadRequestException.class, () -> {
             weightService.addWeightRecordToDB(weightRecordDto);
         });
@@ -93,22 +93,22 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void addWeightRecordToDBGramTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
-        WeightRecordDto weightRecordDto = new WeightRecordDto(1, 60000.0, Constants.GRAM);
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
+        WeightRecordDto weightRecordDto = new WeightRecordDto((long) 1, 60000.0, Constants.GRAM);
         weightService.addWeightRecordToDB(weightRecordDto);
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void addWeightRecordToDBPoundTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
-        WeightRecordDto weightRecordDto = new WeightRecordDto(1, 60000.0, Constants.POUND);
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
+        WeightRecordDto weightRecordDto = new WeightRecordDto((long) 1, 60000.0, Constants.POUND);
         weightService.addWeightRecordToDB(weightRecordDto);
     }
 
     @Test
     public void getWeightHistoryInvalidUserTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(invalidUser());
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(invalidUser());
         Assertions.assertThrows(NotFoundException.class, () -> {
             weightService.addWeightRecordToDB(new WeightRecordDto());
         });
@@ -116,10 +116,10 @@ public class WeHealthWeightServiceTests {
 
     @Test
     public void getWeightHistoryInvalidTimeLengthTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
         UserIdDto userIdDto = new UserIdDto();
         DBUser dbUser = getValidUser();
-        userIdDto.setUserId(dbUser.getUser_id());
+        userIdDto.setUserId(dbUser.getUserId());
         Assertions.assertThrows(BadRequestException.class, () -> {
             weightService.getWeightHistory(userIdDto, Optional.of(Constants.ALL), Optional.of(-1));
         });
@@ -127,12 +127,12 @@ public class WeHealthWeightServiceTests {
 
     @Test
     public void getWeightHistoryTimeLengthAllTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
         when(dbWeightHistoryRepoMock.findAllByUser(Mockito.any(DBUser.class)))
                 .thenReturn(getHistories(10));
         UserIdDto userIdDto = new UserIdDto();
         DBUser dbUser = getValidUser();
-        userIdDto.setUserId(dbUser.getUser_id());
+        userIdDto.setUserId(dbUser.getUserId());
         WeightHistoryResponseDto weightHistoryResponseDto =
                 weightService.getWeightHistory(userIdDto, Optional.of(Constants.ALL), Optional.of(1));
         Assertions.assertEquals(weightHistoryResponseDto.getWeightHistoryList().size(), 10);
@@ -140,13 +140,13 @@ public class WeHealthWeightServiceTests {
 
     @Test
     public void getWeightHistoryTimeLengthNotAllTest() {
-        when(dbUserRepoMock.findByUserId(Mockito.any(Integer.class))).thenReturn(validUser());
+        when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
         when(dbWeightHistoryRepoMock.findAllByUserAndCreatedTimeAfter(
                 Mockito.any(DBUser.class), Mockito.any(String.class)))
                 .thenReturn(getHistories(5));
         UserIdDto userIdDto = new UserIdDto();
         DBUser dbUser = getValidUser();
-        userIdDto.setUserId(dbUser.getUser_id());
+        userIdDto.setUserId(dbUser.getUserId());
         WeightHistoryResponseDto weightHistoryResponseDto =
                 weightService.getWeightHistory(userIdDto, Optional.of(Constants.WEEK), Optional.of(1));
         Assertions.assertEquals(weightHistoryResponseDto.getWeightHistoryList().size(), 5);
@@ -155,7 +155,7 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordInvalidWeightIdTest() {
-        when(dbWeightHistoryRepoMock.findById(Mockito.any(String.class))).thenReturn(invalidHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(invalidHistoryId());
         Assertions.assertThrows(NotFoundException.class, () -> {
             weightService.editWeightRecord("1", new WeightRecordDto());
         });
@@ -164,11 +164,11 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordNotBelongedTest() {
-        when(dbWeightHistoryRepoMock.findById(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
-        dbUser.setUser_id(2);
+        dbUser.setUserId((long) 2);
         WeightRecordDto weightRecordDto = new WeightRecordDto();
-        weightRecordDto.setUserId(dbUser.getUser_id());
+        weightRecordDto.setUserId(dbUser.getUserId());
         Assertions.assertThrows(BadRequestException.class, () -> {
             weightService.editWeightRecord("1", weightRecordDto);
         });
@@ -177,17 +177,17 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordTest() {
-        when(dbWeightHistoryRepoMock.findById(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         WeightRecordDto weightRecordDto = new WeightRecordDto();
-        weightRecordDto.setUserId(dbUser.getUser_id());
+        weightRecordDto.setUserId(dbUser.getUserId());
         weightService.editWeightRecord("1", weightRecordDto);
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordInvalidWeightIdTest() {
-        when(dbWeightHistoryRepoMock.findById(Mockito.any(String.class))).thenReturn(invalidHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(invalidHistoryId());
         Assertions.assertThrows(NotFoundException.class, () -> {
             weightService.editWeightRecord("1", new WeightRecordDto());
         });
@@ -196,11 +196,11 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordNotBelongedTest() {
-        when(dbWeightHistoryRepoMock.findById(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
-        dbUser.setUser_id(2);
+        dbUser.setUserId((long) 2);
         UserIdDto userIdDto = new UserIdDto();
-        userIdDto.setUserId(dbUser.getUser_id());
+        userIdDto.setUserId(dbUser.getUserId());
         Assertions.assertThrows(BadRequestException.class, () -> {
             weightService.deleteWeightRecord("1", userIdDto);
         });
@@ -209,10 +209,10 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordTest() {
-        when(dbWeightHistoryRepoMock.findById(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         UserIdDto userIdDto = new UserIdDto();
-        userIdDto.setUserId(dbUser.getUser_id());
+        userIdDto.setUserId(dbUser.getUserId());
         weightService.deleteWeightRecord("1", userIdDto);
     }
 
