@@ -2,27 +2,29 @@ package com.jvm.coms4156.columbia.wehealth.entity;
 
 import java.util.UUID;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.criteria.CriteriaBuilder;
 import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.jvm.coms4156.columbia.wehealth.utility.Utility;
 
-@Entity
-@Table(schema = "wehealth", name = "user")
+@Entity( name = "user")
+@NoArgsConstructor
 @Data
-public class DBUser implements Serializable{
+public class DBUser {
 
   public static final int ADMIN = 1;
   public static final int USER = 0;
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id", unique = true)
-  private Integer user_id;
+  private Long userId;
 
   @Column(name = "username", nullable = false, unique = true)
   private String username;
@@ -36,19 +38,19 @@ public class DBUser implements Serializable{
   @Column(name = "salt", nullable = false)
   private String salt;
 
-  @Column(name = "lookup_token", nullable = false)
+  @Column(name = "lookup_token")
   private String lookup_token;
 
   @Column(name = "created_time", nullable = false)
-  private long createdTime;
+  private String createdTime;
 
   @Column(name = "updated_time")
-  private Long updateTime;
+  private String updateTime;
 
-  public DBUser( String username,  String lookup_token) {
+  public DBUser(String username,  String lookup_token) {
     this.username = username;
     this.lookup_token = lookup_token;
-    createdTime = System.currentTimeMillis();
+    this.createdTime = Utility.getStringOfCurrentDateTime();
   }
 
   public void setPassword(String clearTextPassword) {

@@ -8,9 +8,11 @@ import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
 import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
 import com.jvm.coms4156.columbia.wehealth.entity.Field;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
+import com.sun.istack.NotNull;
 import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +46,7 @@ public class AppUserService {
 
   private LoginResponse logUserIn(DBUser user) {
     long exp = jwtService.getExpiration();
-    String token = jwtService.generate(user.getUser_id(), user.getUser_type(), exp);
+    String token = jwtService.generate(user.getUserId(), user.getUser_type(), exp);
 
     return new LoginResponse(new AppUserInfo(user), token, exp);
   }
@@ -68,14 +70,39 @@ public class AppUserService {
     }
 
     String lookupToken = UUID.randomUUID().toString();
-    user = new DBUser(in.getUsername(), "v:" + lookupToken);
-    user.setPassword(in.getNewPassword());
-    user.setUsername(in.getUsername());
+    user = saveUser(user, "v:" + lookupToken, in.getNewPassword(), in.getUsername(), 0);
     appUserDao.save(user);
 
     return new AppUserInfo(user);
   }
 
+  @Transactional
+  public DBUser saveUser(DBUser user, String lookupToken, String password, String username, int userType){
+    user = new DBUser(username, lookupToken);
+    user.setPassword(password);
+    user.setUsername(username);
+    user.setUser_type(userType);
+    return user;
+  }
+
+  @Transactional
+  public LoginResponse verifyUser(String lookupToken) throws NotFoundException {
+    DBUser user = appUserDao.findByLookupToken(lookupToken);
+    if (user == null) {
+      throw new NotFoundException("Unable to find user with this lookupToken");
+    }
+    user.setLookup_token(null);
+    appUserDao.save(user);
+
+    return logUserIn(user);
+  }
+
+  @NotNull
+  private AppUserInfo deleteUser(DBUser user) {
+    appUserDao.delete(user);
+
+    return new AppUserInfo(user);
+  }
 
 
   private boolean passwordNotmatch(DBUser u, String clearPassword) {
