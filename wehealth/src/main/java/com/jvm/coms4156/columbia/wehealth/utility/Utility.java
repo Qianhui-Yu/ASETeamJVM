@@ -1,4 +1,4 @@
-package com.jvm.coms4156.columbia.wehealth.Utility;
+package com.jvm.coms4156.columbia.wehealth.utility;
 
 import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
 

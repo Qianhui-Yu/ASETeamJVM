@@ -2,7 +2,7 @@ package com.jvm.coms4156.columbia.wehealth.service;
 
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.entity.*;
-import com.jvm.coms4156.columbia.wehealth.Utility.Utility;
+import com.jvm.coms4156.columbia.wehealth.utility.Utility;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
