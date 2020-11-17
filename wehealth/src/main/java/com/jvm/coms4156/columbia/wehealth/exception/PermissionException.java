@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ResponseStatus(code = HttpStatus.BAD_REQUEST)
 public class PermissionException extends Exception {
-  public PermissionException(String message) {
-    super(message);
-  }
+    public PermissionException(String message) {
+        super(message);
+    }
 }
