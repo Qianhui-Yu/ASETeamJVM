@@ -10,11 +10,13 @@ import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
 import com.jvm.coms4156.columbia.wehealth.service.AppUserService;
 import com.sun.istack.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 /**
@@ -27,7 +29,7 @@ public class UserController extends BaseController {
   private final AppUserService appUserService;
 
   @Autowired
-  public UserController(AppUserService appUserService){
+  public UserController(AppUserService appUserService) {
 
     this.appUserService = appUserService;
   }
@@ -45,7 +47,8 @@ public class UserController extends BaseController {
   }
 
   @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
-  public AppUserInfo register(@RequestBody UserInput in) throws DuplicateException, MissingDataException {
+  public AppUserInfo register(@RequestBody UserInput in)
+          throws DuplicateException, MissingDataException {
     System.out.println(in.getUsername());
     return appUserService.register(in);
   }
