@@ -1,12 +1,12 @@
-package com.jvm.coms4156.columbia.wehealth.Utility;
-import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
-import static com.jvm.coms4156.columbia.wehealth.common.Constants.*;
+package com.jvm.coms4156.columbia.wehealth.utility;
 
+import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.*;
 
 public class Utility {
   public static String getStringFromDate(Date date) {
