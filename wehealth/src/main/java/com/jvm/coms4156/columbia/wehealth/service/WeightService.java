@@ -115,7 +115,7 @@ public class WeightService {
         }
 
         WeightHistory weightHistoryRecord = weightHistory.get();
-        if(weightHistoryRecord.getUser().getUserId() != weightRecordDto.getUserId()) {
+        if(! weightHistoryRecord.getUser().getUserId().equals(weightRecordDto.getUserId())) {
             throw new BadRequestException("Illegal edit attempt: Record not belong to this user.");
         }
 
@@ -134,7 +134,7 @@ public class WeightService {
         }
 
         WeightHistory weightHistoryRecord = weightHistory.get();
-        if(weightHistoryRecord.getUser().getUserId() != userIdDto.getUserId()) {
+        if(! weightHistoryRecord.getUser().getUserId().equals(userIdDto.getUserId())) {
             throw new BadRequestException("Illegal delete attempt: Record not belong to this user.");
         }
 
