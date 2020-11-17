@@ -61,7 +61,7 @@ public class ExerciseService {
             throw new MissingDataException("Exercise type not found with provided name");
         }
         exerciseHistory.setExerciseType(exerciseType.get());
-
+        exerciseHistory.setDurationInMins(exerciseRecordDto.getDuration());
         String currentDateTime = Utility.getStringOfCurrentDateTime();
         exerciseHistory.setCreatedBy(user.getUsername());
         exerciseHistory.setCreatedTime(currentDateTime);
@@ -124,6 +124,7 @@ public class ExerciseService {
                 throw new MissingDataException("Exercise type not found with provided name");
             }
             record.setExerciseType(exerciseType.get());
+            record.setDurationInMins(exerciseRecordDto.getDuration());
             String currentDateTime = Utility.getStringOfCurrentDateTime();
             record.setUpdatedBy(user.getUsername());
             record.setUpdatedTime(currentDateTime);

@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 @Log4j2
-public class ExerciseController {
+public class ExerciseController extends BaseController {
     @Autowired
     private ExerciseService exerciseService;
 
