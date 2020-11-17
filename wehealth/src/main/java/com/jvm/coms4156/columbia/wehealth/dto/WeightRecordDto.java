@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WeightRecordDto {
-    private Long userId;
-    private Double weight;
-    private String unit;
+  private Long userId;
+  private Double weight;
+  private String unit;
 }

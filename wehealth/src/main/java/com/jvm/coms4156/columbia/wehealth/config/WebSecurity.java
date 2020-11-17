@@ -50,7 +50,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         .addFilter(new SecurityFilter(jwtService))
         .addFilter(new BasicAuthenticationFilter(authenticationManager) {
           @Override
-          protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+          protected void doFilterInternal(HttpServletRequest request,
+                                          HttpServletResponse response,
+                                          FilterChain chain) throws IOException, ServletException {
             chain.doFilter(request, response);
           }
         })

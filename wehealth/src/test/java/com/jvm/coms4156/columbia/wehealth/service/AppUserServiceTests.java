@@ -1,5 +1,9 @@
 package com.jvm.coms4156.columbia.wehealth.service;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import com.github.javafaker.Faker;
 import com.jvm.coms4156.columbia.wehealth.dao.AppUserDao;
 import com.jvm.coms4156.columbia.wehealth.domain.AppUserInfo;
@@ -10,17 +14,10 @@ import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-
-import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
 
 
 /**
@@ -28,7 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class AppUserServiceTest {
+public class AppUserServiceTests {
   @Autowired
   private JwtService jwtService;
 
@@ -46,7 +43,7 @@ public class AppUserServiceTest {
 
     AppUserInfo testUserInfo = appUserService.register(new UserInput(name, "123456", "123456"));
 
-    assertEquals(0, testUserInfo.getUser_type());
+    assertEquals(0, testUserInfo.getUserType());
     assertEquals(name, testUserInfo.getUsername());
 
     assertNotNull(testUserInfo.getLookupToken());

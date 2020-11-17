@@ -1,6 +1,5 @@
 package com.jvm.coms4156.columbia.wehealth.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +10,13 @@ public class UserInput {
   private String currentPassword;
   private String newPassword;
 
+  /**
+   * User input construtor.
+   *
+   *  @param username String
+   * @param currentPassword String
+   * @param newPassword String
+   */
   public UserInput(String username, String currentPassword, String newPassword) {
     this.username = username;
     this.currentPassword = currentPassword;

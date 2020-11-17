@@ -8,9 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExerciseHistoryDetailsDto {
-    private Integer exerciseHistoryId;
-    private String exerciseTypeName;
-    private Double duration;
-    private String time;
-    private Double totalCalories;
+  private Integer exerciseHistoryId;
+  private String exerciseTypeName;
+  private Double duration;
+  private String time;
+  private Double totalCalories;
 }

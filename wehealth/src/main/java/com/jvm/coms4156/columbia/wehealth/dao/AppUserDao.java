@@ -1,10 +1,10 @@
 package com.jvm.coms4156.columbia.wehealth.dao;
 
-import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
-import org.springframework.stereotype.Repository;
-
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import org.springframework.stereotype.Repository;
+
 
 /**
  * Created by emagi on 7/31/2019.
@@ -15,23 +15,26 @@ public class AppUserDao extends BaseDao {
   @PersistenceContext
   private EntityManager entityManager;
 
-  public DBUser findByUserId(Long id) {
-    return single(entityManager.createQuery("from user where user_id = :id", DBUser.class).setParameter("id", id));
+  public DbUser findByUserId(Long id) {
+    return single(entityManager.createQuery("from user where user_id = :id", DbUser.class)
+            .setParameter("id", id));
   }
 
-  public DBUser findByUsername(String username) {
-    return single(entityManager.createQuery("from user where username = :u", DBUser.class).setParameter("u", username));
+  public DbUser findByUsername(String username) {
+    return single(entityManager.createQuery("from user where username = :u", DbUser.class)
+            .setParameter("u", username));
   }
 
-  public DBUser findByLookupToken(String lookupToken) {
-    return single(entityManager.createQuery("from user where lookup_token = :lookupToken", DBUser.class).setParameter("lookupToken", lookupToken));
+  public DbUser findByLookupToken(String lookupToken) {
+    return single(entityManager.createQuery("from user where lookup_token = :lookupToken",
+            DbUser.class).setParameter("lookupToken", lookupToken));
   }
 
-  public void save(DBUser in) {
+  public void save(DbUser in) {
     entityManager.persist(in);
   }
 
-  public void delete(DBUser remove) {
+  public void delete(DbUser remove) {
     entityManager.remove(remove);
   }
 
