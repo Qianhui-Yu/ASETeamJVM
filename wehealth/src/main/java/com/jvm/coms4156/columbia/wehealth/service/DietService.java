@@ -58,6 +58,7 @@ public class DietService {
         dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());
         dietHistory.setDietType(dietType.get());
 
+
         // In diet_history table, the default unit of weight is gram
         dietHistory.setUnit(GRAM);
 
@@ -123,7 +124,7 @@ public class DietService {
                                                  Optional<String> unit, Optional<Integer> length) {
         Optional<DBUser> user = dbUserRepo.findByUserId(userIdDto.getUserId());
         if (user.isEmpty()) {
-            throw new NotFoundException("User not found with provided user id.");
+            throw new BadRequestException("User not found with provided user id.");
         }
 
         String timeUnit = unit.orElse(ALL); // Default: find all diet history
@@ -154,6 +155,7 @@ public class DietService {
     private DietHistoryDetailsDto getDietHistoryDetails(DietHistory dietHistory) {
         DietHistoryDetailsDto dietHistoryDetailsDto = new DietHistoryDetailsDto();
         dietHistoryDetailsDto.setDietHistoryId(dietHistory.getDietHistoryId());
+        dietHistoryDetailsDto.setDietTypeId(dietHistory.getDietType().getDietTypeId());
         dietHistoryDetailsDto.setDietTypeName(dietHistory.getDietType().getDietTypeName());
         dietHistoryDetailsDto.setWeight(dietHistory.getWeight());
         dietHistoryDetailsDto.setUnit(dietHistory.getUnit()); // default: gram
@@ -188,8 +190,6 @@ public class DietService {
         }
         return dietHistoryDetailsDto;
     }
-<<<<<<< HEAD
-=======
 
     @Transactional
     public void updateDietHistory(Integer recordId, DietRecordDto dietRecordDto) {
@@ -258,5 +258,4 @@ public class DietService {
         // delete the diet record
         dietHistoryRepo.delete(dietHistory.get());
     }
->>>>>>> origin/dev
 }

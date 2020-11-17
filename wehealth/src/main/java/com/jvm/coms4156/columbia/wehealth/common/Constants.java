@@ -2,6 +2,7 @@ package com.jvm.coms4156.columbia.wehealth.common;
 
 
 public class Constants {
+
   private Constants() {}
 
   public static final double POUND_TO_GRAM = 453.59;
@@ -19,4 +20,6 @@ public class Constants {
   public static final String YEAR = "year";
   public static final int ONE = 1;
 
+
 }
+
