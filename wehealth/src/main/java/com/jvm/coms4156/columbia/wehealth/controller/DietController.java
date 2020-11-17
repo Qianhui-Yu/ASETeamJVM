@@ -1,10 +1,8 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
-import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
-import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
 import com.jvm.coms4156.columbia.wehealth.service.DietService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +39,6 @@ public class DietController extends BaseController {
             @RequestParam Optional<String> unit,
             @RequestParam Optional<Integer> length,
             @RequestBody UserIdDto userIdDto) {
-
         log.info("Get diet history in duration: {} {}", length.orElse(ONE), unit.orElse(ALL));
         DietHistoryResponseDto dietHistoryResponseDto = dietService.getDietHistory(userIdDto, unit, length);
         return new ResponseEntity<>(dietHistoryResponseDto, HttpStatus.OK);
@@ -66,6 +63,5 @@ public class DietController extends BaseController {
         log.info("Successfully deleted diet record {}", recordId);
         return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
     }
-
 
 }
