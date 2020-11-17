@@ -1,6 +1,7 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AppUserInfo;
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginRequest;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
@@ -62,6 +63,7 @@ public class UserController extends BaseController {
     resp.addCookie(buildCookie(out.getToken()));
     return out;
   }
+
 
   @NotNull
   private Cookie buildCookie(String token) {

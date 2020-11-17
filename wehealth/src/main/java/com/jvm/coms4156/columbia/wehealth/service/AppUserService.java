@@ -8,6 +8,7 @@ import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
 import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
 import com.jvm.coms4156.columbia.wehealth.entity.Field;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
@@ -73,20 +74,26 @@ public class AppUserService {
     if (user != null) {
       throw new DuplicateException("There is user with this username already exists");
     }
-    System.out.println("11");
 
     String lookupToken = UUID.randomUUID().toString();
-    user = new DBUser(in.getUsername(), "v:" + lookupToken);
-    user.setPassword(in.getNewPassword());
-    user.setUsername(in.getUsername());
+    user = saveUser(user, "v:" + lookupToken, in.getNewPassword(), in.getUsername(), 0);
     appUserDao.save(user);
 
     return new AppUserInfo(user);
   }
 
   @Transactional
+  public DBUser saveUser(DBUser user, String lookupToken, String password, String username, int userType){
+    user = new DBUser(username, lookupToken);
+    user.setPassword(password);
+    user.setUsername(username);
+    user.setUser_type(userType);
+    return user;
+  }
+
+  @Transactional
   public LoginResponse verifyUser(String lookupToken) throws NotFoundException {
-    DBUser user = appUserDao.findByLookupToken("v:" + lookupToken);
+    DBUser user = appUserDao.findByLookupToken(lookupToken);
     if (user == null) {
       throw new NotFoundException("Unable to find user with this lookupToken");
     }
@@ -102,8 +109,6 @@ public class AppUserService {
 
     return new AppUserInfo(user);
   }
-
-
 
 
   private boolean passwordNotmatch(DBUser u, String clearPassword) {

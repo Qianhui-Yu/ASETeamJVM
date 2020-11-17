@@ -39,7 +39,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.DELETE,  "/diet/**").permitAll()
         .anyRequest().fullyAuthenticated()
         .and()
-        //.addFilter(new SecurityFilter(jwtService))
+        .addFilter(new SecurityFilter(jwtService))
+        .addFilter(new BasicAuthenticationFilter(authenticationManager) {
+          @Override
+          protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+            chain.doFilter(request, response);
+          }
+        })
         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     ;
   }

@@ -3,6 +3,7 @@ package com.jvm.coms4156.columbia.wehealth.entity;
 import java.util.UUID;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.criteria.CriteriaBuilder;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.jvm.coms4156.columbia.wehealth.utility.Utility;
+
 @Entity( name = "user")
 @NoArgsConstructor
 @Data
@@ -36,7 +38,7 @@ public class DBUser {
   @Column(name = "salt", nullable = false)
   private String salt;
 
-  @Column(name = "lookup_token", nullable = false)
+  @Column(name = "lookup_token")
   private String lookup_token;
 
   @Column(name = "created_time", nullable = false)

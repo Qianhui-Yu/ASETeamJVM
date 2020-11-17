@@ -10,9 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface DBUserRepository extends JpaRepository<DBUser, Integer> {
-
-  //@Query("SELECT * FROM USER where user_id = ?1")
   Optional<DBUser> findByUserId(Long userId);
-
-
 }
