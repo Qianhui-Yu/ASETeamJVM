@@ -28,6 +28,12 @@ public class DietController extends BaseController {
   @Autowired
   private DietService dietService;
 
+  /**
+   * Handler for adding diet records into the database.
+   *
+   * @param dietRecordDto Input diet record object. Refer to dto/DietRecordDto for details.
+   * @return Return 200 for success and 401 for unauthorized.
+   */
   @PostMapping(path = "/diet/records", consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> addDietRecord(@RequestBody DietRecordDto dietRecordDto) {
@@ -39,6 +45,15 @@ public class DietController extends BaseController {
     return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
   }
 
+  /**
+   * Hanlder for getting a diet record.
+   *
+   * @param unit Span unit. Can be among ["day", "week", "month", "year"].
+   * @param length Length of the given unit. Must be positive.
+   * @param userIdDto Input user ID object. Refer to dto/UserIdDto for details.
+   * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
+   *         unauthorized access.
+   */
   @GetMapping(path = "/diet/records", consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DietHistoryResponseDto> getDietRecords(
@@ -51,6 +66,14 @@ public class DietController extends BaseController {
     return new ResponseEntity<>(dietHistoryResponseDto, HttpStatus.OK);
   }
 
+  /**
+   * Handler for editing a diet record.
+   *
+   * @param recordId ID of the record to be edited.
+   * @param dietRecordDto Input desired diet record object. Refer to dto/DietRecordDto for details.
+   * @return Return 200 for success, 400 for bad request (invalid diet history ID), and 401 for
+   *         unauthorized access.
+   */
   @PutMapping(path = "/diet/records/{recordId}", consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> updateDietRecord(@PathVariable Integer recordId,
@@ -61,6 +84,14 @@ public class DietController extends BaseController {
     return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
   }
 
+  /**
+   * Hanlder for deleting a diet record.
+   *
+   * @param recordId ID of the record to be deleted.
+   * @param userIdDto Input user ID object. Refer to dto/UserIdDto for details.
+   * @return Return 200 for success, 400 for bad request (invalid diet history ID), and 401 for
+   *         unauthorized access.
+   */
   @DeleteMapping(path = "/diet/records/{recordId}", consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> deleteDietRecord(@PathVariable Integer recordId,

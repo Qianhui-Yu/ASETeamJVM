@@ -35,6 +35,11 @@ public class WeightService {
   @Autowired
   private WeightHistoryRepository weightHistoryRepo;
 
+  /**
+   * Add a weight record into the database.
+   *
+   * @param weightRecordDto Input weight record object. Refer to dto/WeightRecordDto for details.
+   */
   @Transactional
   public void addWeightRecordToDb(WeightRecordDto weightRecordDto) {
     // add weight record to weight_history table
@@ -66,6 +71,14 @@ public class WeightService {
 
   }
 
+  /**
+   * Get a all the weight records based on input criteria.
+   *
+   * @param userIdDto Input user ID. Refer to dto/UserIdDto for details.
+   * @param unit Unit of the span.
+   * @param length Number of units to date back from current date.
+   * @return Refer to dto/WeightHistoryResponseDto for details.
+   */
   public WeightHistoryResponseDto getWeightHistory(UserIdDto userIdDto,
                                                    Optional<String> unit,
                                                    Optional<Integer> length) {
@@ -101,6 +114,12 @@ public class WeightService {
     return weightHistoryResponseDto;
   }
 
+  /**
+   * Pack the weight record into return type.
+   *
+   * @param weightHistory Input record to be packed.
+   * @return Packed record for return. Refer to dto/WeightHistoryDetailsDto for details.
+   */
   private WeightHistoryDetailsDto getWeightHistoryDetails(WeightHistory weightHistory) {
     WeightHistoryDetailsDto weightHistoryDetailsDto = new WeightHistoryDetailsDto();
     weightHistoryDetailsDto.setWeightHistoryId(weightHistory.getWeightHistoryId());
@@ -110,6 +129,12 @@ public class WeightService {
     return weightHistoryDetailsDto;
   }
 
+  /**
+   * Edit a weight record.
+   *
+   * @param weightId ID of the weight record to be edited.
+   * @param weightRecordDto Target weight record after editing.
+   */
   @Transactional
   public void editWeightRecord(Integer weightId, WeightRecordDto weightRecordDto) {
     Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
@@ -129,6 +154,12 @@ public class WeightService {
     weightHistoryRepo.save(weightHistoryRecord);
   }
 
+  /**
+   * Delete a weight record.
+   *
+   * @param weightId ID of the weight record to be deleted.
+   * @param userIdDto Input user ID object.
+   */
   @Transactional
   public void deleteWeightRecord(Integer weightId, UserIdDto userIdDto) {
     Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
