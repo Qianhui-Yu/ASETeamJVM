@@ -64,12 +64,6 @@ public class UserController extends BaseController {
     return out;
   }
 
-  @PostMapping(value = "/refreshToken", consumes = "application/json", produces = "application/json")
-  public LoginResponse refreshJwt(HttpServletResponse resp) throws BadAuthExecption {
-    LoginResponse out = appUserService.refreshToken(au());
-    resp.addCookie(buildCookie(out.getToken()));
-    return out;
-  }
 
   @NotNull
   private Cookie buildCookie(String token) {

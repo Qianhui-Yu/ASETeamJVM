@@ -3,6 +3,7 @@ package com.jvm.coms4156.columbia.wehealth.entity;
 import java.util.UUID;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
+import javax.persistence.criteria.CriteriaBuilder;
 import lombok.Data;
 
 import javax.persistence.Column;
@@ -21,7 +22,7 @@ public class DBUser {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id", unique = true)
-  private Long user_id;
+  private Long userId;
 
   @Column(name = "username", nullable = false, unique = true)
   private String username;
@@ -35,7 +36,7 @@ public class DBUser {
   @Column(name = "salt", nullable = false)
   private String salt;
 
-  @Column(name = "lookup_token", nullable = false)
+  @Column(name = "lookup_token")
   private String lookup_token;
 
   @Column(name = "created_time", nullable = false)
