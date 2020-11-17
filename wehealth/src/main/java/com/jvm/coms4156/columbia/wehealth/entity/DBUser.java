@@ -22,7 +22,7 @@ public class DBUser implements Serializable{
   @Id
   @GeneratedValue
   @Column(name = "user_id", unique = true)
-  private Long user_id;
+  private Integer user_id;
 
   @Column(name = "username", nullable = false, unique = true)
   private String username;

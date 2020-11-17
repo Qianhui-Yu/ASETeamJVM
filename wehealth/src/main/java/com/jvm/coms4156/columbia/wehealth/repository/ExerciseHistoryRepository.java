@@ -12,6 +12,5 @@ import java.util.Optional;
 public interface ExerciseHistoryRepository extends JpaRepository<ExerciseHistory, Integer> {
     List<ExerciseHistory> findAllByUser(DBUser user);
     List<ExerciseHistory> findAllByUserAndCreatedTimeAfter(DBUser user, String startDateTime);
-    Optional<ExerciseHistory> FindByExerciseHistoryId(Integer exerciseHistoryId);
-    void deleteByExerciseHistoryId(Integer exerciseHistoryId);
+    Optional<ExerciseHistory> findByExerciseHistoryId(Integer exerciseHistoryId);
 }

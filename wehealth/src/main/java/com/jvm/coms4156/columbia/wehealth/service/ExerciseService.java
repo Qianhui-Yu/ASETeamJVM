@@ -113,31 +113,29 @@ public class ExerciseService {
     @Transactional
     public void editExerciseRecordAtDB(Optional<Integer> recordId, ExerciseRecordDto exerciseRecordDto) {
         Integer exerciseRecordId = recordId.orElse(-1);
-        Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo.FindByExerciseHistoryId(exerciseRecordId);
-        if (exerciseHistory.isPresent() == false) {
-            throw new MissingDataException("Exercise record not found with provided id");
-        }
-       exerciseHistory.map(record -> {
-            // TODO(Derek Jin): Wait for Ethan to change userId to Integer
-            DBUser user = validateUser(exerciseRecordDto.getUserId(), Optional.of((int) (long) exerciseHistory.get().getUser().getUser_id()));
+        Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo.findByExerciseHistoryId(exerciseRecordId);
+        exerciseHistory.map(record -> {
+            DBUser user = validateUser(exerciseRecordDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUser_id()));
             Optional<ExerciseType> exerciseType = exerciseTypeRepo.findByExerciseTypeName(exerciseRecordDto.getExerciseTypeName());
+            if (exerciseType.isEmpty()) {
+                throw new MissingDataException("Exercise type not found with provided name");
+            }
             record.setExerciseType(exerciseType.get());
             String currentDateTime = Utility.getStringOfCurrentDateTime();
             record.setUpdatedBy(user.getUsername());
             record.setUpdatedTime(currentDateTime);
             return exerciseHistoryRepo.save(record);
-        }).orElseThrow(() -> new MissingDataException("Exercise type not found with provided name"));
+        }).orElseThrow(() -> new MissingDataException("Exercise record not found with provided id"));
     }
 
     @Transactional
     public void deleteExerciseRecordInDB(Optional<Integer> recordId, UserIdDto userIdDto) {
         Integer exerciseRecordId = recordId.orElse(-1);
-        Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo.FindByExerciseHistoryId(exerciseRecordId);
+        Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo.findByExerciseHistoryId(exerciseRecordId);
         if (exerciseHistory.isPresent() == false) {
             throw new MissingDataException("Exercise record not found with provided id");
         }
-        // TODO(Derek Jin): Wait for Ethan to change userId to Integer
-        validateUser(userIdDto.getUserId(), Optional.of((int) (long) exerciseHistory.get().getUser().getUser_id()));
+        validateUser(userIdDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUser_id()));
         exerciseHistoryRepo.deleteById(exerciseRecordId);
     }
 }
