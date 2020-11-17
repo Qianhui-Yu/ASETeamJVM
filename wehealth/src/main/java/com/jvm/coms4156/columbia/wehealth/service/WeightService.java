@@ -30,9 +30,6 @@ public class WeightService {
     @Autowired
     private WeightHistoryRepository weightHistoryRepo;
 
-    @Autowired
-    private NutrientTypeRepository nutrientTypeRepo;
-
     @Transactional
     public void addWeightRecordToDB(WeightRecordDto weightRecordDto) {
         // add weight record to weight_history table
@@ -115,7 +112,7 @@ public class WeightService {
         }
 
         WeightHistory weightHistoryRecord = weightHistory.get();
-        if(! weightHistoryRecord.getUser().getUser_id().equals(weightRecordDto.getUserId())) {
+        if(weightHistoryRecord.getUser().getUser_id() != weightRecordDto.getUserId()) {
             throw new BadRequestException("Illegal edit attempt: Record not belong to this user.");
         }
 
@@ -134,7 +131,7 @@ public class WeightService {
         }
 
         WeightHistory weightHistoryRecord = weightHistory.get();
-        if(! weightHistoryRecord.getUser().getUser_id().equals(userIdDto.getUserId())) {
+        if(weightHistoryRecord.getUser().getUser_id() != userIdDto.getUserId()) {
             throw new BadRequestException("Illegal delete attempt: Record not belong to this user.");
         }
 

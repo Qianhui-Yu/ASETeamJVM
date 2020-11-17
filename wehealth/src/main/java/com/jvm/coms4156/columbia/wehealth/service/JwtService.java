@@ -35,7 +35,7 @@ public class JwtService {
     return System.currentTimeMillis() + (expiration * 60L * 1000L);
   }
 
-  public String generate( Long id, int userType, long exp) {
+  public String generate( Integer id, int userType, long exp) {
     return JWT.create()
         .withClaim("userId", id)
         .withClaim("userType", userType)
