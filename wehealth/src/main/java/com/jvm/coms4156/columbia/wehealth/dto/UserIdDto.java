@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserIdDto {
-    private Integer userId;
+    private Long userId;
 }

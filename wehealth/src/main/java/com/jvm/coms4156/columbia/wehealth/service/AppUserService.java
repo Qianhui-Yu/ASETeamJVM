@@ -8,28 +8,34 @@ import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
 import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
 import com.jvm.coms4156.columbia.wehealth.entity.Field;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
+import com.sun.istack.NotNull;
 import javax.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+@Service
+@Slf4j
 public class AppUserService {
   private final JwtService jwtService;
   private final AppUserDao appUserDao;
+
   @Autowired
   public AppUserService(AppUserDao appUserDao, JwtService jwtService){
     this.appUserDao = appUserDao;
     this.jwtService = jwtService;
   }
 
-  @Transactional
   public LoginResponse login(LoginRequest in) {
     DBUser user = appUserDao.findByUsername(in.getUsername());
     if (user == null  || user.getLookup_token() == null ) {
@@ -44,7 +50,7 @@ public class AppUserService {
 
   private LoginResponse logUserIn(DBUser user) {
     long exp = jwtService.getExpiration();
-    String token = jwtService.generate(user.getUser_id(), user.getUser_type(), exp);
+    String token = jwtService.generate(user.getUserId(), user.getUser_type(), exp);
 
     return new LoginResponse(new AppUserInfo(user), token, exp);
   }
@@ -59,23 +65,50 @@ public class AppUserService {
 
   @Transactional
   public AppUserInfo register(UserInput in) throws DuplicateException, MissingDataException {
+
     if (StringUtils.isEmpty(in) || StringUtils.isEmpty(in.getUsername()) || StringUtils.isEmpty(in.getCurrentPassword()) ) {
       throw new MissingDataException("Missing username or password");
     }
     DBUser user = appUserDao.findByUsername(in.getUsername());
+
     if (user != null) {
       throw new DuplicateException("There is user with this username already exists");
     }
 
     String lookupToken = UUID.randomUUID().toString();
-    user = new DBUser(in.getUsername(), "v:" + lookupToken);
-    user.setPassword(in.getNewPassword());
-    user.setUsername(in.getUsername());
+    user = saveUser(user, "v:" + lookupToken, in.getNewPassword(), in.getUsername(), 0);
     appUserDao.save(user);
 
     return new AppUserInfo(user);
   }
 
+  @Transactional
+  public DBUser saveUser(DBUser user, String lookupToken, String password, String username, int userType){
+    user = new DBUser(username, lookupToken);
+    user.setPassword(password);
+    user.setUsername(username);
+    user.setUser_type(userType);
+    return user;
+  }
+
+  @Transactional
+  public LoginResponse verifyUser(String lookupToken) throws NotFoundException {
+    DBUser user = appUserDao.findByLookupToken(lookupToken);
+    if (user == null) {
+      throw new NotFoundException("Unable to find user with this lookupToken");
+    }
+    user.setLookup_token(null);
+    appUserDao.save(user);
+
+    return logUserIn(user);
+  }
+
+  @NotNull
+  private AppUserInfo deleteUser(DBUser user) {
+    appUserDao.delete(user);
+
+    return new AppUserInfo(user);
+  }
 
 
   private boolean passwordNotmatch(DBUser u, String clearPassword) {
