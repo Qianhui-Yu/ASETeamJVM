@@ -33,6 +33,14 @@ public class JwtService {
     return System.currentTimeMillis() + (expiration * 60L * 1000L);
   }
 
+  /**
+   * Generate jwt token.
+   *
+   * @param id Long
+   * @param userType int
+   * @param exp long
+   * @return String
+   */
   public String generate(Long id, int userType, long exp) {
     return JWT.create()
         .withClaim("userId", id)
@@ -41,6 +49,13 @@ public class JwtService {
         .sign(Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8)));
   }
 
+  /**
+   * Verify token.
+   *
+   * @param token String
+   * @return AuthticatedUser
+   * @throws BadAuthException Authentication Exception
+   */
   public AuthenticatedUser verify(String token) throws BadAuthException {
     try {
       DecodedJWT jwt = JWT.require(Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8)))

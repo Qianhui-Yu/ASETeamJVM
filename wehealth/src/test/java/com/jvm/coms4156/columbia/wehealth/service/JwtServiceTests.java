@@ -41,7 +41,7 @@ public class JwtServiceTests {
   public void generateTokenExpireTest() throws Exception {
     String token = jwtService.generate(10L, 0, System.currentTimeMillis() - 5000);
     AuthenticatedUser au = jwtService.verify(token);
-    assertEquals(10L, au.getUserId());
+    assertEquals(10L, (long)au.getUserId());
     assertEquals(0, au.getUserType());
   }
 

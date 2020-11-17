@@ -31,6 +31,12 @@ public class AppUserService {
     this.jwtService = jwtService;
   }
 
+  /**
+   * Log user in.
+   *
+   * @param in LoginRequest
+   * @return LoginResponse
+   */
   public LoginResponse login(LoginRequest in) {
     DbUser user = appUserDao.findByUsername(in.getUsername());
     if (user == null  || user.getLookupToken() == null) {
@@ -43,6 +49,12 @@ public class AppUserService {
     return logUserIn(user);
   }
 
+  /**
+   * Log in user and refresh jwt.
+   *
+   * @param user DbUser
+   * @return Response for login objcet
+   */
   private LoginResponse logUserIn(DbUser user) {
     long exp = jwtService.getExpiration();
     String token = jwtService.generate(user.getUserId(), user.getUserType(), exp);
@@ -50,6 +62,13 @@ public class AppUserService {
     return new LoginResponse(new AppUserInfo(user), token, exp);
   }
 
+  /**
+   * Get user info from base controller.
+   *
+   * @param authUser AuthenticatedUser
+   * @return AppUserInfo
+   * @throws NotFoundException Not Found
+   */
   public AppUserInfo getAppUserInfo(AuthenticatedUser authUser) throws NotFoundException {
     DbUser user = appUserDao.findByUserId(authUser.getUserId());
     if (user == null) {
@@ -58,6 +77,14 @@ public class AppUserService {
     return new AppUserInfo(user);
   }
 
+  /**
+   * Register user with user input.
+   *
+   * @param in Input
+   * @return AppUserInfo
+   * @throws DuplicateException Duplicate exception
+   * @throws MissingDataException Missing one of the field
+   */
   @Transactional
   public AppUserInfo register(UserInput in) throws DuplicateException, MissingDataException {
 
@@ -78,6 +105,15 @@ public class AppUserService {
     return new AppUserInfo(user);
   }
 
+  /**
+   * Create a new DbUser.
+   *
+   * @param lookupToken String
+   * @param password String
+   * @param username String
+   * @param userType int
+   * @return Created user
+   */
   public DbUser saveUser(String lookupToken, String password, String username, int userType) {
     DbUser user = new DbUser(username, lookupToken);
     user.setPassword(password);
@@ -86,6 +122,13 @@ public class AppUserService {
     return user;
   }
 
+  /**
+   * Verify user base on lookup token.
+   *
+   *  @param lookupToken String
+   * @return LoginResponse
+   * @throws NotFoundException not found
+   */
   @Transactional
   public LoginResponse verifyUser(String lookupToken) throws NotFoundException {
     DbUser user = appUserDao.findByLookupToken(lookupToken);
@@ -98,6 +141,13 @@ public class AppUserService {
     return logUserIn(user);
   }
 
+  /**
+   * Delete a user.
+   *
+   * @param user DbUser
+   *
+   * @return AppUserInfo
+   */
   @NotNull
   private AppUserInfo deleteUser(DbUser user) {
     appUserDao.delete(user);
@@ -105,7 +155,13 @@ public class AppUserService {
     return new AppUserInfo(user);
   }
 
-
+  /**
+   * Check whether password not match.
+   *
+   * @param u DbUser
+   * @param clearPassword String
+   * @return boolean
+   */
   private boolean passwordNotMatch(DbUser u, String clearPassword) {
     return !new BCryptPasswordEncoder().matches(u.getSalt() + "&&"
             + clearPassword, u.getPasswordHash());
