@@ -14,17 +14,18 @@ import com.jvm.coms4156.columbia.wehealth.repository.DBUserRepository;
 import com.jvm.coms4156.columbia.wehealth.repository.WeightHistoryRepository;
 import com.jvm.coms4156.columbia.wehealth.service.WeightService;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.matchers.Null;
 import org.springframework.boot.test.context.SpringBootTest;
-
+import org.springframework.test.context.junit4.SpringRunner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest
 public class WeHealthWeightServiceTests {
 
@@ -109,8 +110,9 @@ public class WeHealthWeightServiceTests {
     @Test
     public void getWeightHistoryInvalidUserTest() {
         when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(invalidUser());
+        UserIdDto userIdDto = new UserIdDto();
         Assertions.assertThrows(NotFoundException.class, () -> {
-            weightService.addWeightRecordToDB(new WeightRecordDto());
+            weightService.getWeightHistory(userIdDto, Optional.of(Constants.ALL), Optional.of(1));
         });
     }
 
@@ -155,7 +157,8 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordInvalidWeightIdTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(invalidHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+                .thenReturn(invalidHistoryId());
         Assertions.assertThrows(NotFoundException.class, () -> {
             weightService.editWeightRecord("1", new WeightRecordDto());
         });
@@ -164,7 +167,8 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordNotBelongedTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+                .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         dbUser.setUserId((long) 2);
         WeightRecordDto weightRecordDto = new WeightRecordDto();
@@ -177,26 +181,34 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void editWeightRecordTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+                .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
-        WeightRecordDto weightRecordDto = new WeightRecordDto();
-        weightRecordDto.setUserId(dbUser.getUserId());
+        WeightRecordDto weightRecordDto = new WeightRecordDto(dbUser.getUserId(),
+                60000.0,
+                Constants.GRAM);
         weightService.editWeightRecord("1", weightRecordDto);
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordInvalidWeightIdTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(invalidHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+                .thenReturn(invalidHistoryId());
+        DBUser dbUser = getValidUser();
+        dbUser.setUserId((long) 2);
+        UserIdDto userIdDto = new UserIdDto();
+        userIdDto.setUserId(dbUser.getUserId());
         Assertions.assertThrows(NotFoundException.class, () -> {
-            weightService.editWeightRecord("1", new WeightRecordDto());
+            weightService.deleteWeightRecord("1", userIdDto);
         });
     }
 
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordNotBelongedTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+                .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         dbUser.setUserId((long) 2);
         UserIdDto userIdDto = new UserIdDto();
@@ -209,11 +221,13 @@ public class WeHealthWeightServiceTests {
     // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
     @Test
     public void deleteWeightRecordTest() {
-        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class))).thenReturn(validHistoryId());
+        when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(String.class)))
+                .thenReturn(validHistoryId());
         DBUser dbUser = getValidUser();
         UserIdDto userIdDto = new UserIdDto();
         userIdDto.setUserId(dbUser.getUserId());
         weightService.deleteWeightRecord("1", userIdDto);
     }
+
 
 }

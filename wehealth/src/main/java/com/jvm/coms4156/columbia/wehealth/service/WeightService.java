@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -87,6 +88,8 @@ public class WeightService {
             weightHistoryList = weightHistoryRepo.findAllByUserAndCreatedTimeAfter(user.get(), startDateTime);
         }
         WeightHistoryResponseDto weightHistoryResponseDto = new WeightHistoryResponseDto();
+        List<WeightHistoryDetailsDto> weightHistoryDetailsDtoList = new ArrayList<>();
+        weightHistoryResponseDto.setWeightHistoryList(weightHistoryDetailsDtoList);
         log.info("**********Add every weight history to responseDto**********");
         for (WeightHistory weightHistory: weightHistoryList) {
             WeightHistoryDetailsDto weightHistoryDetailsDto = getWeightHistoryDetails(weightHistory);
