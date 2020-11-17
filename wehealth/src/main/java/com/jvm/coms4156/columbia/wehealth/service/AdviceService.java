@@ -11,6 +11,7 @@ public class AdviceService {
 
     public AdviceDto getAdvice(UserIdDto userIdDto){
         AdviceDto adviceDto = new AdviceDto();
+        adviceDto.setCalorieAdvice("Hello");
         return adviceDto;
     }
 }

@@ -25,14 +25,11 @@ public class AdviceController extends BaseController {
     @Autowired
     private AdviceService adviceService;
 
-    @GetMapping(path = "/diet/records", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @GetMapping(path = "/advice", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DietHistoryResponseDto> getDietRecords (
-            @RequestParam Optional<String> unit,
-            @RequestParam Optional<Integer> length,
+    public ResponseEntity<AdviceDto> getDietRecords (
             @RequestBody UserIdDto userIdDto) {
-
-        log.info("Get diet history in duration: {} {}", length.orElse(ONE), unit.orElse(ALL));
+        log.info("Get adivce {}", userIdDto.toString());
         AdviceDto adviceDto = adviceService.getAdvice(userIdDto);
         return new ResponseEntity<>(adviceDto, HttpStatus.OK);
     }
