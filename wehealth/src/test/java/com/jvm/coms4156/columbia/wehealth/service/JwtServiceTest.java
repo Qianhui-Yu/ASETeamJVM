@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class JwtServiceTest {
     assertEquals(userType, au.getUserType());
   }
 
-  @Test(expected = BadAuthExecption.class)
+  @Test(expected = BadAuthException.class)
   public void generateTokenExpireTest() throws Exception {
     String token = jwtService.generate(10L, 0, System.currentTimeMillis() - 5000);
     AuthenticatedUser au = jwtService.verify(token);
