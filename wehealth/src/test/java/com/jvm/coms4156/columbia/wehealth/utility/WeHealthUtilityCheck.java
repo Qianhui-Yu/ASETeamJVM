@@ -1,10 +1,12 @@
-package com.jvm.coms4156.columbia.wehealth;
+package com.jvm.coms4156.columbia.wehealth.utility;
 
 import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import com.jvm.coms4156.columbia.wehealth.utility.Utility;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,8 +14,9 @@ import java.util.Date;
 
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.*;
 
+@RunWith(SpringRunner.class)
 @SpringBootTest
-public class WeHealthUtilityTests {
+public class WeHealthUtilityCheck {
     @Test
     public void getStringFromDateTest() {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

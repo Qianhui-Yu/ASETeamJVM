@@ -42,7 +42,7 @@ public class ExerciseService {
         if (user.isEmpty()) {
             throw new NotFoundException("User not found with provided user id.");
         }
-        if (!requestUserId.orElse(-1L).equals(userId)) {
+        if (requestUserId.isPresent() && !requestUserId.orElse(-1L).equals(userId)) {
             throw new BadAuthException();
         }
         return user.get();
@@ -114,6 +114,9 @@ public class ExerciseService {
     public void editExerciseRecordAtDB(Optional<Integer> recordId, ExerciseRecordDto exerciseRecordDto) {
         Integer exerciseRecordId = recordId.orElse(-1);
         Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo.findByExerciseHistoryId(exerciseRecordId);
+        if (exerciseHistory.isEmpty()) {
+            throw new MissingDataException("Exercise record not found with provided id");
+        }
         exerciseHistory.map(record -> {
             DBUser user = validateUser(exerciseRecordDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUserId()));
             Optional<ExerciseType> exerciseType = exerciseTypeRepo.findByExerciseTypeName(exerciseRecordDto.getExerciseTypeName());
