@@ -4,7 +4,6 @@ import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
 import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
 import com.jvm.coms4156.columbia.wehealth.exception.PermissionException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public class BaseController {

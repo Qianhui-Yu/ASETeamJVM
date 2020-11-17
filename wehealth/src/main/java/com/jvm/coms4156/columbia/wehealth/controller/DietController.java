@@ -1,10 +1,8 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
-import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
-import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
 import com.jvm.coms4156.columbia.wehealth.service.DietService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

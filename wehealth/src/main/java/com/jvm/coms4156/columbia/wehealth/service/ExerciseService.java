@@ -37,12 +37,12 @@ public class ExerciseService {
     private ExerciseTypeRepository exerciseTypeRepo;
 
     // TODO(Derek Jin): This function should be more suitable for the utility class
-    public DBUser validateUser(Integer userId, Optional<Integer> requestUserId) {
+    public DBUser validateUser(Long userId, Optional<Long> requestUserId) {
         Optional<DBUser> user = dbUserRepo.findByUserId(userId);
         if (user.isEmpty()) {
             throw new NotFoundException("User not found with provided user id.");
         }
-        if (!requestUserId.orElse(-1).equals(userId)) {
+        if (!requestUserId.orElse(-1L).equals(userId)) {
             throw new BadAuthException();
         }
         return user.get();
@@ -115,7 +115,7 @@ public class ExerciseService {
         Integer exerciseRecordId = recordId.orElse(-1);
         Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo.findByExerciseHistoryId(exerciseRecordId);
         exerciseHistory.map(record -> {
-            DBUser user = validateUser(exerciseRecordDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUser_id()));
+            DBUser user = validateUser(exerciseRecordDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUserId()));
             Optional<ExerciseType> exerciseType = exerciseTypeRepo.findByExerciseTypeName(exerciseRecordDto.getExerciseTypeName());
             if (exerciseType.isEmpty()) {
                 throw new MissingDataException("Exercise type not found with provided name");
@@ -135,7 +135,7 @@ public class ExerciseService {
         if (exerciseHistory.isPresent() == false) {
             throw new MissingDataException("Exercise record not found with provided id");
         }
-        validateUser(userIdDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUser_id()));
+        validateUser(userIdDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUserId()));
         exerciseHistoryRepo.deleteById(exerciseRecordId);
     }
 }
