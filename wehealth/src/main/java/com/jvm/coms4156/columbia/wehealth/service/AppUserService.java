@@ -11,30 +11,25 @@ import com.jvm.coms4156.columbia.wehealth.entity.Field;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
-import com.sun.istack.NotNull;
 import javax.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-@Service
-@Slf4j
 public class AppUserService {
   private final JwtService jwtService;
   private final AppUserDao appUserDao;
-
   @Autowired
   public AppUserService(AppUserDao appUserDao, JwtService jwtService){
     this.appUserDao = appUserDao;
     this.jwtService = jwtService;
   }
 
+  @Transactional
   public LoginResponse login(LoginRequest in) {
     DBUser user = appUserDao.findByUsername(in.getUsername());
     if (user == null  || user.getLookup_token() == null ) {
@@ -64,16 +59,13 @@ public class AppUserService {
 
   @Transactional
   public AppUserInfo register(UserInput in) throws DuplicateException, MissingDataException {
-
     if (StringUtils.isEmpty(in) || StringUtils.isEmpty(in.getUsername()) || StringUtils.isEmpty(in.getCurrentPassword()) ) {
       throw new MissingDataException("Missing username or password");
     }
     DBUser user = appUserDao.findByUsername(in.getUsername());
-
     if (user != null) {
       throw new DuplicateException("There is user with this username already exists");
     }
-    System.out.println("11");
 
     String lookupToken = UUID.randomUUID().toString();
     user = new DBUser(in.getUsername(), "v:" + lookupToken);
@@ -83,26 +75,6 @@ public class AppUserService {
 
     return new AppUserInfo(user);
   }
-
-  @Transactional
-  public LoginResponse verifyUser(String lookupToken) throws NotFoundException {
-    DBUser user = appUserDao.findByLookupToken("v:" + lookupToken);
-    if (user == null) {
-      throw new NotFoundException("Unable to find user with this lookupToken");
-    }
-    user.setLookup_token(null);
-    appUserDao.save(user);
-
-    return logUserIn(user);
-  }
-
-  @NotNull
-  private AppUserInfo deleteUser(DBUser user) {
-    appUserDao.delete(user);
-
-    return new AppUserInfo(user);
-  }
-
 
 
 

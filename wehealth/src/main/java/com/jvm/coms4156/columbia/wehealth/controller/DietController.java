@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
-import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
-import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
-
 @RestController
 @Log4j2
 public class DietController {
@@ -37,27 +34,8 @@ public class DietController {
             @RequestParam Optional<String> unit,
             @RequestParam Optional<Integer> length,
             @RequestBody UserIdDto userIdDto) {
-        log.info("Get diet history in duration: {} {}", length.orElse(ONE), unit.orElse(ALL));
         DietHistoryResponseDto dietHistoryResponseDto = dietService.getDietHistory(userIdDto, unit, length);
         return new ResponseEntity<>(dietHistoryResponseDto, HttpStatus.OK);
-    }
-
-    @PutMapping(path = "/diet/records/{recordId}", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updateDietRecord(@PathVariable Integer recordId,
-                                                   @RequestBody DietRecordDto dietRecordDto) {
-        log.info("Updating diet record {}", recordId);
-        dietService.updateDietHistory(recordId, dietRecordDto);
-        return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
-    }
-
-    @DeleteMapping(path = "/diet/records/{recordId}", consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> deleteDietRecord(@PathVariable Integer recordId,
-                                                   @RequestBody UserIdDto userIdDto) {
-        log.info("Deleting diet record {}", recordId);
-        dietService.deleteDietHistory(recordId, userIdDto);
-        return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
     }
 
 

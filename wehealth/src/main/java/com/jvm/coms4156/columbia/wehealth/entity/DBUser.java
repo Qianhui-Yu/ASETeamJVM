@@ -2,25 +2,25 @@ package com.jvm.coms4156.columbia.wehealth.entity;
 
 import java.util.UUID;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import lombok.NoArgsConstructor;
+import javax.persistence.Table;
+import java.io.Serializable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import com.jvm.coms4156.columbia.wehealth.Utility.Utility;
-@Entity( name = "user")
-@NoArgsConstructor
+
+@Entity
+@Table(schema = "wehealth", name = "user")
 @Data
-public class DBUser {
+public class DBUser implements Serializable{
 
   public static final int ADMIN = 1;
   public static final int USER = 0;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue
   @Column(name = "user_id", unique = true)
   private Long user_id;
 
@@ -40,15 +40,15 @@ public class DBUser {
   private String lookup_token;
 
   @Column(name = "created_time", nullable = false)
-  private String createdTime;
+  private long createdTime;
 
   @Column(name = "updated_time")
-  private String updateTime;
+  private Long updateTime;
 
   public DBUser( String username,  String lookup_token) {
     this.username = username;
     this.lookup_token = lookup_token;
-    createdTime = Utility.getStringOfCurrentDateTime();
+    createdTime = System.currentTimeMillis();
   }
 
   public void setPassword(String clearTextPassword) {
