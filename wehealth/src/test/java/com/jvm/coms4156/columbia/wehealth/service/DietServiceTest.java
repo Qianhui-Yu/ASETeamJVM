@@ -87,7 +87,7 @@ public class DietServiceTest {
 
   private List<DietHistory> validDietHistoryList(Long userId) {
     List<DietHistory> dietHistoryList = new ArrayList<>();
-    for (Integer i = 1; i < 10; ++i) {
+    for (Integer i = 1; i < 5; ++i) {
       dietHistoryList.add(validDietHistory(i, 1));
     }
     return dietHistoryList;
