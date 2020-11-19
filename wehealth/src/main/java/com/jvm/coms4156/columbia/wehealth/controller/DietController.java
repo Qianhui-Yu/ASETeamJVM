@@ -3,8 +3,6 @@ package com.jvm.coms4156.columbia.wehealth.controller;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 
-
-import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
@@ -51,7 +49,6 @@ public class DietController extends BaseController {
    *
    * @param unit Span unit. Can be among ["day", "week", "month", "year"].
    * @param length Length of the given unit. Must be positive.
-   * @param userIdDto Input user ID object. Refer to dto/UserIdDto for details.
    * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
    *         unauthorized access.
    */
@@ -59,8 +56,9 @@ public class DietController extends BaseController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DietHistoryResponseDto> getDietRecords(
           @RequestParam Optional<String> unit,
-          @RequestParam Optional<Integer> length ) {
-    log.info("Get diet history in duration: username {} {} {}",au().getUsername(), length.orElse(ONE), unit.orElse(ALL));
+          @RequestParam Optional<Integer> length) {
+    log.info("Get diet history in duration: username {} {} {}", au().getUsername(),
+            length.orElse(ONE), unit.orElse(ALL));
 
     DietHistoryResponseDto dietHistoryResponseDto = dietService.getDietHistory(
             au(), unit, length);

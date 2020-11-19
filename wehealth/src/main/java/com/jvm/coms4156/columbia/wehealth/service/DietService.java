@@ -13,7 +13,6 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND_TO_GRAM;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.PROTEIN;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.UNIT;
 
-
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
@@ -166,15 +165,14 @@ public class DietService {
     dietNutrientMappingRepo.save(dietNutrientMapping);
   }
 
-  public DietHistoryResponseDto getDietHistory(AuthenticatedUser au,
   /**
    * Get a list of diet history records based on input criterion.
    *
-   * @param userIdDto Input user ID record object. Refer to dto/UserIdDto for details.
    * @param unit Unit type of the span. Among ["day", "week", "month", "year"].
    * @param length Date the number units back.
    * @return Return a list of records. Refer to dto/DietHistoryResponseDto for details.
    */
+  public DietHistoryResponseDto getDietHistory(AuthenticatedUser au,
                                                Optional<String> unit, Optional<Integer> length) {
     Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {

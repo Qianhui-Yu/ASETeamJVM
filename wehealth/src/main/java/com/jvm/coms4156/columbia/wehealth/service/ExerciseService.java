@@ -3,10 +3,10 @@ package com.jvm.coms4156.columbia.wehealth.service;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseRecordDto;
-import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import com.jvm.coms4156.columbia.wehealth.entity.ExerciseHistory;
 import com.jvm.coms4156.columbia.wehealth.entity.ExerciseType;
@@ -43,10 +43,10 @@ public class ExerciseService {
    * If requestUserId is not empty, also check if two userId are the same.
    *
    * @param userId userId.
-   * @param requestUserId the id to match with userId.
    * @return user object retrieved from database.
    */
   // TODO(Derek Jin): This function should be more suitable for the utility class
+
   public DbUser validateUser(Long userId, Optional<Long> requestUserId) {
     Optional<DbUser> user = dbUserRepo.findByUserId(userId);
     if (user.isEmpty()) {
@@ -62,15 +62,16 @@ public class ExerciseService {
    * Add one exercise record to database.
    *
    * @param exerciseRecordDto dto that contains the record information
+   * @param au dto containing requester user's information.
    */
   @Transactional
-  public void addExerciseRecordToDb(ExerciseRecordDto exerciseRecordDto) {
+  public void addExerciseRecordToDb(ExerciseRecordDto exerciseRecordDto, AuthenticatedUser au) {
     // add exercise record to exercise_history table
     ExerciseHistory exerciseHistory = new ExerciseHistory();
     if (exerciseRecordDto.getDuration() <= 0) {
       throw new BadRequestException("Exercise duration should be larger than zero");
     }
-    DbUser user = validateUser(exerciseRecordDto.getUserId(), Optional.empty());
+    DbUser user = validateUser(au.getUserId(), Optional.empty());
     exerciseHistory.setUser(user);
 
     Optional<ExerciseType> exerciseType = exerciseTypeRepo
@@ -93,16 +94,16 @@ public class ExerciseService {
   /**
    * Get exercise history from database.
    *
-   * @param userIdDto dto containing requester user's information.
    * @param unit Unit of time for specific period of history.
    *             If ALL or empty, retrieve all history.
-   * @param length Length of time to retriev, Ignored if unit is ALL.
+   * @param length Length of time to retrieve, Ignored if unit is ALL.
+   * @param au dto containing requester user's information.
    * @return response dto containing the list of all record for that user in the time period
    */
-  public ExerciseHistoryResponseDto getExerciseHistory(UserIdDto userIdDto,
-                                                       Optional<String> unit,
-                                                       Optional<Integer> length) {
-    DbUser user = validateUser(userIdDto.getUserId(), Optional.empty());
+  public ExerciseHistoryResponseDto getExerciseHistory(Optional<String> unit,
+                                                       Optional<Integer> length,
+                                                       AuthenticatedUser au) {
+    DbUser user = validateUser(au.getUserId(), Optional.empty());
     String timeUnit = unit.orElse(ALL); // Default: find all exercise history
     int timeLength = length.orElse(ONE); // Default: 1 time unit e.g. 1 week, 1 month...
     if (timeLength < 0) {
@@ -147,10 +148,12 @@ public class ExerciseService {
    *
    * @param recordId the id of the record to be edited.
    * @param exerciseRecordDto the content of the result to edit to.
+   * @param au dto containing requester user's information.
    */
   @Transactional
   public void editExerciseRecordAtDb(Optional<Integer> recordId,
-                                     ExerciseRecordDto exerciseRecordDto) {
+                                     ExerciseRecordDto exerciseRecordDto,
+                                     AuthenticatedUser au) {
     Integer exerciseRecordId = recordId.orElse(-1);
     Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo
             .findByExerciseHistoryId(exerciseRecordId);
@@ -163,8 +166,7 @@ public class ExerciseService {
       if (exerciseType.isEmpty()) {
         throw new MissingDataException("Exercise type not found with provided name");
       }
-      DbUser user = validateUser(exerciseRecordDto.getUserId(),
-              Optional.of(exerciseHistory.get().getUser().getUserId()));
+      DbUser user = validateUser(au.getUserId(), Optional.of(record.getUser().getUserId()));
       record.setExerciseType(exerciseType.get());
       record.setDurationInMins(exerciseRecordDto.getDuration());
       record.setUpdatedBy(user.getUsername());
@@ -178,17 +180,18 @@ public class ExerciseService {
    * delete one exercise record from database.
    *
    * @param recordId the id of the record to be deleted.
-   * @param userIdDto dto containing the user id that made this request.
+   * @param au AuthenticatedUser the user that makes the request
    */
   @Transactional
-  public void deleteExerciseRecordInDb(Optional<Integer> recordId, UserIdDto userIdDto) {
+  public void deleteExerciseRecordInDb(Optional<Integer> recordId,
+                                       AuthenticatedUser au) {
     Integer exerciseRecordId = recordId.orElse(-1);
     Optional<ExerciseHistory> exerciseHistory = exerciseHistoryRepo
             .findByExerciseHistoryId(exerciseRecordId);
     if (exerciseHistory.isEmpty()) {
       throw new MissingDataException("Exercise record not found with provided id");
     }
-    validateUser(userIdDto.getUserId(), Optional.of(exerciseHistory.get().getUser().getUserId()));
+    validateUser(au.getUserId(), Optional.of(exerciseHistory.get().getUser().getUserId()));
     exerciseHistoryRepo.deleteById(exerciseRecordId);
   }
 }

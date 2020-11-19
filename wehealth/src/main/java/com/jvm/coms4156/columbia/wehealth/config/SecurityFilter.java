@@ -69,8 +69,8 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
     //AuthenticatedUser user = new AuthenticatedUser(10L , 0, "Test");
     SecurityContextHolder.getContext().setAuthentication(user);
 
-    Cookie cookie = new Cookie("authToken", jwtService.generate(user.getUsername(), user.getUserId(),
-            user.getUserType(), jwtService.getExpiration()));
+    Cookie cookie = new Cookie("authToken", jwtService.generate(user.getUsername(),
+            user.getUserId(), user.getUserType(), jwtService.getExpiration()));
     cookie.setPath("/");
     cookie.setHttpOnly(true);
     resp.addCookie(cookie);
