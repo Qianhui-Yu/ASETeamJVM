@@ -43,7 +43,6 @@ public class JwtServiceTests {
     String token = jwtService.generate("Test", 10L, 0, System.currentTimeMillis() - 5000);
     AuthenticatedUser au = jwtService.verify(token);
     assertEquals(String.valueOf(10L), String.valueOf(au.getUserId()));
-    assertEquals(0, au.getUserType());
   }
 
 }

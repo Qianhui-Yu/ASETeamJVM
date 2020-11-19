@@ -57,6 +57,11 @@ public class DietService {
   @Autowired
   private NutrientTypeRepository nutrientTypeRepo;
 
+  /**
+   * Backend logic for adding a diet record into the database.
+   *
+   * @param dietRecordDto Input diet record object. Refer to dto/DietRecordDto for details.
+   */
   @Transactional
   public void addDietRecordToDb(DietRecordDto dietRecordDto) {
     // add diet record to diet_history table
@@ -99,6 +104,12 @@ public class DietService {
 
   }
 
+  /**
+   * Add a new diet type into the database.
+   *
+   * @param dietTypeId ID of the diet type.
+   * @param dietTypeName Name of the diet type.
+   */
   public void addDietType(int dietTypeId, String dietTypeName) {
     String currentDateTime = Utility.getStringOfCurrentDateTime();
     DietType dietType = new DietType();
@@ -111,6 +122,11 @@ public class DietService {
     dietTypeRepo.save(dietType);
   }
 
+  /**
+   * Associate the four nutrition types to a diet type.
+   *
+   * @param dietRecordDto Input diet record object. Refer to dto/DietRecordDto for details.
+   */
   public void addAllNutrientsInfoToDietNutrientMapping(DietRecordDto dietRecordDto) {
     Optional<DietType> dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());
     if (dietType.isEmpty()) {
@@ -128,6 +144,14 @@ public class DietService {
             dietRecordDto.getCalories(), currentDateTime);
   }
 
+  /**
+   * Associate one nutrition to a diet type.
+   *
+   * @param dietType Input diet type.
+   * @param nutrientTypeId Input nutrietion type ID.
+   * @param value Input value of the nutrition per 100 gram.
+   * @param currentDateTime Input date and time.
+   */
   public void addOneNutrientInfoToDietNutrientMapping(DietType dietType, int nutrientTypeId,
                                                       double value,
                                                       String currentDateTime) {
@@ -143,6 +167,14 @@ public class DietService {
   }
 
   public DietHistoryResponseDto getDietHistory(AuthenticatedUser au,
+  /**
+   * Get a list of diet history records based on input criterion.
+   *
+   * @param userIdDto Input user ID record object. Refer to dto/UserIdDto for details.
+   * @param unit Unit type of the span. Among ["day", "week", "month", "year"].
+   * @param length Date the number units back.
+   * @return Return a list of records. Refer to dto/DietHistoryResponseDto for details.
+   */
                                                Optional<String> unit, Optional<Integer> length) {
     Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {
@@ -173,6 +205,12 @@ public class DietService {
     return dietHistoryResponseDto;
   }
 
+  /**
+   * Pack a diet history record into the return type DeitHisotryDetailsDto.
+   *
+   * @param dietHistory The record to be packed.
+   * @return Refer to dto/DietHistoryDetailsDto for details.
+   */
   private DietHistoryDetailsDto getDietHistoryDetails(DietHistory dietHistory) {
     DietHistoryDetailsDto dietHistoryDetailsDto = new DietHistoryDetailsDto();
     dietHistoryDetailsDto.setDietHistoryId(dietHistory.getDietHistoryId());
@@ -208,6 +246,12 @@ public class DietService {
     return dietHistoryDetailsDto;
   }
 
+  /**
+   * Edit a diet record in the database.
+   *
+   * @param recordId ID of the record to be edited.
+   * @param dietRecordDto Target record after editing. Refer to dto/DietRecordDto for details.
+   */
   @Transactional
   public void updateDietHistory(Integer recordId, DietRecordDto dietRecordDto) {
     // Check and get the old record
@@ -255,6 +299,12 @@ public class DietService {
     dietHistoryRepo.save(dietHistory.get());
   }
 
+  /**
+   * Delete a diet record from the database.
+   *
+   * @param recordId ID of the diet record to be deleted.
+   * @param userIdDto Input user ID object indicating which user performs this.
+   */
   @Transactional
   public void deleteDietHistory(Integer recordId, UserIdDto userIdDto) {
     // Check and get the old record

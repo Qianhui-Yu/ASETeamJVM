@@ -1,11 +1,9 @@
 package com.jvm.coms4156.columbia.wehealth.domain;
 
-
 import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import lombok.Data;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,7 +12,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 /**
  * Created by Ethan on 11/04/2020.
  */
-@Data
 public class AuthenticatedUser extends UsernamePasswordAuthenticationToken {
   private Long userId;
   private int userType;
@@ -55,6 +52,30 @@ public class AuthenticatedUser extends UsernamePasswordAuthenticationToken {
     super("Test User", "Test credential");
     this.userId = userId;
     this.username = "TestUsername";
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public long getUserId() {
+    return userId;
+  }
+
+  public void setUserId(long userId) {
+    this.userId = userId;
+  }
+
+  public int getUserType() {
+    return userType;
+  }
+
+  public void setUserType(int userType) {
+    this.userType = userType;
   }
 
   /**

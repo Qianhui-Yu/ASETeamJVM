@@ -25,6 +25,12 @@ public class WeightController {
   @Autowired
   private WeightService weightService;
 
+  /**
+   * Hanlder for adding a weight record into the database.
+   *
+   * @param weightRecordDto Input weight record object. Refer to dto/WeightRecordDto for details.
+   * @return Return 200 for success and 401 for unauthorized.
+   */
   @PostMapping(path = "/weight/records",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,6 +41,15 @@ public class WeightController {
     return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
   }
 
+  /**
+   * Handler for getting weight records based on input criteria.
+   *
+   * @param unit Unit of the time span. Among ["day", "week", "month", "year"]
+   * @param length Number of units to data back from current date.
+   * @param userIdDto Input user ID object.
+   * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
+   *         unauthorized access.
+   */
   @GetMapping(path = "/weight/records",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
@@ -47,6 +62,14 @@ public class WeightController {
     return new ResponseEntity<>(weightHistoryResponseDto, HttpStatus.OK);
   }
 
+  /**
+   * Hanlder for editing a weight record.
+   *
+   * @param weightId ID of the record to be edited.
+   * @param weightRecordDto Target weight record after editing.
+   * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
+   *         unauthorized access.
+   */
   @PutMapping(path = "/weight/records/{weightId}",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
@@ -59,6 +82,14 @@ public class WeightController {
     return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
   }
 
+  /**
+   * Hanlder for deleting a weight record from the database.
+   *
+   * @param weightId ID of the weight record to be deleted.
+   * @param userIdDto Input user id object.
+   * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
+   *         unauthorized access.
+   */
   @DeleteMapping(path = "weight/records/{weightId}",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
