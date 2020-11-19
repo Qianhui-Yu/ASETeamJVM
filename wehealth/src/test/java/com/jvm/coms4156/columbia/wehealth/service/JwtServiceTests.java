@@ -28,9 +28,10 @@ public class JwtServiceTests {
 
   @Test
   public void generateTokenTest() throws Exception {
+    String username = "Test";
     Long id = 10L;
     int userType = 0;
-    String token = jwtService.generate(id, userType, jwtService.getExpiration());
+    String token = jwtService.generate(username, id, userType, jwtService.getExpiration());
     AuthenticatedUser au = jwtService.verify(token);
 
     assertEquals(id.toString(), String.valueOf(au.getUserId()));
@@ -39,10 +40,9 @@ public class JwtServiceTests {
 
   @Test(expected = BadAuthException.class)
   public void generateTokenExpireTest() throws Exception {
-    String token = jwtService.generate(10L, 0, System.currentTimeMillis() - 5000);
+    String token = jwtService.generate("Test", 10L, 0, System.currentTimeMillis() - 5000);
     AuthenticatedUser au = jwtService.verify(token);
-    assertEquals(10L, (long)au.getUserId());
-    assertEquals(0, au.getUserType());
+    assertEquals(String.valueOf(10L), String.valueOf(au.getUserId()));
   }
 
 }

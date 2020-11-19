@@ -3,6 +3,8 @@ package com.jvm.coms4156.columbia.wehealth.controller;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 
+
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
@@ -38,7 +40,6 @@ public class DietController extends BaseController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> addDietRecord(@RequestBody DietRecordDto dietRecordDto) {
     log.info("New Diet Record: {}", dietRecordDto.toString());
-    //AuthenticatedUser user = au();
     dietService.addDietRecordToDb(dietRecordDto);
 
     log.info("Successfully added a new diet record.");
@@ -58,11 +59,11 @@ public class DietController extends BaseController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DietHistoryResponseDto> getDietRecords(
           @RequestParam Optional<String> unit,
-          @RequestParam Optional<Integer> length,
-          @RequestBody UserIdDto userIdDto) {
-    log.info("Get diet history in duration: {} {}", length.orElse(ONE), unit.orElse(ALL));
+          @RequestParam Optional<Integer> length ) {
+    log.info("Get diet history in duration: username {} {} {}",au().getUsername(), length.orElse(ONE), unit.orElse(ALL));
+
     DietHistoryResponseDto dietHistoryResponseDto = dietService.getDietHistory(
-            userIdDto, unit, length);
+            au(), unit, length);
     return new ResponseEntity<>(dietHistoryResponseDto, HttpStatus.OK);
   }
 

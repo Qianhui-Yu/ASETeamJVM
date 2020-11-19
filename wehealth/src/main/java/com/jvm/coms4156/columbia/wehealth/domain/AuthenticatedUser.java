@@ -25,7 +25,7 @@ public class AuthenticatedUser extends UsernamePasswordAuthenticationToken {
    * @param username String
    */
   public AuthenticatedUser(Long userId, int userType, String username) {
-    super(null, buildGrantedAuthority(userType));
+    super(username,null, buildGrantedAuthority(userType));
     this.username = username;
     this.userId = userId;
     this.userType = userType;
@@ -38,7 +38,7 @@ public class AuthenticatedUser extends UsernamePasswordAuthenticationToken {
    * @param userType int
    */
   public AuthenticatedUser(Long userId, int userType) {
-    super(null, buildGrantedAuthority(userType));
+    super("Test User", "Test credential");
     this.userId = userId;
     this.userType = userType;
   }
@@ -49,8 +49,9 @@ public class AuthenticatedUser extends UsernamePasswordAuthenticationToken {
    * @param userId Long
    */
   public AuthenticatedUser(Long userId) {
-    super("Test User", "Test Credentials");
+    super("Test User", "Test credential");
     this.userId = userId;
+    this.username = "TestUsername";
   }
 
   public String getUsername() {
@@ -86,7 +87,7 @@ public class AuthenticatedUser extends UsernamePasswordAuthenticationToken {
   private static Collection<? extends GrantedAuthority> buildGrantedAuthority(int userType) {
     List<GrantedAuthority> out = new ArrayList<>();
     out.add(new SimpleGrantedAuthority("ROLE_USER"));
-    if (userType == DbUser.ADMIN) {
+    if (userType == 1) {
       out.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
     }
     return out;
