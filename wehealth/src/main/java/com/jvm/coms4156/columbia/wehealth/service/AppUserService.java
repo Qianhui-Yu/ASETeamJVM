@@ -57,7 +57,8 @@ public class AppUserService {
    */
   private LoginResponse logUserIn(DbUser user) {
     long exp = jwtService.getExpiration();
-    String token = jwtService.generate(user.getUsername(), user.getUserId(), user.getUserType(), exp);
+    String token = jwtService.generate(user.getUsername(), user.getUserId(),
+            user.getUserType(), exp);
 
     return new LoginResponse(new AppUserInfo(user), token, exp);
   }
