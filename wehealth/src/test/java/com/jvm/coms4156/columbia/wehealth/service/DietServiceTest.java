@@ -6,6 +6,7 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.FAT;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.PROTEIN;
 import static org.mockito.Mockito.when;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
@@ -215,31 +216,31 @@ public class DietServiceTest {
             .findAllByDietTypeOrderByNutrientType(Mockito.any(DietType.class)))
             .thenReturn(validDietNutrientMappingList(1));
 
-    UserIdDto userIdDto = new UserIdDto(1L);
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     String unit = "all";
     Integer length = 1;
-    dietService.getDietHistory(userIdDto, Optional.of(unit), Optional.of(length));
+    dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));
   }
 
   @Test
   public void getDietHistoryInvalidTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());
-    UserIdDto userIdDto = new UserIdDto(1L);
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     String unit = "all";
     Integer length = 1;
     Assertions.assertThrows(BadRequestException.class, () -> {
-      dietService.getDietHistory(userIdDto, Optional.of(unit), Optional.of(length));
+      dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));
     });
   }
 
   @Test
   public void getDietHistoryInvalid2Test() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());
-    UserIdDto userIdDto = new UserIdDto(1L);
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     String unit = "all";
     Integer length = -1;
     Assertions.assertThrows(BadRequestException.class, () -> {
-      dietService.getDietHistory(userIdDto, Optional.of(unit), Optional.of(length));
+      dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));
     });
   }
 
