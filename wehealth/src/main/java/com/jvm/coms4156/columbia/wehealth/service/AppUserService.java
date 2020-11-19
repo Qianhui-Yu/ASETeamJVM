@@ -6,20 +6,15 @@ import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginRequest;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
-import com.jvm.coms4156.columbia.wehealth.entity.DBUser;
-import com.jvm.coms4156.columbia.wehealth.entity.Field;
-import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
 import com.sun.istack.NotNull;
+import java.util.UUID;
 import javax.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -31,87 +26,144 @@ public class AppUserService {
   private final AppUserDao appUserDao;
 
   @Autowired
-  public AppUserService(AppUserDao appUserDao, JwtService jwtService){
+  public AppUserService(AppUserDao appUserDao, JwtService jwtService) {
     this.appUserDao = appUserDao;
     this.jwtService = jwtService;
   }
 
+  /**
+   * Log user in.
+   *
+   * @param in LoginRequest
+   * @return LoginResponse
+   */
   public LoginResponse login(LoginRequest in) {
-    DBUser user = appUserDao.findByUsername(in.getUsername());
-    if (user == null  || user.getLookup_token() == null ) {
+    DbUser user = appUserDao.findByUsername(in.getUsername());
+    if (user == null  || user.getLookupToken() == null) {
       return null;
     }
-    if (passwordNotmatch(user, in.getPassword())) {
+    if (passwordNotMatch(user, in.getPassword())) {
       return null;
     }
 
     return logUserIn(user);
   }
 
-  private LoginResponse logUserIn(DBUser user) {
+  /**
+   * Log in user and refresh jwt.
+   *
+   * @param user DbUser
+   * @return Response for login objcet
+   */
+  private LoginResponse logUserIn(DbUser user) {
     long exp = jwtService.getExpiration();
-    String token = jwtService.generate(user.getUserId(), user.getUser_type(), exp);
+    String token = jwtService.generate(user.getUsername(), user.getUserId(), user.getUserType(), exp);
 
     return new LoginResponse(new AppUserInfo(user), token, exp);
   }
 
+  /**
+   * Get user info from base controller.
+   *
+   * @param authUser AuthenticatedUser
+   * @return AppUserInfo
+   * @throws NotFoundException Not Found
+   */
   public AppUserInfo getAppUserInfo(AuthenticatedUser authUser) throws NotFoundException {
-    DBUser user = appUserDao.findByUserId(authUser.getUserId());
+    DbUser user = appUserDao.findByUserId(authUser.getUserId());
     if (user == null) {
       throw new NotFoundException("User not found with provided id");
     }
     return new AppUserInfo(user);
   }
 
+  /**
+   * Register user with user input.
+   *
+   * @param in Input
+   * @return AppUserInfo
+   * @throws DuplicateException Duplicate exception
+   * @throws MissingDataException Missing one of the field
+   */
   @Transactional
   public AppUserInfo register(UserInput in) throws DuplicateException, MissingDataException {
 
-    if (StringUtils.isEmpty(in) || StringUtils.isEmpty(in.getUsername()) || StringUtils.isEmpty(in.getCurrentPassword()) ) {
+    if (StringUtils.isEmpty(in) || StringUtils.isEmpty(in.getUsername())
+            || StringUtils.isEmpty(in.getCurrentPassword())) {
       throw new MissingDataException("Missing username or password");
     }
-    DBUser user = appUserDao.findByUsername(in.getUsername());
+    DbUser user = appUserDao.findByUsername(in.getUsername());
 
     if (user != null) {
       throw new DuplicateException("There is user with this username already exists");
     }
 
     String lookupToken = UUID.randomUUID().toString();
-    user = saveUser(user, "v:" + lookupToken, in.getNewPassword(), in.getUsername(), 0);
+    user = saveUser("v:" + lookupToken, in.getNewPassword(), in.getUsername(), 0);
     appUserDao.save(user);
 
     return new AppUserInfo(user);
   }
 
-  @Transactional
-  public DBUser saveUser(DBUser user, String lookupToken, String password, String username, int userType){
-    user = new DBUser(username, lookupToken);
+  /**
+   * Create a new DbUser.
+   *
+   * @param lookupToken String
+   * @param password String
+   * @param username String
+   * @param userType int
+   * @return Created user
+   */
+  public DbUser saveUser(String lookupToken, String password, String username, int userType) {
+    DbUser user = new DbUser(username, lookupToken);
     user.setPassword(password);
     user.setUsername(username);
-    user.setUser_type(userType);
+    user.setUserType(userType);
     return user;
   }
 
+  /**
+   * Verify user base on lookup token.
+   *
+   *  @param lookupToken String
+   * @return LoginResponse
+   * @throws NotFoundException not found
+   */
   @Transactional
   public LoginResponse verifyUser(String lookupToken) throws NotFoundException {
-    DBUser user = appUserDao.findByLookupToken(lookupToken);
+    DbUser user = appUserDao.findByLookupToken(lookupToken);
     if (user == null) {
       throw new NotFoundException("Unable to find user with this lookupToken");
     }
-    user.setLookup_token(null);
+    user.setLookupToken(null);
     appUserDao.save(user);
 
     return logUserIn(user);
   }
 
+  /**
+   * Delete a user.
+   *
+   * @param user DbUser
+   *
+   * @return AppUserInfo
+   */
   @NotNull
-  private AppUserInfo deleteUser(DBUser user) {
+  private AppUserInfo deleteUser(DbUser user) {
     appUserDao.delete(user);
 
     return new AppUserInfo(user);
   }
 
-
-  private boolean passwordNotmatch(DBUser u, String clearPassword) {
-    return !new BCryptPasswordEncoder().matches(u.getSalt() + "&&" + clearPassword, u.getPassword_hash());
+  /**
+   * Check whether password not match.
+   *
+   * @param u DbUser
+   * @param clearPassword String
+   * @return boolean
+   */
+  private boolean passwordNotMatch(DbUser u, String clearPassword) {
+    return !new BCryptPasswordEncoder().matches(u.getSalt() + "&&"
+            + clearPassword, u.getPasswordHash());
   }
 }

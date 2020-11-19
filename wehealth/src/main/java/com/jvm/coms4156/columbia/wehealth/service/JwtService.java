@@ -6,15 +6,12 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.exception.BadAuthExecption;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
 
 
 /**
@@ -26,7 +23,8 @@ public class JwtService {
   private final String secret;
   private final long expiration;
 
-  public JwtService(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration}") int expiration){
+  public JwtService(@Value("${jwt.secret}") String secret,
+                    @Value("${jwt.expiration}") int expiration) {
     this.secret = secret;
     this.expiration = expiration;
   }
@@ -35,26 +33,43 @@ public class JwtService {
     return System.currentTimeMillis() + (expiration * 60L * 1000L);
   }
 
-  public String generate( Long id, int userType, long exp) {
+  /**
+   * Generate jwt token.
+   *
+   * @param id Long
+   * @param userType int
+   * @param exp long
+   * @return String
+   */
+  public String generate(String username, Long id, int userType, long exp) {
     return JWT.create()
+        .withSubject(username)
         .withClaim("userId", id)
         .withClaim("userType", userType)
         .withExpiresAt(new Date(exp))
         .sign(Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8)));
   }
 
-  public AuthenticatedUser verify(String token) throws BadAuthExecption {
+  /**
+   * Verify token.
+   *
+   * @param token String
+   * @return AuthticatedUser
+   * @throws BadAuthException Authentication Exception
+   */
+  public AuthenticatedUser verify(String token) throws BadAuthException {
     try {
       DecodedJWT jwt = JWT.require(Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8)))
           .build()
           .verify(token);
-      return new AuthenticatedUser(jwt.getClaim("userId").asLong(), jwt.getClaim("userType").asInt());
+      return new AuthenticatedUser(jwt.getClaim("userId").asLong(),
+              jwt.getClaim("userType").asInt(), jwt.getSubject());
     } catch (TokenExpiredException e) {
       log.error("Expired token");
-      throw new BadAuthExecption();
+      throw new BadAuthException();
     } catch (Throwable t) {
       log.error("Error while verifying JWT token", t);
-      throw new BadAuthExecption();
+      throw new BadAuthException();
     }
   }
 

@@ -37,12 +37,22 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.PUT,  "/diet/**").permitAll()
         .antMatchers(HttpMethod.POST,  "/diet/**").permitAll()
         .antMatchers(HttpMethod.DELETE,  "/diet/**").permitAll()
+        .antMatchers(HttpMethod.GET,  "/weight/**").permitAll()
+        .antMatchers(HttpMethod.PUT,  "/weight/**").permitAll()
+        .antMatchers(HttpMethod.POST,  "/weight/**").permitAll()
+        .antMatchers(HttpMethod.DELETE,  "/weight/**").permitAll()
+        .antMatchers(HttpMethod.GET,  "/exercise/**").permitAll()
+        .antMatchers(HttpMethod.PUT,  "/exercise/**").permitAll()
+        .antMatchers(HttpMethod.POST,  "/exercise/**").permitAll()
+        .antMatchers(HttpMethod.DELETE,  "/exercise/**").permitAll()
         .anyRequest().fullyAuthenticated()
         .and()
         .addFilter(new SecurityFilter(jwtService))
         .addFilter(new BasicAuthenticationFilter(authenticationManager) {
           @Override
-          protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+          protected void doFilterInternal(HttpServletRequest request,
+                                          HttpServletResponse response,
+                                          FilterChain chain) throws IOException, ServletException {
             chain.doFilter(request, response);
           }
         })

@@ -1,0 +1,248 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+   <head>
+      <title>SpotBugs Report</title>
+      <style type="text/css">
+		.tablerow0 {
+			background: #EEEEEE;
+		}
+
+		.tablerow1 {
+			background: white;
+		}
+
+		.detailrow0 {
+			background: #EEEEEE;
+		}
+
+		.detailrow1 {
+			background: white;
+		}
+
+		.tableheader {
+			background: #b9b9fe;
+			font-size: larger;
+		}
+		</style>
+   </head>
+   <body>
+      <h1>SpotBugs Report</h1>
+      <p>Produced using <a href="https://spotbugs.github.io">SpotBugs</a>4.1.3.</p>
+      <p>Project: 
+			wehealth[wehealth]</p>
+      <h2>Metrics</h2>
+      <p>1536 lines of code analyzed,
+	in 65 classes, 
+	in 12 packages.</p>
+      <table width="500" cellpadding="5" cellspacing="2">
+         <tr class="tableheader">
+            <th align="left">Metric</th>
+            <th align="right">Total</th>
+            <th align="right">Density*</th>
+         </tr>
+         <tr class="tablerow0">
+            <td>High Priority Warnings</td>
+            <td align="right">4</td>
+            <td align="right">2.60</td>
+         </tr>
+         <tr class="tablerow1">
+            <td>Medium Priority Warnings</td>
+            <td align="right">1</td>
+            <td align="right">0.65</td>
+         </tr>
+         <tr class="$totalClass">
+            <td>
+               <b>Total Warnings</b>
+            </td>
+            <td align="right">
+               <b>5</b>
+            </td>
+            <td align="right">
+               <b>3.26</b>
+            </td>
+         </tr>
+      </table>
+      <p>
+         <i>(* Defects per Thousand lines of non-commenting source statements)</i>
+      </p>
+      <p>
+         <br/>
+         <br/>
+      </p>
+      <h2>Summary</h2>
+      <table width="500" cellpadding="5" cellspacing="2">
+         <tr class="tableheader">
+            <th align="left">Warning Type</th>
+            <th align="right">Number</th>
+         </tr>
+         <tr class="tablerow0">
+            <td>
+               <a href="#Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+            </td>
+            <td align="right">4</td>
+         </tr>
+         <tr class="tablerow1">
+            <td>
+               <a href="#Warnings_STYLE">Dodgy code Warnings</a>
+            </td>
+            <td align="right">1</td>
+         </tr>
+         <tr class="tablerow0">
+            <td>
+               <b>Total</b>
+            </td>
+            <td align="right">
+               <b>5</b>
+            </td>
+         </tr>
+      </table>
+      <p>
+         <br/>
+         <br/>
+      </p>
+      <h1>Warnings</h1>
+      <p>Click on each warning link to see a full description of the issue, and
+	    details of how to resolve it.</p>
+      <h2>
+         <a name="Warnings_BAD_PRACTICE">Bad practice Warnings</a>
+      </h2>
+      <table class="warningtable"
+             width="100%"
+             cellspacing="2"
+             cellpadding="5">
+         <tr class="tableheader">
+            <th align="left">Warning</th>
+            <th align="left">Priority</th>
+            <th align="left">Details</th>
+         </tr>
+         <tr class="tablerow1">
+            <td width="20%" valign="top">
+               <a href="#SE_BAD_FIELD">Non-transient non-serializable instance field in serializable class</a>
+            </td>
+            <td width="10%" valign="top">High</td>
+            <td width="70%">
+               <p>Class com.jvm.coms4156.columbia.wehealth.entity.DietHistory defines non-transient non-serializable instance field dietType<br/>
+                  <br/>
+                  <br/>In file DietHistory.java,
+					
+						lines 
+						    to <br/>In class com.jvm.coms4156.columbia.wehealth.entity.DietHistory<br/>Field com.jvm.coms4156.columbia.wehealth.entity.DietHistory.dietType<br/>Actual type com.jvm.coms4156.columbia.wehealth.entity.DietType<br/>In DietHistory.java</p>
+            </td>
+         </tr>
+         <tr class="tablerow0">
+            <td width="20%" valign="top">
+               <a href="#SE_BAD_FIELD">Non-transient non-serializable instance field in serializable class</a>
+            </td>
+            <td width="10%" valign="top">High</td>
+            <td width="70%">
+               <p>Class com.jvm.coms4156.columbia.wehealth.entity.DietHistory defines non-transient non-serializable instance field user<br/>
+                  <br/>
+                  <br/>In file DietHistory.java,
+					
+						lines 
+						    to <br/>In class com.jvm.coms4156.columbia.wehealth.entity.DietHistory<br/>Field com.jvm.coms4156.columbia.wehealth.entity.DietHistory.user<br/>Actual type com.jvm.coms4156.columbia.wehealth.entity.DBUser<br/>In DietHistory.java</p>
+            </td>
+         </tr>
+         <tr class="tablerow1">
+            <td width="20%" valign="top">
+               <a href="#SE_BAD_FIELD">Non-transient non-serializable instance field in serializable class</a>
+            </td>
+            <td width="10%" valign="top">High</td>
+            <td width="70%">
+               <p>Class com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping defines non-transient non-serializable instance field dietType<br/>
+                  <br/>
+                  <br/>In file DietNutrientMapping.java,
+					
+						lines 
+						    to <br/>In class com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping<br/>Field com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping.dietType<br/>Actual type com.jvm.coms4156.columbia.wehealth.entity.DietType<br/>In DietNutrientMapping.java</p>
+            </td>
+         </tr>
+         <tr class="tablerow0">
+            <td width="20%" valign="top">
+               <a href="#SE_BAD_FIELD">Non-transient non-serializable instance field in serializable class</a>
+            </td>
+            <td width="10%" valign="top">High</td>
+            <td width="70%">
+               <p>Class com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping defines non-transient non-serializable instance field nutrientType<br/>
+                  <br/>
+                  <br/>In file DietNutrientMapping.java,
+					
+						lines 
+						    to <br/>In class com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping<br/>Field com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping.nutrientType<br/>Actual type com.jvm.coms4156.columbia.wehealth.entity.NutrientType<br/>In DietNutrientMapping.java</p>
+            </td>
+         </tr>
+      </table>
+      <p>
+         <br/>
+         <br/>
+      </p>
+      <h2>
+         <a name="Warnings_STYLE">Dodgy code Warnings</a>
+      </h2>
+      <table class="warningtable"
+             width="100%"
+             cellspacing="2"
+             cellpadding="5">
+         <tr class="tableheader">
+            <th align="left">Warning</th>
+            <th align="left">Priority</th>
+            <th align="left">Details</th>
+         </tr>
+         <tr class="tablerow1">
+            <td width="20%" valign="top">
+               <a href="#NP_LOAD_OF_KNOWN_NULL_VALUE">Load of known null value</a>
+            </td>
+            <td width="10%" valign="top">Medium</td>
+            <td width="70%">
+               <p>Load of known null value in com.jvm.coms4156.columbia.wehealth.service.AppUserService.register(UserInput)<br/>
+                  <br/>
+                  <br/>In file AppUserService.java AppUserService.java,
+					
+						line 76 76<br/>In class com.jvm.coms4156.columbia.wehealth.service.AppUserService<br/>In method com.jvm.coms4156.columbia.wehealth.service.AppUserService.register(UserInput)<br/>Value loaded from user<br/>At AppUserService.java:[line 76]<br/>At AppUserService.java:[line 76]</p>
+            </td>
+         </tr>
+      </table>
+      <p>
+         <br/>
+         <br/>
+      </p>
+      <p>
+         <br/>
+         <br/>
+      </p>
+      <h1>
+         <a name="Details">Warning Types</a>
+      </h1>
+      <h2>
+         <a name="NP_LOAD_OF_KNOWN_NULL_VALUE">Load of known null value</a>
+      </h2>
+
+  <p> The variable referenced at this point is known to be null due to an earlier
+   check against null. Although this is valid, it might be a mistake (perhaps you
+intended to refer to a different variable, or perhaps the earlier check to see if the
+variable is null should have been a check to see if it was non-null).
+</p>
+
+    <p>
+         <br/>
+         <br/>
+      </p>
+      <h2>
+         <a name="SE_BAD_FIELD">Non-transient non-serializable instance field in serializable class</a>
+      </h2>
+
+<p> This Serializable class defines a non-primitive instance field which is neither transient,
+Serializable, or <code>java.lang.Object</code>, and does not appear to implement
+the <code>Externalizable</code> interface or the
+<code>readObject()</code> and <code>writeObject()</code> methods.&nbsp;
+Objects of this class will not be deserialized correctly if a non-Serializable
+object is stored in this field.</p>
+
+    <p>
+         <br/>
+         <br/>
+      </p>
+   </body>
+</html>

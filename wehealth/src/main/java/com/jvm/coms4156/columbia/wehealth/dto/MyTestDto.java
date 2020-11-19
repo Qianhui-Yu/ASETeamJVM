@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MyTestDto {
 
-    private String testInfo;
+  private String testInfo;
 
 }

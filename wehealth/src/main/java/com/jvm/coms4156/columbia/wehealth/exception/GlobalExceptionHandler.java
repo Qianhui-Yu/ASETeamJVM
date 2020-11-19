@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseBody
 public class GlobalExceptionHandler {
 
-//    @ExceptionHandler(BadRequestException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ExceptionResponse handleBadRequestException(Exception e) {
-//        return new ExceptionResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-//    }
+  //  @ExceptionHandler(BadRequestException.class)
+  //  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  //  public ExceptionResponse handleBadRequestException(Exception e) {
+  //    return new ExceptionResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+  //  }
 
-    @ExceptionHandler(BadRequestException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ExceptionResponse> handleBadRequestException(Exception e) {
-        return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(BadRequestException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ExceptionResponse> handleBadRequestException(Exception e) {
+    return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+  }
 }
