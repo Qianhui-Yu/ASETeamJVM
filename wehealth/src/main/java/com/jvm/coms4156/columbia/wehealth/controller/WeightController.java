@@ -1,5 +1,6 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Log4j2
-public class WeightController {
+public class WeightController extends BaseController{
   @Autowired
   private WeightService weightService;
 
@@ -34,9 +35,10 @@ public class WeightController {
   @PostMapping(path = "/weight/records",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> addWeightRecord(@RequestBody WeightRecordDto weightRecordDto) {
+  public ResponseEntity<String> addWeightRecord(
+          @RequestBody WeightRecordDto weightRecordDto) {
     log.info("New Weight Record: {}", weightRecordDto.toString());
-    weightService.addWeightRecordToDb(weightRecordDto);
+    weightService.addWeightRecordToDb(au(), weightRecordDto);
     log.info("Successfully added a new weight record.");
     return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
   }
@@ -55,10 +57,9 @@ public class WeightController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<WeightHistoryResponseDto> getWeightRecords(
           @RequestParam Optional<String> unit,
-          @RequestParam Optional<Integer> length,
-          @RequestBody UserIdDto userIdDto) {
+          @RequestParam Optional<Integer> length) {
     WeightHistoryResponseDto weightHistoryResponseDto = weightService
-            .getWeightHistory(userIdDto, unit, length);
+            .getWeightHistory(au(), unit, length);
     return new ResponseEntity<>(weightHistoryResponseDto, HttpStatus.OK);
   }
 
@@ -77,7 +78,7 @@ public class WeightController {
           @PathVariable Integer weightId,
           @RequestBody WeightRecordDto weightRecordDto) {
     log.info("Edit Weight Record ID: {}. Result Record: {}", weightId, weightRecordDto.toString());
-    weightService.editWeightRecord(weightId, weightRecordDto);
+    weightService.editWeightRecord(au(), weightId, weightRecordDto);
     log.info("Successfully edited weight record {}.", weightId);
     return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
   }
@@ -94,10 +95,9 @@ public class WeightController {
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> deleteWeightRecord(
-          @PathVariable Integer weightId,
-          @RequestBody UserIdDto userIdDto) {
+          @PathVariable Integer weightId) {
     log.info("Delete Weight Record ID: {}.", weightId);
-    weightService.deleteWeightRecord(weightId, userIdDto);
+    weightService.deleteWeightRecord(au(), weightId);
     log.info("Successfully deleted weight record {}.", weightId);
     return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
   }

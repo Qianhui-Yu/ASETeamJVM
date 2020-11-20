@@ -6,6 +6,7 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND_TO_GRAM;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
@@ -41,10 +42,10 @@ public class WeightService {
    * @param weightRecordDto Input weight record object. Refer to dto/WeightRecordDto for details.
    */
   @Transactional
-  public void addWeightRecordToDb(WeightRecordDto weightRecordDto) {
+  public void addWeightRecordToDb(AuthenticatedUser au, WeightRecordDto weightRecordDto) {
     // add weight record to weight_history table
     WeightHistory weightHistory = new WeightHistory();
-    Optional<DbUser> user = dbUserRepo.findByUserId(weightRecordDto.getUserId());
+    Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {
       throw new NotFoundException("User not found with provided user id.");
     }
@@ -79,10 +80,10 @@ public class WeightService {
    * @param length Number of units to date back from current date.
    * @return Refer to dto/WeightHistoryResponseDto for details.
    */
-  public WeightHistoryResponseDto getWeightHistory(UserIdDto userIdDto,
+  public WeightHistoryResponseDto getWeightHistory(AuthenticatedUser au,
                                                    Optional<String> unit,
                                                    Optional<Integer> length) {
-    Optional<DbUser> user = dbUserRepo.findByUserId(userIdDto.getUserId());
+    Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {
       throw new NotFoundException("User not found with provided user id.");
     }
@@ -136,14 +137,16 @@ public class WeightService {
    * @param weightRecordDto Target weight record after editing.
    */
   @Transactional
-  public void editWeightRecord(Integer weightId, WeightRecordDto weightRecordDto) {
+  public void editWeightRecord(AuthenticatedUser au,
+                               Integer weightId,
+                               WeightRecordDto weightRecordDto) {
     Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
     if (weightHistory.isEmpty()) {
       throw new NotFoundException("Weight record not found with provided weight record id.");
     }
 
     WeightHistory weightHistoryRecord = weightHistory.get();
-    if (! weightHistoryRecord.getUser().getUserId().equals(weightRecordDto.getUserId())) {
+    if (! weightHistoryRecord.getUser().getUserId().equals(au.getUserId())) {
       throw new BadRequestException("Illegal edit attempt: Record not belong to this user.");
     }
 
@@ -161,14 +164,14 @@ public class WeightService {
    * @param userIdDto Input user ID object.
    */
   @Transactional
-  public void deleteWeightRecord(Integer weightId, UserIdDto userIdDto) {
+  public void deleteWeightRecord(AuthenticatedUser au, Integer weightId) {
     Optional<WeightHistory> weightHistory = weightHistoryRepo.findByWeightHistoryId(weightId);
     if (weightHistory.isEmpty()) {
       throw new NotFoundException("Weight record not found with provided weight record id.");
     }
 
     WeightHistory weightHistoryRecord = weightHistory.get();
-    if (! weightHistoryRecord.getUser().getUserId().equals(userIdDto.getUserId())) {
+    if (! weightHistoryRecord.getUser().getUserId().equals(au.getUserId())) {
       throw new BadRequestException("Illegal delete attempt: Record not belong to this user.");
     }
     weightHistoryRepo.delete(weightHistoryRecord);
