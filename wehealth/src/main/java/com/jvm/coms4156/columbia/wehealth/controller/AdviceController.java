@@ -30,7 +30,7 @@ public class AdviceController extends BaseController {
     public ResponseEntity<AdviceDto> getDietRecords (
             @RequestBody UserIdDto userIdDto) {
         log.info("Get adivce {}", userIdDto.toString());
-        AdviceDto adviceDto = adviceService.getAdvice(userIdDto);
+        AdviceDto adviceDto = adviceService.getAdvice(au());
         return new ResponseEntity<>(adviceDto, HttpStatus.OK);
     }
 

@@ -41,6 +41,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.PUT,  "/weight/**").permitAll()
         .antMatchers(HttpMethod.POST,  "/weight/**").permitAll()
         .antMatchers(HttpMethod.DELETE,  "/weight/**").permitAll()
+        .antMatchers(HttpMethod.GET, "/advice/**").permitAll()
         .anyRequest().fullyAuthenticated()
         .and()
         .addFilter(new SecurityFilter(jwtService))

@@ -8,5 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdviceDto {
-    private String calorieAdvice;
+    private String caloriesAdvice;
+    private String fatAdvice;
+    private String proteinAdvice;
+    private String carbsAdvice;
+    private String exerciseAdvice;
+    private Boolean isEmpty;
 }
