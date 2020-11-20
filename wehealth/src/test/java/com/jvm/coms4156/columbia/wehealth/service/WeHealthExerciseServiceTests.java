@@ -3,6 +3,7 @@ package com.jvm.coms4156.columbia.wehealth.service;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.MONTH;
 import static org.mockito.Mockito.when;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseRecordDto;
@@ -97,10 +98,10 @@ public class WeHealthExerciseServiceTests {
   public void addExerciseRecordToDBInvalidTypeTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseTypeRepoMock.findByExerciseTypeName(Mockito.any(String.class))).thenReturn(Optional.empty());
-    ExerciseRecordDto exerciseRecordDto = new ExerciseRecordDto(1L,
-            "TestExerciseType", 1000.0);
+    ExerciseRecordDto exerciseRecordDto = new ExerciseRecordDto("TestExerciseType", 1000.0);
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(MissingDataException.class, () ->
-            exerciseService.addExerciseRecordToDb(exerciseRecordDto)
+            exerciseService.addExerciseRecordToDb(exerciseRecordDto, au)
     );
   }
 
@@ -109,10 +110,10 @@ public class WeHealthExerciseServiceTests {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseTypeRepoMock.findByExerciseTypeName(Mockito.any(String.class)))
             .thenReturn(Optional.of(new ExerciseType()));
-    ExerciseRecordDto exerciseRecordDto = new ExerciseRecordDto(1L,
-            "TestExerciseType", -1000.0);
+    ExerciseRecordDto exerciseRecordDto = new ExerciseRecordDto("TestExerciseType", -1000.0);
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(BadRequestException.class, () ->
-            exerciseService.addExerciseRecordToDb(exerciseRecordDto)
+            exerciseService.addExerciseRecordToDb(exerciseRecordDto, au)
     );
   }
 
@@ -122,18 +123,19 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseTypeRepoMock.findByExerciseTypeName(Mockito.any(String.class)))
             .thenReturn(Optional.of(new ExerciseType()));
-    ExerciseRecordDto exerciseRecordDto = new ExerciseRecordDto(1L,
-            "TestExerciseType", 1000.0);
-    exerciseService.addExerciseRecordToDb(exerciseRecordDto);
+    ExerciseRecordDto exerciseRecordDto = new ExerciseRecordDto("TestExerciseType", 1000.0);
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    exerciseService.addExerciseRecordToDb(exerciseRecordDto, au);
   }
 
   @Test
   public void getExerciseHistoryNegativeDurationTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(BadRequestException.class, () ->
-            exerciseService.getExerciseHistory(new UserIdDto(1L),
-                    Optional.empty(), Optional.of(-100))
+            exerciseService.getExerciseHistory(Optional.empty(),
+                    Optional.of(-100), au)
     );
   }
 
@@ -144,8 +146,9 @@ public class WeHealthExerciseServiceTests {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseHistoryRepoMock.findAllByUser(user)).thenReturn(historyDetailList);
-    ExerciseHistoryResponseDto retDto = exerciseService.getExerciseHistory(new UserIdDto(1L),
-            Optional.empty(), Optional.empty());
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    ExerciseHistoryResponseDto retDto = exerciseService.getExerciseHistory(
+            Optional.empty(), Optional.empty(), au);
     List<ExerciseHistoryDetailsDto> historyDetailDtoList = retDto.getExerciseHistoryList();
     Assertions.assertEquals(historyDetailDtoList.size(), historyDetailList.size());
     for (int i = 0; i < historyDetailDtoList.size(); ++i) {
@@ -161,8 +164,9 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseHistoryRepoMock.findAllByUserAndCreatedTimeAfter(Mockito.any(DbUser.class),
             Mockito.any(String.class))).thenReturn(historyDetailList);
-    ExerciseHistoryResponseDto retDto = exerciseService.getExerciseHistory(new UserIdDto(1L),
-            Optional.of(MONTH), Optional.of(1));
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    ExerciseHistoryResponseDto retDto = exerciseService.getExerciseHistory(
+            Optional.of(MONTH), Optional.of(1), au);
     List<ExerciseHistoryDetailsDto> historyDetailDtoList = retDto.getExerciseHistoryList();
     Assertions.assertEquals(historyDetailList.size(), historyDetailDtoList.size());
     for (int i = 0; i < historyDetailDtoList.size(); ++i) {
@@ -177,8 +181,10 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseHistoryRepoMock.findByExerciseHistoryId(Mockito.any(Integer.class)))
             .thenReturn(Optional.empty());
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(MissingDataException.class, () ->
-            exerciseService.editExerciseRecordAtDb(Optional.of(1), new ExerciseRecordDto())
+            exerciseService.editExerciseRecordAtDb(Optional.of(1),
+                    new ExerciseRecordDto(), au)
     );
   }
 
@@ -190,12 +196,10 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(validExerciseHistory(1L));
     when(dbExerciseTypeRepoMock.findByExerciseTypeName(Mockito.any(String.class)))
             .thenReturn(Optional.empty());
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(MissingDataException.class, () -> {
-      ExerciseRecordDto newRecord = new ExerciseRecordDto();
-      newRecord.setUserId(1L);
-      newRecord.setExerciseTypeName("TestExerciseType");
-      newRecord.setDuration(10.0);
-      exerciseService.editExerciseRecordAtDb(Optional.of(1), newRecord);
+      ExerciseRecordDto newRecord = new ExerciseRecordDto("TestExerciseType", 10.0);
+      exerciseService.editExerciseRecordAtDb(Optional.of(1), newRecord, au);
     });
   }
 
@@ -209,12 +213,10 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(validExerciseHistory(1L).get());
     when(dbExerciseTypeRepoMock.findByExerciseTypeName(Mockito.any(String.class)))
             .thenReturn(Optional.of(new ExerciseType()));
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(BadRequestException.class, () -> {
-      ExerciseRecordDto newRecord = new ExerciseRecordDto();
-      newRecord.setUserId(1L);
-      newRecord.setExerciseTypeName("TestExerciseType");
-      newRecord.setDuration(-1000.0);
-      exerciseService.editExerciseRecordAtDb(Optional.of(1), newRecord);
+      ExerciseRecordDto newRecord = new ExerciseRecordDto("TestExerciseType", -1000.0);
+      exerciseService.editExerciseRecordAtDb(Optional.of(1), newRecord, au);
     });
   }
 
@@ -228,8 +230,9 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(validExerciseHistory(1L).get());
     when(dbExerciseTypeRepoMock.findByExerciseTypeName(Mockito.any(String.class)))
             .thenReturn(Optional.of(new ExerciseType()));
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     exerciseService.editExerciseRecordAtDb(Optional.of(1),
-            new ExerciseRecordDto(1L, "TestExerciseType", 10.0));
+            new ExerciseRecordDto("TestExerciseType", 10.0), au);
   }
 
   @Test
@@ -238,8 +241,9 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseHistoryRepoMock.findByExerciseHistoryId(Mockito.any(Integer.class)))
             .thenReturn(Optional.empty());
+    AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(MissingDataException.class, () ->
-            exerciseService.deleteExerciseRecordInDb(Optional.of(1), new UserIdDto(1L))
+            exerciseService.deleteExerciseRecordInDb(Optional.of(1), au)
     );
   }
 
@@ -249,7 +253,8 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseHistoryRepoMock.findByExerciseHistoryId(Mockito.any(Integer.class)))
             .thenReturn(validExerciseHistory(1L));
-    exerciseService.deleteExerciseRecordInDb(Optional.of(1), new UserIdDto(1L));
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    exerciseService.deleteExerciseRecordInDb(Optional.of(1), au);
   }
   
 }

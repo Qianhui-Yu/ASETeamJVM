@@ -41,8 +41,9 @@ public class JwtService {
    * @param exp long
    * @return String
    */
-  public String generate(Long id, int userType, long exp) {
+  public String generate(String username, Long id, int userType, long exp) {
     return JWT.create()
+        .withSubject(username)
         .withClaim("userId", id)
         .withClaim("userType", userType)
         .withExpiresAt(new Date(exp))
@@ -62,7 +63,7 @@ public class JwtService {
           .build()
           .verify(token);
       return new AuthenticatedUser(jwt.getClaim("userId").asLong(),
-              jwt.getClaim("userType").asInt());
+              jwt.getClaim("userType").asInt(), jwt.getSubject());
     } catch (TokenExpiredException e) {
       log.error("Expired token");
       throw new BadAuthException();

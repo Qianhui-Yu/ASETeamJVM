@@ -38,7 +38,6 @@ public class DietController extends BaseController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> addDietRecord(@RequestBody DietRecordDto dietRecordDto) {
     log.info("New Diet Record: {}", dietRecordDto.toString());
-    //AuthenticatedUser user = au();
     dietService.addDietRecordToDb(dietRecordDto);
 
     log.info("Successfully added a new diet record.");
@@ -50,7 +49,6 @@ public class DietController extends BaseController {
    *
    * @param unit Span unit. Can be among ["day", "week", "month", "year"].
    * @param length Length of the given unit. Must be positive.
-   * @param userIdDto Input user ID object. Refer to dto/UserIdDto for details.
    * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
    *         unauthorized access.
    */
@@ -58,11 +56,12 @@ public class DietController extends BaseController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<DietHistoryResponseDto> getDietRecords(
           @RequestParam Optional<String> unit,
-          @RequestParam Optional<Integer> length,
-          @RequestBody UserIdDto userIdDto) {
-    log.info("Get diet history in duration: {} {}", length.orElse(ONE), unit.orElse(ALL));
+          @RequestParam Optional<Integer> length) {
+    log.info("Get diet history in duration: username {} {} {}", au().getUsername(),
+            length.orElse(ONE), unit.orElse(ALL));
+
     DietHistoryResponseDto dietHistoryResponseDto = dietService.getDietHistory(
-            userIdDto, unit, length);
+            au(), unit, length);
     return new ResponseEntity<>(dietHistoryResponseDto, HttpStatus.OK);
   }
 

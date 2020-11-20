@@ -13,6 +13,7 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND_TO_GRAM;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.PROTEIN;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.UNIT;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
@@ -167,14 +168,13 @@ public class DietService {
   /**
    * Get a list of diet history records based on input criterion.
    *
-   * @param userIdDto Input user ID record object. Refer to dto/UserIdDto for details.
    * @param unit Unit type of the span. Among ["day", "week", "month", "year"].
    * @param length Date the number units back.
    * @return Return a list of records. Refer to dto/DietHistoryResponseDto for details.
    */
-  public DietHistoryResponseDto getDietHistory(UserIdDto userIdDto,
+  public DietHistoryResponseDto getDietHistory(AuthenticatedUser au,
                                                Optional<String> unit, Optional<Integer> length) {
-    Optional<DbUser> user = dbUserRepo.findByUserId(userIdDto.getUserId());
+    Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {
       throw new BadRequestException("User not found with provided user id.");
     }

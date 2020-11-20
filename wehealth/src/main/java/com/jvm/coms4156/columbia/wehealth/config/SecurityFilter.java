@@ -50,14 +50,14 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
       filterChain.doFilter(servletRequest, servletResponse);
       resp.addHeader("X-XSS-Protection", "1");
       log.info(String.format("Request %s %s %s %d", remoteAddress, req.getRequestURI(),
-              user == null ? "Anonymous" : user.getName(), resp.getStatus()));
+              user == null ? "Anonymous" : user.getUserId(), resp.getStatus()));
     } catch (ServletException | IOException e) {
       log.error(String.format("Request %s %s %s %d %s", remoteAddress, req.getRequestURI(),
-              user == null ? "Anonymous" : user.getName(), resp.getStatus(), e.toString()), e);
+              user == null ? "Anonymous" : user.getUserId(), resp.getStatus(), e.toString()), e);
       throw e;
     } catch (Throwable t) {
       log.error(String.format("Request %s %s %s %d %s", remoteAddress, req.getRequestURI(),
-              user == null ? "Anonymous" : user.getName(), resp.getStatus(), t.toString()), t);
+              user == null ? "Anonymous" : user.getUserId(), resp.getStatus(), t.toString()), t);
       throw new ServletException(t);
     }
   }
@@ -66,10 +66,11 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
                                                 String token)
           throws AuthenticationException, BadAuthException {
     AuthenticatedUser user = jwtService.verify(token);
+    //AuthenticatedUser user = new AuthenticatedUser(10L , 0, "Test");
     SecurityContextHolder.getContext().setAuthentication(user);
 
-    Cookie cookie = new Cookie("authToken", jwtService.generate(user.getUserId(),
-            user.getUserType(), jwtService.getExpiration()));
+    Cookie cookie = new Cookie("authToken", jwtService.generate(user.getUsername(),
+            user.getUserId(), user.getUserType(), jwtService.getExpiration()));
     cookie.setPath("/");
     cookie.setHttpOnly(true);
     resp.addCookie(cookie);
