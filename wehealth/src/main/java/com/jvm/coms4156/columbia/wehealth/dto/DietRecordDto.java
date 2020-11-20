@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DietRecordDto {
-  private Long userId;
   //private String time;
   private Integer dietTypeId;
   private String dietTypeName;

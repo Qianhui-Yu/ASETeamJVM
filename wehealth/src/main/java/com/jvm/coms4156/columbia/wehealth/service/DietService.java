@@ -62,10 +62,10 @@ public class DietService {
    * @param dietRecordDto Input diet record object. Refer to dto/DietRecordDto for details.
    */
   @Transactional
-  public void addDietRecordToDb(DietRecordDto dietRecordDto) {
+  public void addDietRecordToDb(AuthenticatedUser au, DietRecordDto dietRecordDto) {
     // add diet record to diet_history table
     DietHistory dietHistory = new DietHistory();
-    Optional<DbUser> user = dbUserRepo.findByUserId(dietRecordDto.getUserId());
+    Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {
       throw new NotFoundException("User not found with provided user id.");
     }
@@ -251,14 +251,15 @@ public class DietService {
    * @param dietRecordDto Target record after editing. Refer to dto/DietRecordDto for details.
    */
   @Transactional
-  public void updateDietHistory(Integer recordId, DietRecordDto dietRecordDto) {
+  public void updateDietHistory(AuthenticatedUser au, Integer recordId,
+                                DietRecordDto dietRecordDto) {
     // Check and get the old record
     Optional<DietHistory> dietHistory = dietHistoryRepo.findByDietHistoryId(recordId);
     if (dietHistory.isEmpty()) {
       throw new BadRequestException("Invalid recordId.");
     }
     // Check and get the user
-    Optional<DbUser> user = dbUserRepo.findByUserId(dietRecordDto.getUserId());
+    Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {
       throw new BadRequestException("User not found with provided user id.");
     }
@@ -304,14 +305,14 @@ public class DietService {
    * @param userIdDto Input user ID object indicating which user performs this.
    */
   @Transactional
-  public void deleteDietHistory(Integer recordId, UserIdDto userIdDto) {
+  public void deleteDietHistory(AuthenticatedUser au, Integer recordId) {
     // Check and get the old record
     Optional<DietHistory> dietHistory = dietHistoryRepo.findByDietHistoryId(recordId);
     if (dietHistory.isEmpty()) {
       throw new BadRequestException("Invalid recordId.");
     }
     // Check and get the user
-    Optional<DbUser> user = dbUserRepo.findByUserId(userIdDto.getUserId());
+    Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
     if (user.isEmpty()) {
       throw new BadRequestException("User not found with provided user id.");
     }
