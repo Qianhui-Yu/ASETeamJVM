@@ -33,8 +33,8 @@ public class AdviceService {
     if (dietStatsDto.isEmpty()) {
       adviceDto.setIsEmpty(true);
     } else {
-      adviceDto.setIsEmpty(false);
       adviceDto = generateAdvice(dietStatsDto.get());
+      adviceDto.setIsEmpty(false);
     }
     return adviceDto;
   }
