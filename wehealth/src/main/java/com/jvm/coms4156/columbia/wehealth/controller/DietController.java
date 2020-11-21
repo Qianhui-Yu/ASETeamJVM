@@ -38,7 +38,7 @@ public class DietController extends BaseController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<String> addDietRecord(@RequestBody DietRecordDto dietRecordDto) {
     log.info("New Diet Record: {}", dietRecordDto.toString());
-    dietService.addDietRecordToDb(dietRecordDto);
+    dietService.addDietRecordToDb(au(), dietRecordDto);
 
     log.info("Successfully added a new diet record.");
     return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
@@ -78,7 +78,7 @@ public class DietController extends BaseController {
   public ResponseEntity<String> updateDietRecord(@PathVariable Integer recordId,
                                                  @RequestBody DietRecordDto dietRecordDto) {
     log.info("Updating diet record {}", recordId);
-    dietService.updateDietHistory(recordId, dietRecordDto);
+    dietService.updateDietHistory(au(), recordId, dietRecordDto);
     log.info("Successfully updated diet record {}", recordId);
     return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
   }
@@ -93,10 +93,9 @@ public class DietController extends BaseController {
    */
   @DeleteMapping(path = "/diet/records/{recordId}", consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<String> deleteDietRecord(@PathVariable Integer recordId,
-                                                 @RequestBody UserIdDto userIdDto) {
+  public ResponseEntity<String> deleteDietRecord(@PathVariable Integer recordId) {
     log.info("Deleting diet record {}", recordId);
-    dietService.deleteDietHistory(recordId, userIdDto);
+    dietService.deleteDietHistory(au(), recordId);
     log.info("Successfully deleted diet record {}", recordId);
     return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
   }
