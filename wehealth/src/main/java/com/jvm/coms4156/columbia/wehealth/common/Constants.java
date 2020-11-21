@@ -19,7 +19,10 @@ public class Constants {
   public static final String MONTH = "month";
   public static final String YEAR = "year";
   public static final int ONE = 1;
-
+  public static final double  GOOD_AVG_CALORIES = 600;
+  public static final double GOOD_AVG_PROTEIN = 80;
+  public static final double GOOD_AVG_CARBS = 300;
+  public static final double GOOD_AVG_FAT = 60;
 
 }
 

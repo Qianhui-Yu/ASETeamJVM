@@ -1,15 +1,21 @@
 package com.jvm.coms4156.columbia.wehealth.service;
 
-import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.*;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_CALORIES;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_CARBS;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_FAT;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_PROTEIN;
 
-import javax.swing.text.html.Option;
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
+import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietStatsDto;
 import java.lang.Math;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
@@ -17,11 +23,12 @@ public class AdviceService {
   @Autowired
   private DietService dietService;
 
-  private final double  GOOD_AVG_CALORIES = 600;
-  private final double GOOD_AVG_PROTEIN = 80;
-  private final double GOOD_AVG_CARBS = 300;
-  private final double GOOD_AVG_FAT = 60;
-
+  /**
+   * generate diet and exercise advice for a given user.
+   *
+   * @param user authenticated user
+   * @return adviceDto generated advice
+   */
   public AdviceDto getAdvice(AuthenticatedUser user) {
     AdviceDto adviceDto = new AdviceDto();
     Optional<String> unit = Optional.of("month");
@@ -41,7 +48,8 @@ public class AdviceService {
 
   private AdviceDto generateAdvice(DietStatsDto dietStatsDto) {
     AdviceDto adviceDto = new AdviceDto();
-    String suggestions = String.format("You Avg calroies intake is %.2f KCAL; the recommended intake is %.2f KCAL,",
+    String suggestions = String.format("You Avg calories intake is %.2f KCAL; "
+                    + "the recommended intake is %.2f KCAL,",
             dietStatsDto.getAvgCalories(), GOOD_AVG_CALORIES);
     // calories recommendation
     if (dietStatsDto.getAvgCalories() < GOOD_AVG_CALORIES * 0.8) {
@@ -53,7 +61,8 @@ public class AdviceService {
     }
     adviceDto.setCaloriesAdvice(suggestions);
     // protein recommendation
-    suggestions = String.format("You Avg protein intake is %.2f grams; the recommended intake is %.2f grams,",
+    suggestions = String.format("You Avg protein intake is %.2f grams; "
+                    + "the recommended intake is %.2f grams,",
             dietStatsDto.getAvgProtein(), GOOD_AVG_PROTEIN);
     if (dietStatsDto.getAvgProtein() < GOOD_AVG_PROTEIN * 0.8) {
       suggestions += " You should eat more protein product (like Milk or beef)!";
@@ -64,7 +73,8 @@ public class AdviceService {
     }
     adviceDto.setProteinAdvice(suggestions);
     // fat recommendation
-    suggestions = String.format("You Avg fat intake is %.2f grams; the recommended intake is %.2f grams,",
+    suggestions = String.format("You Avg fat intake is %.2f grams; "
+                    + "the recommended intake is %.2f grams,",
             dietStatsDto.getAvgFat(), GOOD_AVG_FAT);
     if (dietStatsDto.getAvgFat() < GOOD_AVG_FAT * 0.8) {
       suggestions += " You should eat more fat product (like pork)!";
@@ -75,7 +85,8 @@ public class AdviceService {
     }
     adviceDto.setFatAdvice(suggestions);
     // carbs recommendation
-    suggestions = String.format("You Avg carbs intake is %.2f grams; the recommended intake is %.2f grams,",
+    suggestions = String.format("You Avg carbs intake is %.2f grams; "
+                    + "the recommended intake is %.2f grams,",
             dietStatsDto.getAvgCarbs(), GOOD_AVG_CARBS);
     if (dietStatsDto.getAvgCarbs() < GOOD_AVG_CARBS * 0.8) {
       suggestions += " You should eat more carbs product (like rice or bread)!";
