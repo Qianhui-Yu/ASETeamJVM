@@ -151,8 +151,12 @@ public class WeightService {
     }
 
     String currentDateTime = Utility.getStringOfCurrentDateTime();
-    weightHistoryRecord.setWeight(weightRecordDto.getWeight());
-    weightHistoryRecord.setUnit(weightRecordDto.getUnit());
+    if (weightRecordDto.getUnit().toLowerCase().equals(POUND)) {
+      weightHistoryRecord.setWeight(weightRecordDto.getWeight() * POUND_TO_GRAM);
+    } else {
+      weightHistoryRecord.setWeight(weightRecordDto.getWeight());
+    }
+    weightHistoryRecord.setUnit(GRAM);
     weightHistoryRecord.setUpdatedTime(currentDateTime);
     weightHistoryRepo.save(weightHistoryRecord);
   }
