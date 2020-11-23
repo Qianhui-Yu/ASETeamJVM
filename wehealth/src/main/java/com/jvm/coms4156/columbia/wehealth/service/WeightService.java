@@ -50,6 +50,9 @@ public class WeightService {
       throw new NotFoundException("User not found with provided user id.");
     }
     weightHistory.setUser(user.get());
+    if (weightRecordDto.getWeight() <= 0) {
+      throw new BadRequestException("Weight should be larger than zero.");
+    }
 
     // In weight_history table, the default unit of weight is gram
     weightHistory.setUnit(GRAM);
@@ -148,6 +151,10 @@ public class WeightService {
     WeightHistory weightHistoryRecord = weightHistory.get();
     if (! weightHistoryRecord.getUser().getUserId().equals(au.getUserId())) {
       throw new BadRequestException("Illegal edit attempt: Record not belong to this user.");
+    }
+
+    if (weightRecordDto.getWeight() <= 0) {
+      throw new BadRequestException("Weight should be larger than zero.");
     }
 
     String currentDateTime = Utility.getStringOfCurrentDateTime();

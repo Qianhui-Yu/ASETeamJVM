@@ -71,6 +71,10 @@ public class DietService {
     }
     dietHistory.setUser(user.get());
 
+    if (dietRecordDto.getWeight() <= 0) {
+      throw new BadRequestException("Weight should be larger than zero.");
+    }
+
     Optional<DietType> dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());
     if (dietType.isEmpty()) {
       // add new diet type to diet_type table
@@ -265,6 +269,9 @@ public class DietService {
     }
     if (!dietHistory.get().getUser().getUserId().equals(user.get().getUserId())) {
       throw new BadRequestException("You can't update other user's diet record.");
+    }
+    if (dietRecordDto.getWeight() <= 0) {
+      throw new BadRequestException("Weight should be larger than zero.");
     }
 
     // Check if need to update diet type
