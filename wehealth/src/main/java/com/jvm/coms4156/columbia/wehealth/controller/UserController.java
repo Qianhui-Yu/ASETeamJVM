@@ -1,5 +1,7 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
+
 import com.jvm.coms4156.columbia.wehealth.domain.AppUserInfo;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginRequest;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;

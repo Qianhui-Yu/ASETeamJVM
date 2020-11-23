@@ -2,6 +2,7 @@ package com.jvm.coms4156.columbia.wehealth.controller;
 
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
 
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
@@ -13,15 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @Log4j2
 public class DietController extends BaseController {
@@ -41,7 +36,7 @@ public class DietController extends BaseController {
     dietService.addDietRecordToDb(au(), dietRecordDto);
 
     log.info("Successfully added a new diet record.");
-    return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
   /**
@@ -80,7 +75,7 @@ public class DietController extends BaseController {
     log.info("Updating diet record {}", recordId);
     dietService.updateDietHistory(au(), recordId, dietRecordDto);
     log.info("Successfully updated diet record {}", recordId);
-    return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
   /**
@@ -97,7 +92,7 @@ public class DietController extends BaseController {
     log.info("Deleting diet record {}", recordId);
     dietService.deleteDietHistory(au(), recordId);
     log.info("Successfully deleted diet record {}", recordId);
-    return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
 }

@@ -1,5 +1,7 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
+
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
 import com.jvm.coms4156.columbia.wehealth.service.WeightService;
@@ -9,10 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Optional;
 
-import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
+
 
 
 @CrossOrigin

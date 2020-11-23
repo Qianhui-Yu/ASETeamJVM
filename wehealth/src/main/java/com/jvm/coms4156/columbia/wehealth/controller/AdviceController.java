@@ -19,6 +19,7 @@ import java.util.Optional;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 
+@CrossOrigin
 @RestController
 @Log4j2
 public class AdviceController extends BaseController {
