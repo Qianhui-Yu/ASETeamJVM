@@ -28,9 +28,7 @@ public class AdviceController extends BaseController {
 
     @GetMapping(path = "/advice", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdviceDto> getDietRecords (
-            @RequestBody UserIdDto userIdDto) {
-        log.info("Get adivce {}", userIdDto.toString());
+    public ResponseEntity<AdviceDto> getDietRecords () {
         AdviceDto adviceDto = adviceService.getAdvice(au());
         return new ResponseEntity<>(adviceDto, HttpStatus.OK);
     }
