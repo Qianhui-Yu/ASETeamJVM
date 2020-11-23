@@ -1,25 +1,21 @@
 package com.jvm.coms4156.columbia.wehealth.controller;
 
-import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
 import com.jvm.coms4156.columbia.wehealth.service.WeightService;
-import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
+
+
+@CrossOrigin
 @RestController
 @Log4j2
 public class WeightController extends BaseController{
@@ -40,7 +36,7 @@ public class WeightController extends BaseController{
     log.info("New Weight Record: {}", weightRecordDto.toString());
     weightService.addWeightRecordToDb(au(), weightRecordDto);
     log.info("Successfully added a new weight record.");
-    return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
   /**
@@ -80,7 +76,7 @@ public class WeightController extends BaseController{
     log.info("Edit Weight Record ID: {}. Result Record: {}", weightId, weightRecordDto.toString());
     weightService.editWeightRecord(au(), weightId, weightRecordDto);
     log.info("Successfully edited weight record {}.", weightId);
-    return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
   /**
@@ -99,7 +95,7 @@ public class WeightController extends BaseController{
     log.info("Delete Weight Record ID: {}.", weightId);
     weightService.deleteWeightRecord(au(), weightId);
     log.info("Successfully deleted weight record {}.", weightId);
-    return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
 }

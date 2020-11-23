@@ -13,15 +13,13 @@ import com.sun.istack.NotNull;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
  * Created by Ethan on 11/10/2020.
  */
+@CrossOrigin
 @RestController()
 @RequestMapping(value = "/api/appUser")
 public class UserController extends BaseController {
