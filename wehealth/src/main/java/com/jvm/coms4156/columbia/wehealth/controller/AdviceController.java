@@ -19,7 +19,6 @@ import java.util.Optional;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 
-@CrossOrigin
 @RestController
 @Log4j2
 public class AdviceController extends BaseController {
@@ -28,7 +27,9 @@ public class AdviceController extends BaseController {
 
     @GetMapping(path = "/advice", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AdviceDto> getDietRecords () {
+    public ResponseEntity<AdviceDto> getDietRecords (
+            @RequestBody UserIdDto userIdDto) {
+        log.info("Get adivce {}", userIdDto.toString());
         AdviceDto adviceDto = adviceService.getAdvice(au());
         return new ResponseEntity<>(adviceDto, HttpStatus.OK);
     }

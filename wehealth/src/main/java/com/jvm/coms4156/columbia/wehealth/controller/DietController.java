@@ -6,7 +6,6 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
 
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
-import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.service.DietService;
 import java.util.Optional;
 import lombok.extern.log4j.Log4j2;

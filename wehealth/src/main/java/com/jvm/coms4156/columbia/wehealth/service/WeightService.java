@@ -7,7 +7,6 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND_TO_GRAM;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
