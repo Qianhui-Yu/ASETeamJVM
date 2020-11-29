@@ -5,21 +5,19 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
 import com.jvm.coms4156.columbia.wehealth.service.WeightService;
+import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.Optional;
-
-
 
 
 @CrossOrigin
 @RestController
 @Log4j2
-public class WeightController extends BaseController{
+public class WeightController extends BaseController {
   @Autowired
   private WeightService weightService;
 
@@ -45,7 +43,6 @@ public class WeightController extends BaseController{
    *
    * @param unit Unit of the time span. Among ["day", "week", "month", "year"]
    * @param length Number of units to data back from current date.
-   * @param userIdDto Input user ID object.
    * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
    *         unauthorized access.
    */
@@ -84,7 +81,6 @@ public class WeightController extends BaseController{
    * Hanlder for deleting a weight record from the database.
    *
    * @param weightId ID of the weight record to be deleted.
-   * @param userIdDto Input user id object.
    * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
    *         unauthorized access.
    */

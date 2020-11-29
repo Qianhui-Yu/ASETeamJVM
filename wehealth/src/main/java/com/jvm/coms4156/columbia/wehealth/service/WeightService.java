@@ -38,6 +38,7 @@ public class WeightService {
   /**
    * Add a weight record into the database.
    *
+   * @param au Authenticated user indicating which user performs this.
    * @param weightRecordDto Input weight record object. Refer to dto/WeightRecordDto for details.
    */
   @Transactional
@@ -77,7 +78,7 @@ public class WeightService {
   /**
    * Get a all the weight records based on input criteria.
    *
-   * @param userIdDto Input user ID. Refer to dto/UserIdDto for details.
+   * @param au Authenticated user indicating which user performs this.
    * @param unit Unit of the span.
    * @param length Number of units to date back from current date.
    * @return Refer to dto/WeightHistoryResponseDto for details.
@@ -135,6 +136,7 @@ public class WeightService {
   /**
    * Edit a weight record.
    *
+   * @param au Authenticated user indicating which user performs this.
    * @param weightId ID of the weight record to be edited.
    * @param weightRecordDto Target weight record after editing.
    */
@@ -170,8 +172,8 @@ public class WeightService {
   /**
    * Delete a weight record.
    *
+   * @param au Authenticated user indicating which user performs this.
    * @param weightId ID of the weight record to be deleted.
-   * @param userIdDto Input user ID object.
    */
   @Transactional
   public void deleteWeightRecord(AuthenticatedUser au, Integer weightId) {

@@ -2,7 +2,6 @@ package com.jvm.coms4156.columbia.wehealth.entity;
 
 import java.io.Serializable;
 import javax.persistence.*;
-
 import lombok.Data;
 
 @Entity
@@ -11,7 +10,7 @@ import lombok.Data;
 @Data
 public class DietNutrientMapping implements Serializable {
   @Id
-  @GeneratedValue(strategy=GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "diet_nutrient_mapping_id")
   private int dietNutrientMappingId;
 

@@ -81,7 +81,6 @@ public class DietController extends BaseController {
    * Hanlder for deleting a diet record.
    *
    * @param recordId ID of the record to be deleted.
-   * @param userIdDto Input user ID object. Refer to dto/UserIdDto for details.
    * @return Return 200 for success, 400 for bad request (invalid diet history ID), and 401 for
    *         unauthorized access.
    */
