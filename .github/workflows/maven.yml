@@ -1,0 +1,29 @@
+# This workflow will build a Java project with Maven
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: 
+      - dev
+      - cicd
+  pull_request:
+    branches: 
+      - dev
+      - cicd
+
+jobs:
+  build_and_test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml -DargLine="-Dspring.datasource.url=jdbc:mysql://database-adv-swe.cukopzgih6s7.us-east-2.rds.amazonaws.com:3306/wehealth?useUnicode=yes&characterEncoding=utf8 -Dspring.datasource.username=admin -Dspring.datasource.password=12345678aA! -Dspring.security.user.name=wehealth -Dspring.security.user.password=wehealth -Djwt.secret=sdfhh2isd9wuebsdlhf -Djwt.expiration=30"
+
