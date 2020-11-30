@@ -6,11 +6,11 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_FAT;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_PROTEIN;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietStatsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.*;
+
 import java.lang.Math;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 public class AdviceService {
   @Autowired
   private DietService dietService;
+  @Autowired
+  private ExerciseService exerciseService;
 
   /**
    * generate diet and exercise advice for a given user.
@@ -34,17 +36,54 @@ public class AdviceService {
     Optional<String> unit = Optional.of("month");
     Optional<Integer> length = Optional.of(1);
 
+    DietHistoryResponseDto dietHistory = dietService.getDietHistory(user, unit, length);
+    List<DietByDayDto> dietByDayDtos = groupDietByDate(dietHistory);
+    ExerciseHistoryResponseDto exerciseHistory = exerciseService
+            .getExerciseHistory(unit, length, user);
+    List<ExerciseByDayDto> exerciseByDayDtos = groupExerciseByDate(exerciseHistory);
 
-    DietHistoryResponseDto dietHistoryResponseDto = dietService.getDietHistory(user, unit, length);
-    Optional<DietStatsDto> dietStatsDto = getStats(dietHistoryResponseDto);
-    if (dietStatsDto.isEmpty()) {
-      adviceDto.setIsEmpty(true);
-    } else {
-      adviceDto = generateAdvice(dietStatsDto.get());
-      adviceDto.setIsEmpty(false);
-    }
+    adviceDto.setDietByDate(dietByDayDtos);
+    adviceDto.setExerciseByDate(exerciseByDayDtos);
+//    Optional<DietStatsDto> dietStatsDto = getStats(dietHistoryResponseDto);
+//    if (dietStatsDto.isEmpty()) {
+//      adviceDto.setIsEmpty(true);
+//    } else {
+//      adviceDto = generateAdvice(dietStatsDto.get());
+//      adviceDto.setIsEmpty(false);
+//    }
     return adviceDto;
   }
+
+  private List<DietByDayDto> groupDietByDate(DietHistoryResponseDto dto) {
+    HashMap<String, DietByDayDto> aggregated = new HashMap<String, DietByDayDto>();
+    for (DietHistoryDetailsDto dhd : dto.getDietHistoryList()) {
+      String date = dhd.getTime().split(" ")[0];
+      if (!aggregated.containsKey(date)) {
+        aggregated.put(date, new DietByDayDto(date, 0.0, 0.0, 0.0, 0.0));
+      }
+      DietByDayDto dietByDayDto = aggregated.get(date);
+      dietByDayDto.setTotalCalories(dietByDayDto.getTotalCalories() + dhd.getTotalCalories());
+      dietByDayDto.setTotalProtein(dietByDayDto.getTotalProtein() + dhd.getTotalProtein());
+      dietByDayDto.setTotalCarbs(dietByDayDto.getTotalCarbs() + dhd.getTotalCarbs());
+      dietByDayDto.setTotalFat(dietByDayDto.getTotalFat() + dhd.getTotalFat());
+    }
+    return new ArrayList(aggregated.values());
+  }
+
+  private List<ExerciseByDayDto> groupExerciseByDate(ExerciseHistoryResponseDto dto) {
+    HashMap<String, ExerciseByDayDto> aggregated = new HashMap<String, ExerciseByDayDto>();
+    for (ExerciseHistoryDetailsDto dhd : dto.getExerciseHistoryList()) {
+      String date = dhd.getTime().split(" ")[0];
+      if (!aggregated.containsKey(date)) {
+        aggregated.put(date, new ExerciseByDayDto(date, 0.0, 0.0));
+      }
+      ExerciseByDayDto exerciseByDayDto = aggregated.get(date);
+      exerciseByDayDto.setTotalCalories(exerciseByDayDto.getTotalCalories() + dhd.getTotalCalories());
+      exerciseByDayDto.setTotalDuration(exerciseByDayDto.getTotalDuration() + dhd.getDuration());
+    }
+    return new ArrayList(aggregated.values());
+  }
+
 
   private AdviceDto generateAdvice(DietStatsDto dietStatsDto) {
     AdviceDto adviceDto = new AdviceDto();
