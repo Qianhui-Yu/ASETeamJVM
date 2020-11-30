@@ -25,6 +25,6 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      env: # Or as an environment variable
+      env: #Environment variable
         super_secret: ${{ secrets.PROJECR_VM_OPTION }}
-      run: cd wehealth && mvn -B package --file pom.xml -DargLine="$super_secret"
+      run: cd wehealth && mvn -B clean package --file pom.xml -DargLine="$super_secret"
