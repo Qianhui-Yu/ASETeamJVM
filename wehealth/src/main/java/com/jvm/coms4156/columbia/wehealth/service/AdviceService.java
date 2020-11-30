@@ -33,14 +33,19 @@ public class AdviceService {
    */
   public AdviceDto getAdvice(AuthenticatedUser user) {
     AdviceDto adviceDto = new AdviceDto();
+    adviceDto.setIsEmpty(true);
     Optional<String> unit = Optional.of("month");
     Optional<Integer> length = Optional.of(1);
 
     DietHistoryResponseDto dietHistory = dietService.getDietHistory(user, unit, length);
     List<DietByDayDto> dietByDayDtos = groupDietByDate(dietHistory);
+
     ExerciseHistoryResponseDto exerciseHistory = exerciseService
             .getExerciseHistory(unit, length, user);
     List<ExerciseByDayDto> exerciseByDayDtos = groupExerciseByDate(exerciseHistory);
+    if (dietByDayDtos.size() > 0 || exerciseByDayDtos.size() > 0) {
+      adviceDto.setIsEmpty(false);
+    }
 
     adviceDto.setDietByDate(dietByDayDtos);
     adviceDto.setExerciseByDate(exerciseByDayDtos);
@@ -51,6 +56,7 @@ public class AdviceService {
 //      adviceDto = generateAdvice(dietStatsDto.get());
 //      adviceDto.setIsEmpty(false);
 //    }
+
     return adviceDto;
   }
 
