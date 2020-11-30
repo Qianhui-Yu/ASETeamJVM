@@ -25,5 +25,6 @@ jobs:
       with:
         java-version: 11
     - name: Build with Maven
-      run: cd wehealth && mvn -B package --file pom.xml -DargLine="-Dspring.datasource.url=jdbc:mysql://database-adv-swe.cukopzgih6s7.us-east-2.rds.amazonaws.com:3306/wehealth?useUnicode=yes&characterEncoding=utf8 -Dspring.datasource.username=admin -Dspring.datasource.password=12345678aA! -Dspring.security.user.name=wehealth -Dspring.security.user.password=wehealth -Djwt.secret=sdfhh2isd9wuebsdlhf -Djwt.expiration=30"
-
+      env: # Or as an environment variable
+        super_secret: ${{ secrets.PROJECR_VM_OPTION }}
+      run: cd wehealth && mvn -B package --file pom.xml -DargLine="$super_secret"
