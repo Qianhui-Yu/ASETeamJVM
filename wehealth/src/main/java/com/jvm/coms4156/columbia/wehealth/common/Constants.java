@@ -5,7 +5,6 @@ public class Constants {
 
   private Constants() {}
 
-  public static final String SUCCESS_MSG = "\"Successfully recorded.\"";
   public static final double POUND_TO_GRAM = 453.59;
   public static final String DEVELOPER = "developer";
   public static final String GRAM = "gram";

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
+import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import com.jvm.coms4156.columbia.wehealth.entity.DietHistory;
 import com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping;
@@ -35,7 +36,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class DietServiceTests {
+public class DietServiceTest {
 
   @InjectMocks
   private DietService dietService;
@@ -245,7 +246,7 @@ public class DietServiceTests {
 
   @Test
   public void getDietHistoryInvalid2Test() {
-    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.of(validUser(1L)));
+    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());
     AuthenticatedUser au = new AuthenticatedUser(1L);
     String unit = "all";
     Integer length = -1;
@@ -267,7 +268,7 @@ public class DietServiceTests {
   }
 
   @Test
-  public void updateDietHistoryUserNotFoundTest() {
+  public void updateDietHistoryInvalidTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());
     when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
             .thenReturn(Optional.of(validDietHistory(1, 1)));
@@ -281,55 +282,14 @@ public class DietServiceTests {
   }
 
   @Test
-  public void updateDietHistoryInvalidUserTest() {
+  public void updateDietHistoryInvalid2Test() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
-        .thenReturn(Optional.of(validUser(2L)));
+            .thenReturn(Optional.empty());
     when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
-        .thenReturn(Optional.of(validDietHistory(1, 1)));
+            .thenReturn(Optional.empty());
     AuthenticatedUser au = getValidAU();
     DietRecordDto dietRecordDto = new DietRecordDto(1, "test", 10.0,
-        "gram", 10.0, 10.0, 10.0, 10.0);
-    Assertions.assertThrows(BadRequestException.class, () -> {
-      dietService.updateDietHistory(au, 1, dietRecordDto);
-    });
-
-  }
-
-  @Test
-  public void updateDietHistoryInvalidWeightTest() {
-    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
-        .thenReturn(Optional.of(validUser(1L)));
-    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
-        .thenReturn(Optional.of(validDietHistory(1, 1)));
-    AuthenticatedUser au = getValidAU();
-    DietRecordDto dietRecordDto = new DietRecordDto(1, "test", -10.0,
-        "gram", 10.0, 10.0, 10.0, 10.0);
-    Assertions.assertThrows(BadRequestException.class, () -> {
-      dietService.updateDietHistory(au, 1, dietRecordDto);
-    });
-  }
-
-  @Test
-  public void updateDietHistoryInvalidWeightUnitTest() {
-    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
-        .thenReturn(Optional.of(validUser(1L)));
-    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
-        .thenReturn(Optional.of(validDietHistory(1, 1)));
-    AuthenticatedUser au = getValidAU();
-    DietRecordDto dietRecordDto = new DietRecordDto(1, "test", 10.0,
-        "kilogram", 10.0, 10.0, 10.0, 10.0);
-    Assertions.assertThrows(BadRequestException.class, () -> {
-      dietService.updateDietHistory(au, 1, dietRecordDto);
-    });
-  }
-
-  @Test
-  public void updateDietHistoryInvalidRecordIdTest() {
-    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
-        .thenReturn(Optional.empty());
-    AuthenticatedUser au = getValidAU();
-    DietRecordDto dietRecordDto = new DietRecordDto(1, "test", 10.0,
-        "gram", 10.0, 10.0, 10.0, 10.0);
+            "gram", 10.0, 10.0, 10.0, 10.0);
     Assertions.assertThrows(BadRequestException.class, () -> {
       dietService.updateDietHistory(au, 1, dietRecordDto);
     });
@@ -348,7 +308,7 @@ public class DietServiceTests {
   }
 
   @Test
-  public void deleteDietHistoryInvalidRecordIdTest() {
+  public void deleteDietHistoryInvalidTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
     when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
@@ -360,23 +320,11 @@ public class DietServiceTests {
   }
 
   @Test
-  public void deleteDietHistoryUserNotFoundTest() {
+  public void deleteDietHistoryInvalid2Test() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.empty());
     when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
-            .thenReturn(Optional.of(validDietHistory(1, 1)));
-    AuthenticatedUser au = getValidAU();
-    Assertions.assertThrows(BadRequestException.class, () -> {
-      dietService.deleteDietHistory(au, 1);
-    });
-  }
-
-  @Test
-  public void deleteDietHistoryInvalidUserTest() {
-    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
-        .thenReturn(Optional.of(validUser(2L)));
-    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))
-        .thenReturn(Optional.of(validDietHistory(1, 1)));
+            .thenReturn(Optional.empty());
     AuthenticatedUser au = getValidAU();
     Assertions.assertThrows(BadRequestException.class, () -> {
       dietService.deleteDietHistory(au, 1);
