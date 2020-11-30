@@ -2,10 +2,10 @@ package com.jvm.coms4156.columbia.wehealth.controller;
 
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
 
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
-import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.service.DietService;
 import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
@@ -13,15 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin
 @RestController
 @Log4j2
 public class DietController extends BaseController {
@@ -41,7 +35,7 @@ public class DietController extends BaseController {
     dietService.addDietRecordToDb(au(), dietRecordDto);
 
     log.info("Successfully added a new diet record.");
-    return new ResponseEntity<>("Successfully recorded.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
   /**
@@ -80,14 +74,13 @@ public class DietController extends BaseController {
     log.info("Updating diet record {}", recordId);
     dietService.updateDietHistory(au(), recordId, dietRecordDto);
     log.info("Successfully updated diet record {}", recordId);
-    return new ResponseEntity<>("Successfully updated.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
   /**
    * Hanlder for deleting a diet record.
    *
    * @param recordId ID of the record to be deleted.
-   * @param userIdDto Input user ID object. Refer to dto/UserIdDto for details.
    * @return Return 200 for success, 400 for bad request (invalid diet history ID), and 401 for
    *         unauthorized access.
    */
@@ -97,7 +90,7 @@ public class DietController extends BaseController {
     log.info("Deleting diet record {}", recordId);
     dietService.deleteDietHistory(au(), recordId);
     log.info("Successfully deleted diet record {}", recordId);
-    return new ResponseEntity<>("Successfully deleted.", HttpStatus.OK);
+    return new ResponseEntity<>(SUCCESS_MSG, HttpStatus.OK);
   }
 
 }

@@ -7,7 +7,6 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND_TO_GRAM;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
@@ -39,6 +38,7 @@ public class WeightService {
   /**
    * Add a weight record into the database.
    *
+   * @param au Authenticated user indicating which user performs this.
    * @param weightRecordDto Input weight record object. Refer to dto/WeightRecordDto for details.
    */
   @Transactional
@@ -50,6 +50,9 @@ public class WeightService {
       throw new NotFoundException("User not found with provided user id.");
     }
     weightHistory.setUser(user.get());
+    if (weightRecordDto.getWeight() <= 0) {
+      throw new BadRequestException("Weight should be larger than zero.");
+    }
 
     // In weight_history table, the default unit of weight is gram
     weightHistory.setUnit(GRAM);
@@ -75,7 +78,7 @@ public class WeightService {
   /**
    * Get a all the weight records based on input criteria.
    *
-   * @param userIdDto Input user ID. Refer to dto/UserIdDto for details.
+   * @param au Authenticated user indicating which user performs this.
    * @param unit Unit of the span.
    * @param length Number of units to date back from current date.
    * @return Refer to dto/WeightHistoryResponseDto for details.
@@ -133,6 +136,7 @@ public class WeightService {
   /**
    * Edit a weight record.
    *
+   * @param au Authenticated user indicating which user performs this.
    * @param weightId ID of the weight record to be edited.
    * @param weightRecordDto Target weight record after editing.
    */
@@ -150,9 +154,17 @@ public class WeightService {
       throw new BadRequestException("Illegal edit attempt: Record not belong to this user.");
     }
 
+    if (weightRecordDto.getWeight() <= 0) {
+      throw new BadRequestException("Weight should be larger than zero.");
+    }
+
     String currentDateTime = Utility.getStringOfCurrentDateTime();
-    weightHistoryRecord.setWeight(weightRecordDto.getWeight());
-    weightHistoryRecord.setUnit(weightRecordDto.getUnit());
+    if (weightRecordDto.getUnit().toLowerCase().equals(POUND)) {
+      weightHistoryRecord.setWeight(weightRecordDto.getWeight() * POUND_TO_GRAM);
+    } else {
+      weightHistoryRecord.setWeight(weightRecordDto.getWeight());
+    }
+    weightHistoryRecord.setUnit(GRAM);
     weightHistoryRecord.setUpdatedTime(currentDateTime);
     weightHistoryRepo.save(weightHistoryRecord);
   }
@@ -160,8 +172,8 @@ public class WeightService {
   /**
    * Delete a weight record.
    *
+   * @param au Authenticated user indicating which user performs this.
    * @param weightId ID of the weight record to be deleted.
-   * @param userIdDto Input user ID object.
    */
   @Transactional
   public void deleteWeightRecord(AuthenticatedUser au, Integer weightId) {

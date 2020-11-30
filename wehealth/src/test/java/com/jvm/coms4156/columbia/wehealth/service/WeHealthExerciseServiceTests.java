@@ -7,7 +7,6 @@ import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseRecordDto;
-import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import com.jvm.coms4156.columbia.wehealth.entity.ExerciseHistory;
 import com.jvm.coms4156.columbia.wehealth.entity.ExerciseType;
