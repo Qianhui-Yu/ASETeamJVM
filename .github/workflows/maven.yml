@@ -27,4 +27,4 @@ jobs:
     - name: Build with Maven
       env: #Environment variable
         super_secret: ${{ secrets.PROJECT_VM_OPTION }}
-      run: cd wehealth && mvn -B clean package --file pom.xml -DargLine=${{ secrets.PROJECT_VM_OPTION }}
+      run: cd wehealth && mvn -B clean package --file pom.xml -DargLine="$super_secret"
