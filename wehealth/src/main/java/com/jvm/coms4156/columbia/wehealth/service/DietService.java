@@ -17,6 +17,7 @@ import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
+import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
 import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import com.jvm.coms4156.columbia.wehealth.entity.DietHistory;
 import com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping;
@@ -58,7 +59,6 @@ public class DietService {
   /**
    * Backend logic for adding a diet record into the database.
    *
-   * @param au Authenticated user indicating which user performs this.
    * @param dietRecordDto Input diet record object. Refer to dto/DietRecordDto for details.
    */
   @Transactional
@@ -70,10 +70,6 @@ public class DietService {
       throw new NotFoundException("User not found with provided user id.");
     }
     dietHistory.setUser(user.get());
-
-    if (dietRecordDto.getWeight() <= 0) {
-      throw new BadRequestException("Weight should be larger than zero.");
-    }
 
     Optional<DietType> dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());
     if (dietType.isEmpty()) {
@@ -172,7 +168,6 @@ public class DietService {
   /**
    * Get a list of diet history records based on input criterion.
    *
-   * @param au Authenticated user indicating which user performs this.
    * @param unit Unit type of the span. Among ["day", "week", "month", "year"].
    * @param length Date the number units back.
    * @return Return a list of records. Refer to dto/DietHistoryResponseDto for details.
@@ -186,7 +181,6 @@ public class DietService {
 
     String timeUnit = unit.orElse(ALL); // Default: find all diet history
     int timeLength = length.orElse(ONE); // Default: 1 time unit e.g. 1 week, 1 month...
-    log.info("**********time length = {}**********", timeLength);
     if (timeLength < 0) {
       throw new BadRequestException("Invalid time length: Duration must be positive.");
     }
@@ -253,7 +247,6 @@ public class DietService {
   /**
    * Edit a diet record in the database.
    *
-   * @param au Authenticated user indicating which user performs this.
    * @param recordId ID of the record to be edited.
    * @param dietRecordDto Target record after editing. Refer to dto/DietRecordDto for details.
    */
@@ -272,9 +265,6 @@ public class DietService {
     }
     if (!dietHistory.get().getUser().getUserId().equals(user.get().getUserId())) {
       throw new BadRequestException("You can't update other user's diet record.");
-    }
-    if (dietRecordDto.getWeight() <= 0) {
-      throw new BadRequestException("Weight should be larger than zero.");
     }
 
     // Check if need to update diet type
@@ -312,7 +302,7 @@ public class DietService {
    * Delete a diet record from the database.
    *
    * @param recordId ID of the diet record to be deleted.
-   * @param au Authenticated user indicating which user performs this.
+   * @param userIdDto Input user ID object indicating which user performs this.
    */
   @Transactional
   public void deleteDietHistory(AuthenticatedUser au, Integer recordId) {
