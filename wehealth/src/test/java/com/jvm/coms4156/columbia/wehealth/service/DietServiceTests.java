@@ -382,9 +382,5 @@ public class DietServiceTests {
       dietService.deleteDietHistory(au, 1);
     });
   }
-
-
-
-
-
+  
 }
