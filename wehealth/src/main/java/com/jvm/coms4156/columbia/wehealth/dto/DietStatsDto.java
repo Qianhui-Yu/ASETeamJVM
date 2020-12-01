@@ -13,9 +13,7 @@ public class DietStatsDto {
   private Double avgProtein;
   private Double avgCarbs;
 
-  private Double maxCalories;
-  private Double maxFat;
-  private Double maxProtein;
-  private Double maxCarbs;
+  private Double avgDuration;
+  private Double avgExerciseCal;
 
 }

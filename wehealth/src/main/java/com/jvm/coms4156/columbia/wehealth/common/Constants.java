@@ -24,6 +24,7 @@ public class Constants {
   public static final double GOOD_AVG_PROTEIN = 80;
   public static final double GOOD_AVG_CARBS = 300;
   public static final double GOOD_AVG_FAT = 60;
+  public static final double GOOD_DURATION = 30;
 
 }
 

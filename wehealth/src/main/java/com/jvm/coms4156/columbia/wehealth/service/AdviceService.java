@@ -4,13 +4,18 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_CALOR
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_CARBS;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_FAT;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_PROTEIN;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_DURATION;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietByDayDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietStatsDto;
-import java.lang.Math;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseByDayDto;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +27,8 @@ import org.springframework.stereotype.Service;
 public class AdviceService {
   @Autowired
   private DietService dietService;
+  @Autowired
+  private ExerciseService exerciseService;
 
   /**
    * generate diet and exercise advice for a given user.
@@ -31,113 +38,142 @@ public class AdviceService {
    */
   public AdviceDto getAdvice(AuthenticatedUser user) {
     AdviceDto adviceDto = new AdviceDto();
+    adviceDto.setIsEmpty(true);
     Optional<String> unit = Optional.of("month");
     Optional<Integer> length = Optional.of(1);
 
+    DietHistoryResponseDto dietHistory = dietService.getDietHistory(user, unit, length);
+    List<DietByDayDto> dietByDayDtos = groupDietByDate(dietHistory);
 
-    DietHistoryResponseDto dietHistoryResponseDto = dietService.getDietHistory(user, unit, length);
-    Optional<DietStatsDto> dietStatsDto = getStats(dietHistoryResponseDto);
-    if (dietStatsDto.isEmpty()) {
-      adviceDto.setIsEmpty(true);
-    } else {
-      adviceDto = generateAdvice(dietStatsDto.get());
+    ExerciseHistoryResponseDto exerciseHistory = exerciseService
+            .getExerciseHistory(unit, length, user);
+    List<ExerciseByDayDto> exerciseByDayDtos = groupExerciseByDate(exerciseHistory);
+    if (dietByDayDtos.size() > 0 || exerciseByDayDtos.size() > 0) {
       adviceDto.setIsEmpty(false);
     }
+
+    adviceDto.setDietByDate(dietByDayDtos);
+    adviceDto.setExerciseByDate(exerciseByDayDtos);
+    getStats(adviceDto);
+    generateAdvice(adviceDto);
     return adviceDto;
   }
 
-  private AdviceDto generateAdvice(DietStatsDto dietStatsDto) {
-    AdviceDto adviceDto = new AdviceDto();
-    String suggestions = String.format("You Avg calories intake is %.2f KCAL; "
-                    + "the recommended intake is %.2f KCAL,",
-            dietStatsDto.getAvgCalories(), GOOD_AVG_CALORIES);
-    // calories recommendation
-    if (dietStatsDto.getAvgCalories() < GOOD_AVG_CALORIES * 0.8) {
-      suggestions += " You should eat more!";
-    } else if (dietStatsDto.getAvgCalories() > GOOD_AVG_CALORIES * 1.2) {
-      suggestions += " You should eat less!";
+  private void generateAdvice(AdviceDto adviceDto) {
+    String suggestion;
+    if (adviceDto.getAvgCalories() < GOOD_AVG_CALORIES * 0.7) {
+      suggestion = "You avg calories intake is 30% lower than the recommended level."
+              + " Please eat more to control your weight.";
+    } else if (adviceDto.getAvgCalories() > GOOD_AVG_CALORIES * 1.3) {
+      suggestion = "You avg calories intake is 30% higher than the recommended level."
+              + " Please eat less to control your weight.";
     } else {
-      suggestions += " Your calories intake is just about right!";
+      suggestion = " Your calories intake is just about right!";
     }
-    adviceDto.setCaloriesAdvice(suggestions);
+    adviceDto.setCaloriesAdvice(suggestion);
+
     // protein recommendation
-    suggestions = String.format("You Avg protein intake is %.2f grams; "
-                    + "the recommended intake is %.2f grams,",
-            dietStatsDto.getAvgProtein(), GOOD_AVG_PROTEIN);
-    if (dietStatsDto.getAvgProtein() < GOOD_AVG_PROTEIN * 0.8) {
-      suggestions += " You should eat more protein product (like Milk or beef)!";
-    } else if (dietStatsDto.getAvgProtein() > GOOD_AVG_PROTEIN * 1.2) {
-      suggestions += " You should eat less protein product (like Milk or beef)!!";
+    if (adviceDto.getAvgProtein() < GOOD_AVG_PROTEIN * 0.7) {
+      suggestion = "Low protein intake, recommended food for you: Eggs, "
+              + "Roasted Chicken, Lean Beef.";
+    } else if (adviceDto.getAvgProtein() > GOOD_AVG_PROTEIN * 1.3) {
+      suggestion = "Too much protein intake, recommended cutting 30% of high protein food intake.";
     } else {
-      suggestions += " Your protein intake is just about right!";
+      suggestion = " Your protein intake is just about right!";
     }
-    adviceDto.setProteinAdvice(suggestions);
+    adviceDto.setProteinAdvice(suggestion);
+
     // fat recommendation
-    suggestions = String.format("You Avg fat intake is %.2f grams; "
-                    + "the recommended intake is %.2f grams,",
-            dietStatsDto.getAvgFat(), GOOD_AVG_FAT);
-    if (dietStatsDto.getAvgFat() < GOOD_AVG_FAT * 0.8) {
-      suggestions += " You should eat more fat product (like pork)!";
-    } else if (dietStatsDto.getAvgFat() > GOOD_AVG_FAT * 1.2) {
-      suggestions += " You should eat less fat product (like pork)!!";
+    if (adviceDto.getAvgFat() < GOOD_AVG_FAT * 0.7) {
+      suggestion = "Low fat intake, recommended food for you: Avocado, Eggs, Fish.";
+    } else if (adviceDto.getAvgFat() > GOOD_AVG_FAT * 1.3) {
+      suggestion = "Too much fat intake, recommended cutting 30% of high fat food intake.";
     } else {
-      suggestions += " Your fat intake is just about right!";
+      suggestion = " Your fat intake is just about right!";
     }
-    adviceDto.setFatAdvice(suggestions);
+    adviceDto.setFatAdvice(suggestion);
+
     // carbs recommendation
-    suggestions = String.format("You Avg carbs intake is %.2f grams; "
-                    + "the recommended intake is %.2f grams,",
-            dietStatsDto.getAvgCarbs(), GOOD_AVG_CARBS);
-    if (dietStatsDto.getAvgCarbs() < GOOD_AVG_CARBS * 0.8) {
-      suggestions += " You should eat more carbs product (like rice or bread)!";
-    } else if (dietStatsDto.getAvgCarbs() > GOOD_AVG_CARBS * 1.2) {
-      suggestions += " You should eat less carbs product (like rice or bread)!!";
+    if (adviceDto.getAvgCarbs() < GOOD_AVG_CARBS * 0.8) {
+      suggestion = "Low carbs intake, recommended food for you: Bread, Rice, Oats.";
+    } else if (adviceDto.getAvgCarbs() > GOOD_AVG_CARBS * 1.2) {
+      suggestion = "Too much carbs intake, recommended cutting 30% of high fat carbs intake.";
     } else {
-      suggestions += " Your carbs intake is just about right!";
+      suggestion = " Your carbs intake is just about right!";
     }
-    adviceDto.setCarbsAdvice(suggestions);
-    return adviceDto;
+    adviceDto.setCarbsAdvice(suggestion);
+
+    // exercise recommendation
+    if (adviceDto.getAvgDuration() < GOOD_DURATION) {
+      suggestion = "We recommend 30 mins of mild to medium intensity exercise every day!";
+    } else {
+      suggestion = "You are killing the daily exercises target!";
+    }
+    adviceDto.setExerciseAdvice(suggestion);
   }
 
 
-  private Optional<DietStatsDto> getStats(DietHistoryResponseDto dietHistoryResponseDto) {
+
+  private List<DietByDayDto> groupDietByDate(DietHistoryResponseDto dto) {
+    HashMap<String, DietByDayDto> aggregated = new HashMap<String, DietByDayDto>();
+    for (DietHistoryDetailsDto dhd : dto.getDietHistoryList()) {
+      String date = dhd.getTime().split(" ")[0];
+      if (!aggregated.containsKey(date)) {
+        aggregated.put(date, new DietByDayDto(date, 0.0, 0.0, 0.0, 0.0));
+      }
+      DietByDayDto dietByDayDto = aggregated.get(date);
+      dietByDayDto.setTotalCalories(dietByDayDto.getTotalCalories() + dhd.getTotalCalories());
+      dietByDayDto.setTotalProtein(dietByDayDto.getTotalProtein() + dhd.getTotalProtein());
+      dietByDayDto.setTotalCarbs(dietByDayDto.getTotalCarbs() + dhd.getTotalCarbs());
+      dietByDayDto.setTotalFat(dietByDayDto.getTotalFat() + dhd.getTotalFat());
+    }
+    return new ArrayList<DietByDayDto>(aggregated.values());
+  }
+
+  private List<ExerciseByDayDto> groupExerciseByDate(ExerciseHistoryResponseDto dto) {
+    HashMap<String, ExerciseByDayDto> aggregated = new HashMap<String, ExerciseByDayDto>();
+    for (ExerciseHistoryDetailsDto dhd : dto.getExerciseHistoryList()) {
+      String date = dhd.getTime().split(" ")[0];
+      if (!aggregated.containsKey(date)) {
+        aggregated.put(date, new ExerciseByDayDto(date, 0.0, 0.0));
+      }
+      ExerciseByDayDto exerciseByDayDto = aggregated.get(date);
+      exerciseByDayDto.setTotalCalories(exerciseByDayDto.getTotalCalories()
+              + dhd.getTotalCalories());
+      exerciseByDayDto.setTotalDuration(exerciseByDayDto.getTotalDuration()
+              + dhd.getDuration());
+    }
+    return new ArrayList<ExerciseByDayDto>(aggregated.values());
+  }
+
+
+  private void getStats(AdviceDto adviceDto) {
     Double avgCalories = 0.0;
     Double avgFat = 0.0;
     Double avgProtein = 0.0;
     Double avgCarbs = 0.0;
+    Double avgDuration = 0.0;
+    Double avgExerciseCal = 0.0;
 
-    Double maxCalories = 0.0;
-    Double maxFat = 0.0;
-    Double maxProtein = 0.0;
-    Double maxCarbs = 0.0;
-
-    List<DietHistoryDetailsDto> dietHistoryList = dietHistoryResponseDto.getDietHistoryList();
-    if (dietHistoryList.size() == 0) {
-      return Optional.empty();
+    List<DietByDayDto> dietHist = adviceDto.getDietByDate();
+    for (DietByDayDto oneDay : dietHist) {
+      avgCalories += oneDay.getTotalCalories();
+      avgFat += oneDay.getTotalFat();
+      avgProtein += oneDay.getTotalProtein();
+      avgCarbs += oneDay.getTotalCarbs();
     }
-    DietStatsDto dietStatsDto = new DietStatsDto();
-    for (DietHistoryDetailsDto detail : dietHistoryList) {
-      avgCalories += detail.getTotalCalories();
-      avgFat += detail.getTotalFat();
-      avgProtein += detail.getTotalProtein();
-      avgCarbs += detail.getTotalCarbs();
 
-      maxCalories = Math.max(maxCalories, detail.getTotalCalories());
-      maxFat = Math.max(maxFat, detail.getTotalFat());
-      maxCarbs = Math.max(maxCarbs, detail.getTotalCarbs());
-      maxProtein = Math.max(maxProtein, detail.getTotalProtein());
+    adviceDto.setAvgCalories(avgCalories / dietHist.size());
+    adviceDto.setAvgFat(avgFat / dietHist.size());
+    adviceDto.setAvgProtein(avgProtein / dietHist.size());
+    adviceDto.setAvgCarbs(avgCarbs / dietHist.size());
+
+    List<ExerciseByDayDto> exerciseHist = adviceDto.getExerciseByDate();
+    for (ExerciseByDayDto oneDay : exerciseHist) {
+      avgDuration += oneDay.getTotalDuration();
+      avgExerciseCal += oneDay.getTotalCalories();
     }
-    dietStatsDto.setAvgCalories(avgCalories / dietHistoryList.size());
-    dietStatsDto.setAvgFat(avgFat / dietHistoryList.size());
-    dietStatsDto.setAvgProtein(avgProtein / dietHistoryList.size());
-    dietStatsDto.setAvgCarbs(avgCarbs / dietHistoryList.size());
-
-    dietStatsDto.setMaxCalories(maxCalories);
-    dietStatsDto.setMaxFat(maxFat);
-    dietStatsDto.setMaxCarbs(maxCarbs);
-    dietStatsDto.setMaxProtein(maxProtein);
-
-    return Optional.of(dietStatsDto);
+    adviceDto.setAvgDuration(avgDuration / exerciseHist.size());
+    adviceDto.setAvgExerciseCal(avgExerciseCal / exerciseHist.size());
   }
 }
-
