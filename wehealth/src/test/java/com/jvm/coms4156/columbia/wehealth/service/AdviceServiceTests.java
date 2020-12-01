@@ -3,17 +3,17 @@ package com.jvm.coms4156.columbia.wehealth.service;
 import static org.mockito.Mockito.when;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.*;
-
+import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -64,11 +64,12 @@ public class AdviceServiceTests {
     return dietHistoryResponseDto;
   }
 
-  private ExerciseHistoryDetailsDto validExercise(Integer exerciseHistoryId, Double duration, String time) {
+  private ExerciseHistoryDetailsDto validExercise(Integer exerciseHistoryId,
+                                                  Double duration, String time) {
     ExerciseHistoryDetailsDto exercise = new ExerciseHistoryDetailsDto();
     exercise.setExerciseHistoryId(exerciseHistoryId);
     exercise.setExerciseTypeName("test");
-    exercise.setDuration(duration);
+    exercise.setDuration(duration * exerciseHistoryId);
     exercise.setTime(time);
     exercise.setTotalCalories(duration * 5);
     return exercise;
@@ -106,17 +107,17 @@ public class AdviceServiceTests {
   public void getAdviceValid1Test() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
-            .thenReturn(getValidDiestHistory(10));
+            .thenReturn(getValidDiestHistory(100));
 
     when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
             Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
-            .thenReturn(getValidExerciseHistory(10));
+            .thenReturn(getValidExerciseHistory(100));
 
     AuthenticatedUser au = new AuthenticatedUser(1L);
     AdviceDto adviceDto = adviceService.getAdvice(au);
     Assertions.assertEquals(false, adviceDto.getIsEmpty());
-    Assertions.assertEquals(10, adviceDto.getDietByDate().size());
-    Assertions.assertEquals(10, adviceDto.getExerciseByDate().size());
+    Assertions.assertEquals(100, adviceDto.getDietByDate().size());
+    Assertions.assertEquals(100, adviceDto.getExerciseByDate().size());
   }
 
   @Test
@@ -133,15 +134,24 @@ public class AdviceServiceTests {
     Assertions.assertEquals(1, adviceDto.getDietByDate().size());
     Assertions.assertEquals(1, adviceDto.getExerciseByDate().size());
   }
-//
-//  @Test
-//  public void getAdviceValid3Test() {
-//    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
-//            Mockito.any(Optional.class), Mockito.any(Optional.class)))
-//            .thenReturn(getValidDiestHistory(100));
-//    AuthenticatedUser au = new AuthenticatedUser(1L);
-//    AdviceDto adviceDto = adviceService.getAdvice(au);
-//    Assertions.assertEquals(false, adviceDto.getIsEmpty());
-//  }
+
+  @Test
+  public void getAdviceValid3Test() {
+    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
+            Mockito.any(Optional.class), Mockito.any(Optional.class)))
+            .thenReturn(getValidDiestHistory(1));
+    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
+            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
+            .thenReturn(getValidExerciseHistory(1));
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Assertions.assertEquals(false, adviceDto.getIsEmpty());
+    Assertions.assertEquals(adviceDto.getDietByDate().get(0).getTotalCalories(),
+            adviceDto.getAvgCalories());
+
+    Assertions.assertEquals(adviceDto.getExerciseByDate().get(0).getTotalDuration(),
+            adviceDto.getAvgDuration());
+    //Assertions.assertEquals(1, adviceDto.getExerciseByDate().size());
+  }
 
 }
