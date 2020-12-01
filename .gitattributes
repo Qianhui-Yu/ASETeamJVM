@@ -1,1 +1,4 @@
 wehealth/reports/* linguist-documentation
+wehealth/reports/InspectionReportLatest/index.html linguist-documentation
+wehealth/reports/InspectionReportOld/index.html linguist-documentation
+wehealth/reports/SpotbugReportOld/spotbugs-result-wehealth[wehealth]_2020_11_17_18_42_48.html linguist-documentation
