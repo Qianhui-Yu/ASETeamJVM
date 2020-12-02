@@ -27,11 +27,6 @@ public class SecurityFilter extends UsernamePasswordAuthenticationFilter {
     this.jwtService = jwtService;
   }
 
-//  @Override
-//  public void doFilter(ServletRequest servletRequest,
-//                       ServletResponse servletResponse,
-//                       FilterChain filterChain) {
-//  }
   @Override
   public void doFilter(ServletRequest servletRequest,
                        ServletResponse servletResponse,
