@@ -90,7 +90,6 @@ public class AdviceServiceTests {
   }
 
 
-
   @Test
   public void getAdviceValidLongRecordTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
@@ -143,7 +142,7 @@ public class AdviceServiceTests {
   }
 
   @Test
-  public void getAdviceValidNoDietTest() {
+  public void getAdviceInvalidDietTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(new DietHistoryResponseDto());
@@ -157,7 +156,7 @@ public class AdviceServiceTests {
   }
 
   @Test
-  public void getAdviceValidNoExerciseTest() {
+  public void getAdviceInvalidExerciseTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(getValidDiestHistory(1));
@@ -172,7 +171,7 @@ public class AdviceServiceTests {
 
 
   @Test
-  public void getAdviceInvalidBranchTest() {
+  public void getAdviceInvalidBothTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(new DietHistoryResponseDto());
@@ -182,6 +181,21 @@ public class AdviceServiceTests {
             .thenReturn(new ExerciseHistoryResponseDto());
 
     AuthenticatedUser au = new AuthenticatedUser(1L);
+    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Assertions.assertEquals(true, adviceDto.getIsEmpty());
+  }
+
+  @Test
+  public void getAdviceInvalidUserTest() {
+    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
+            Mockito.any(Optional.class), Mockito.any(Optional.class)))
+            .thenReturn(new DietHistoryResponseDto());
+
+    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
+            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
+            .thenReturn(new ExerciseHistoryResponseDto());
+
+    AuthenticatedUser au = new AuthenticatedUser(-1L);
     AdviceDto adviceDto = adviceService.getAdvice(au);
     Assertions.assertEquals(true, adviceDto.getIsEmpty());
   }
