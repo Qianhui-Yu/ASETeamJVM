@@ -98,6 +98,16 @@ public class WeHealthWeightServiceTests {
     );
   }
 
+  @Test
+  public void addWeightRecordToDBInvalidWeightTest() {
+    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
+    WeightRecordDto weightRecordDto = new WeightRecordDto(-60000.0, "gram");
+    AuthenticatedUser au = getValidUserAu();
+    Assertions.assertThrows(BadRequestException.class, () ->
+        weightService.addWeightRecordToDb(au, weightRecordDto)
+    );
+  }
+
   // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
   @Test
   public void addWeightRecordToDBGramTest() {
@@ -169,6 +179,16 @@ public class WeHealthWeightServiceTests {
     );
   }
 
+  @Test
+  public void editWeightRecordInvalidWeightTest() {
+    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
+        .thenReturn(validHistoryId());
+    AuthenticatedUser au = getValidUserAu();
+    Assertions.assertThrows(BadRequestException.class, () ->
+        weightService.editWeightRecord(au, 1, new WeightRecordDto(-60000.0, Constants.GRAM))
+    );
+  }
+
   // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
   @Test
   public void editWeightRecordNotBelongedTest() {
@@ -184,11 +204,20 @@ public class WeHealthWeightServiceTests {
 
   // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
   @Test
-  public void editWeightRecordTest() {
+  public void editWeightRecordValidGRAMTest() {
     when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
             .thenReturn(validHistoryId());
     AuthenticatedUser au = getValidUserAu();
     WeightRecordDto weightRecordDto = new WeightRecordDto(60000.0, Constants.GRAM);
+    weightService.editWeightRecord(au, 1, weightRecordDto);
+  }
+
+  @Test
+  public void editWeightRecordValidPOUNDTest() {
+    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))
+        .thenReturn(validHistoryId());
+    AuthenticatedUser au = getValidUserAu();
+    WeightRecordDto weightRecordDto = new WeightRecordDto(60000.0, Constants.POUND);
     weightService.editWeightRecord(au, 1, weightRecordDto);
   }
 
