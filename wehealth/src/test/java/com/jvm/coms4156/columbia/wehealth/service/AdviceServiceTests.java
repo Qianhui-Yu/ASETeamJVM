@@ -90,23 +90,9 @@ public class AdviceServiceTests {
   }
 
 
-  @Test
-  public void getAdviceInvalidTest() {
-    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
-            Mockito.any(Optional.class), Mockito.any(Optional.class)))
-            .thenReturn(new DietHistoryResponseDto());
-
-    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
-            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
-            .thenReturn(new ExerciseHistoryResponseDto());
-
-    AuthenticatedUser au = new AuthenticatedUser(1L);
-    AdviceDto adviceDto = adviceService.getAdvice(au);
-    Assertions.assertEquals(true, adviceDto.getIsEmpty());
-  }
 
   @Test
-  public void getAdviceValid1Test() {
+  public void getAdviceValidLongRecordTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(getValidDiestHistory(100));
@@ -123,7 +109,7 @@ public class AdviceServiceTests {
   }
 
   @Test
-  public void getAdviceValid2Test() {
+  public void getAdviceValidShortRecordTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(getValidDiestHistory(1));
@@ -138,7 +124,7 @@ public class AdviceServiceTests {
   }
 
   @Test
-  public void getAdviceBranchTest() {
+  public void getAdviceValidCalculationTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(getValidDiestHistory(1));
@@ -157,7 +143,7 @@ public class AdviceServiceTests {
   }
 
   @Test
-  public void getAdviceBranch2Test() {
+  public void getAdviceValidNoDietTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(new DietHistoryResponseDto());
@@ -171,7 +157,7 @@ public class AdviceServiceTests {
   }
 
   @Test
-  public void getAdviceValid3Test() {
+  public void getAdviceValidNoExerciseTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(getValidDiestHistory(1));
@@ -182,5 +168,21 @@ public class AdviceServiceTests {
     AuthenticatedUser au = new AuthenticatedUser(1L);
     AdviceDto adviceDto = adviceService.getAdvice(au);
     Assertions.assertEquals(false, adviceDto.getIsEmpty());
+  }
+
+
+  @Test
+  public void getAdviceInvalidBranchTest() {
+    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
+            Mockito.any(Optional.class), Mockito.any(Optional.class)))
+            .thenReturn(new DietHistoryResponseDto());
+
+    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
+            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
+            .thenReturn(new ExerciseHistoryResponseDto());
+
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Assertions.assertEquals(true, adviceDto.getIsEmpty());
   }
 }
