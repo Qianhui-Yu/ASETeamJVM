@@ -45,8 +45,8 @@ public class AdviceServiceTests {
     dietHistory.setDietTypeId(dietTypeId);
     dietHistory.setTotalProtein(10.0 * dietHistoryId);
     dietHistory.setTotalFat(5.0 * dietHistoryId);
-    dietHistory.setTotalCarbs(5.0 * dietHistoryId);
-    dietHistory.setTotalCalories(10.0 * dietHistoryId);
+    dietHistory.setTotalCarbs(10.0 * dietHistoryId);
+    dietHistory.setTotalCalories(100.0 * dietHistoryId);
     dietHistory.setTime(time);
     return dietHistory;
   }
@@ -58,6 +58,7 @@ public class AdviceServiceTests {
     // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     for (int i = 0; i < length; i++) {
       String day = LocalDateTime.now(ZoneId.systemDefault()).minusDays(i).format(formatter);
+      dietHistoryList.add(validDietHistory(i, i, day));
       dietHistoryList.add(validDietHistory(i, i, day));
     }
     dietHistoryResponseDto.setDietHistoryList(dietHistoryList);
@@ -81,6 +82,7 @@ public class AdviceServiceTests {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
     for (int i = 0; i < length; i++) {
       String day = LocalDateTime.now(ZoneId.systemDefault()).minusDays(i).format(formatter);
+      exerciseHistoryList.add(validExercise(i, 10.0, day));
       exerciseHistoryList.add(validExercise(i, 10.0, day));
     }
     dto.setExerciseHistoryList(exerciseHistoryList);
@@ -136,7 +138,7 @@ public class AdviceServiceTests {
   }
 
   @Test
-  public void getAdviceValid3Test() {
+  public void getAdviceBranchTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
             Mockito.any(Optional.class), Mockito.any(Optional.class)))
             .thenReturn(getValidDiestHistory(1));
@@ -154,4 +156,31 @@ public class AdviceServiceTests {
     //Assertions.assertEquals(1, adviceDto.getExerciseByDate().size());
   }
 
+  @Test
+  public void getAdviceBranch2Test() {
+    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
+            Mockito.any(Optional.class), Mockito.any(Optional.class)))
+            .thenReturn(new DietHistoryResponseDto());
+    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
+            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
+            .thenReturn(getValidExerciseHistory(1));
+
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Assertions.assertEquals(false, adviceDto.getIsEmpty());
+  }
+
+  @Test
+  public void getAdviceValid3Test() {
+    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
+            Mockito.any(Optional.class), Mockito.any(Optional.class)))
+            .thenReturn(getValidDiestHistory(1));
+    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
+            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
+            .thenReturn(new ExerciseHistoryResponseDto());
+
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Assertions.assertEquals(false, adviceDto.getIsEmpty());
+  }
 }
