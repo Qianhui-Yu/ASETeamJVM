@@ -13,6 +13,7 @@ import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
+import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +89,12 @@ public class AppUserServiceTests {
   public void loginTestWithWrongPassword() throws Exception {
     LoginResponse resp = appUserService.login(new LoginRequest("Test1", "1"));
     assertNull(resp);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void getUserInfoWithWrongId() throws Exception {
+    AuthenticatedUser au = new AuthenticatedUser(100000L, 0, "Test");
+    appUserService.getAppUserInfo(au);
   }
 
 }
