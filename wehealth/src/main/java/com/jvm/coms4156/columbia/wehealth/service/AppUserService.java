@@ -89,7 +89,7 @@ public class AppUserService {
   @Transactional
   public AppUserInfo register(UserInput in) throws DuplicateException, MissingDataException {
 
-    if (StringUtils.isEmpty(in) || StringUtils.isEmpty(in.getUsername())
+    if (StringUtils.isEmpty(in.getUsername())
             || StringUtils.isEmpty(in.getCurrentPassword())) {
       throw new MissingDataException("Missing username or password");
     }
@@ -140,20 +140,6 @@ public class AppUserService {
     appUserDao.save(user);
 
     return logUserIn(user);
-  }
-
-  /**
-   * Delete a user.
-   *
-   * @param user DbUser
-   *
-   * @return AppUserInfo
-   */
-  @NotNull
-  private AppUserInfo deleteUser(DbUser user) {
-    appUserDao.delete(user);
-
-    return new AppUserInfo(user);
   }
 
   /**

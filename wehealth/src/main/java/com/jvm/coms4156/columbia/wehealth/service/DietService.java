@@ -279,8 +279,7 @@ public class DietService {
 
     // Check if need to update diet type
     DietType dietType = dietHistory.get().getDietType();
-    if (dietType.getDietTypeId() != dietRecordDto.getDietTypeId()
-            && !dietType.getDietTypeName().equals(dietRecordDto.getDietTypeName())) {
+    if (dietType.getDietTypeId() != dietRecordDto.getDietTypeId()) {
       // Update diet type for this record
       // Check if the new diet type exists
       Optional<DietType> newDietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());

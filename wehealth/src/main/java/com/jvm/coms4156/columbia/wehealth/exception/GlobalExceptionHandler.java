@@ -45,7 +45,8 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(BadAuthException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ResponseEntity<ExceptionResponse> handleBadAuthException(Exception e) {
-    return new ResponseEntity<>(new ExceptionResponse("Authentication failed"), HttpStatus.UNAUTHORIZED);
+    return new ResponseEntity<>(new ExceptionResponse("Authentication failed"),
+                                HttpStatus.UNAUTHORIZED);
   }
 
   @ExceptionHandler(DuplicateException.class)
