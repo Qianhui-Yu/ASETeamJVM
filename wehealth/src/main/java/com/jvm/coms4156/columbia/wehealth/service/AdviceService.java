@@ -14,10 +14,12 @@ import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseByDayDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
 import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+
+import java.text.DateFormat;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -115,7 +117,7 @@ public class AdviceService {
 
 
   private List<DietByDayDto> groupDietByDate(DietHistoryResponseDto dto) {
-    HashMap<String, DietByDayDto> aggregated = new HashMap<String, DietByDayDto>();
+    HashMap<String, DietByDayDto> aggregated = new HashMap<>();
     for (DietHistoryDetailsDto dhd : dto.getDietHistoryList()) {
       String date = dhd.getTime().split(" ")[0];
       if (!aggregated.containsKey(date)) {
@@ -127,7 +129,10 @@ public class AdviceService {
       dietByDayDto.setTotalCarbs(dietByDayDto.getTotalCarbs() + dhd.getTotalCarbs());
       dietByDayDto.setTotalFat(dietByDayDto.getTotalFat() + dhd.getTotalFat());
     }
-    return new ArrayList<DietByDayDto>(aggregated.values());
+    List<DietByDayDto> result = new ArrayList<>(aggregated.values());
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    result.sort(Comparator.comparing((DietByDayDto var) -> df.parse(var.getDate(), new ParsePosition(0))));
+    return result;
   }
 
   private List<ExerciseByDayDto> groupExerciseByDate(ExerciseHistoryResponseDto dto) {
@@ -143,7 +148,10 @@ public class AdviceService {
       exerciseByDayDto.setTotalDuration(exerciseByDayDto.getTotalDuration()
               + dhd.getDuration());
     }
-    return new ArrayList<ExerciseByDayDto>(aggregated.values());
+    List<ExerciseByDayDto> result = new ArrayList<>(aggregated.values());
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    result.sort(Comparator.comparing((ExerciseByDayDto var) -> df.parse(var.getDate(), new ParsePosition(0))));
+    return result;
   }
 
 
