@@ -126,9 +126,7 @@ public class AdviceService {
 
   private List<DietByDayDto> groupDietByDate(DietHistoryResponseDto dto) {
     HashMap<String, DietByDayDto> aggregated = new HashMap<>();
-    if (dto.getDietHistoryList() == null) {
-      return new ArrayList<>(aggregated.values());
-    }
+
     for (DietHistoryDetailsDto dhd : dto.getDietHistoryList()) {
       String date = dhd.getTime().split(" ")[0];
       if (!aggregated.containsKey(date)) {
@@ -148,9 +146,7 @@ public class AdviceService {
 
   private List<ExerciseByDayDto> groupExerciseByDate(ExerciseHistoryResponseDto dto) {
     HashMap<String, ExerciseByDayDto> aggregated = new HashMap<String, ExerciseByDayDto>();
-    if (dto.getExerciseHistoryList() == null) {
-      return new ArrayList<>(aggregated.values());
-    }
+
     for (ExerciseHistoryDetailsDto dhd : dto.getExerciseHistoryList()) {
       String date = dhd.getTime().split(" ")[0];
       if (!aggregated.containsKey(date)) {
@@ -171,9 +167,6 @@ public class AdviceService {
   private List<WeightHistoryDetailsDto> groupWeightByDate(WeightHistoryResponseDto dto) {
     HashMap<String, WeightHistoryDetailsDto> aggregated = new HashMap<String, WeightHistoryDetailsDto>();
     HashMap<String, Integer> counter = new HashMap<String, Integer>();
-    if (dto.getWeightHistoryList() == null) {
-      return new ArrayList<>(aggregated.values());
-    }
 
     for (WeightHistoryDetailsDto dhd : dto.getWeightHistoryList()) {
       String date = dhd.getTime().split(" ")[0];
