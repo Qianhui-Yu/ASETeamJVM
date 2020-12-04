@@ -54,7 +54,7 @@ public class AdviceServiceTests {
   private DietHistoryResponseDto getValidDiestHistory(Integer length) {
     List<DietHistoryDetailsDto> dietHistoryList = new ArrayList<>();
     DietHistoryResponseDto dietHistoryResponseDto = new DietHistoryResponseDto();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     for (int i = 0; i < length; i++) {
       String day = LocalDateTime.now(ZoneId.systemDefault()).minusDays(i).format(formatter);
@@ -78,7 +78,7 @@ public class AdviceServiceTests {
   private ExerciseHistoryResponseDto getValidExerciseHistory(Integer length) {
     List<ExerciseHistoryDetailsDto> exerciseHistoryList = new ArrayList<>();
     ExerciseHistoryResponseDto dto = new ExerciseHistoryResponseDto();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu/MM/dd HH:mm:ss");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     for (int i = 0; i < length; i++) {
       String day = LocalDateTime.now(ZoneId.systemDefault()).minusDays(i).format(formatter);
       exerciseHistoryList.add(validExercise(i, 10.0, day));
