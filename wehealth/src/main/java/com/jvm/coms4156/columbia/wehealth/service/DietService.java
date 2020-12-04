@@ -173,7 +173,7 @@ public class DietService {
    * Get a list of diet history records based on input criterion.
    *
    * @param au Authenticated user indicating which user performs this.
-   * @param unit Unit type of the span. Among ["day", "week", "month", "year"].
+   * @param unit Unit type of the span. Among ["all", "week", "month", "year"].
    * @param length Date the number units back.
    * @return Return a list of records. Refer to dto/DietHistoryResponseDto for details.
    */
@@ -279,8 +279,7 @@ public class DietService {
 
     // Check if need to update diet type
     DietType dietType = dietHistory.get().getDietType();
-    if (dietType.getDietTypeId() != dietRecordDto.getDietTypeId()
-            && !dietType.getDietTypeName().equals(dietRecordDto.getDietTypeName())) {
+    if (dietType.getDietTypeId() != dietRecordDto.getDietTypeId()) {
       // Update diet type for this record
       // Check if the new diet type exists
       Optional<DietType> newDietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());

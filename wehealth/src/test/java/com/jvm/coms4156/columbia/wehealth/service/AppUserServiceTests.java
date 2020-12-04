@@ -11,8 +11,10 @@ import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginRequest;
 import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
 import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
 import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
 import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
+import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,9 +87,51 @@ public class AppUserServiceTests {
   }
 
   @Test
+  public void loginTestUserNotFoundTest() throws Exception {
+    LoginResponse resp = appUserService.login(new LoginRequest("UserName NotFound", "1"));
+    assertNull(resp);
+  }
+
+  @Test
+  public void loginTestLookUpTokenNotFoundTest() throws Exception {
+    LoginResponse resp = appUserService.login(new LoginRequest("testuser", "1"));
+    assertNull(resp);
+  }
+
+  @Test
   public void loginTestWithWrongPassword() throws Exception {
     LoginResponse resp = appUserService.login(new LoginRequest("Test1", "1"));
     assertNull(resp);
   }
+
+  @Test(expected = NotFoundException.class)
+  public void getUserInfoWithWrongId() throws Exception {
+    AuthenticatedUser au = new AuthenticatedUser(100000L, 0, "Test");
+    appUserService.getAppUserInfo(au);
+  }
+
+  @Test
+  public void getUserInfoValidTest() throws Exception {
+    AuthenticatedUser au = new AuthenticatedUser(2L, 0, "Test1");
+    AppUserInfo userInfo = appUserService.getAppUserInfo(au);
+    assertEquals(userInfo.getUsername(), "Test1");
+    assertEquals(userInfo.getUserId(), 2L);
+    assertEquals(userInfo.getUserType(), 0);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void verifyUserLookUpTokenNotFoundTest() throws Exception {
+    appUserService.verifyUser("InvalidLoopUpToken");
+  }
+
+//  @Test
+//  public void deleteUserValidTest() throws DuplicateException {
+//    String name = "Delete Test";
+//    AppUserInfo userInfo = appUserService.register(
+//        new UserInput(name, "123456", "123456")
+//    );
+//    appUserService.deleteUser(new DbUser(name, userInfo.getLookupToken()));
+//    assertNull(appUserDao.findByUsername(name));
+//  }
 
 }
