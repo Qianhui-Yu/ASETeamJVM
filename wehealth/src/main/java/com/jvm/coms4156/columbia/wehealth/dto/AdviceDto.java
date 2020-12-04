@@ -25,4 +25,5 @@ public class AdviceDto {
 
   private List<DietByDayDto> dietByDate;
   private List<ExerciseByDayDto> exerciseByDate;
+  private List<WeightHistoryDetailsDto> weightByDate;
 }

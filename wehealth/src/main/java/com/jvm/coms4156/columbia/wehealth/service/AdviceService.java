@@ -7,13 +7,7 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_PROTE
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_DURATION;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietByDayDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
-import com.jvm.coms4156.columbia.wehealth.dto.ExerciseByDayDto;
-import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
-import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.*;
 
 import java.text.DateFormat;
 import java.text.ParsePosition;
@@ -31,6 +25,8 @@ public class AdviceService {
   private DietService dietService;
   @Autowired
   private ExerciseService exerciseService;
+  @Autowired
+  private WeightService weightService;
 
   /**
    * generate diet and exercise advice for a given user.
@@ -50,12 +46,24 @@ public class AdviceService {
     ExerciseHistoryResponseDto exerciseHistory = exerciseService
             .getExerciseHistory(unit, length, user);
     List<ExerciseByDayDto> exerciseByDayDtos = groupExerciseByDate(exerciseHistory);
-    if (dietByDayDtos.size() > 0 || exerciseByDayDtos.size() > 0) {
+
+    WeightHistoryResponseDto weightHistory = weightService
+            .getWeightHistory(user, unit, length);
+    List<WeightHistoryDetailsDto> weightByDay = groupWeightByDate(weightHistory);
+
+    if (dietByDayDtos.size() > 0) {
+      adviceDto.setIsEmpty(false);
+    }
+    if (exerciseByDayDtos.size() > 0) {
+      adviceDto.setIsEmpty(false);
+    }
+    if (weightByDay.size() > 0) {
       adviceDto.setIsEmpty(false);
     }
 
     adviceDto.setDietByDate(dietByDayDtos);
     adviceDto.setExerciseByDate(exerciseByDayDtos);
+    adviceDto.setWeightByDate(weightByDay);
     getStats(adviceDto);
     generateAdvice(adviceDto);
     return adviceDto;
@@ -118,6 +126,9 @@ public class AdviceService {
 
   private List<DietByDayDto> groupDietByDate(DietHistoryResponseDto dto) {
     HashMap<String, DietByDayDto> aggregated = new HashMap<>();
+    if (dto.getDietHistoryList() == null) {
+      return new ArrayList<>(aggregated.values());
+    }
     for (DietHistoryDetailsDto dhd : dto.getDietHistoryList()) {
       String date = dhd.getTime().split(" ")[0];
       if (!aggregated.containsKey(date)) {
@@ -137,6 +148,9 @@ public class AdviceService {
 
   private List<ExerciseByDayDto> groupExerciseByDate(ExerciseHistoryResponseDto dto) {
     HashMap<String, ExerciseByDayDto> aggregated = new HashMap<String, ExerciseByDayDto>();
+    if (dto.getExerciseHistoryList() == null) {
+      return new ArrayList<>(aggregated.values());
+    }
     for (ExerciseHistoryDetailsDto dhd : dto.getExerciseHistoryList()) {
       String date = dhd.getTime().split(" ")[0];
       if (!aggregated.containsKey(date)) {
@@ -151,6 +165,36 @@ public class AdviceService {
     List<ExerciseByDayDto> result = new ArrayList<>(aggregated.values());
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     result.sort(Comparator.comparing((ExerciseByDayDto var) -> df.parse(var.getDate(), new ParsePosition(0))));
+    return result;
+  }
+
+  private List<WeightHistoryDetailsDto> groupWeightByDate(WeightHistoryResponseDto dto) {
+    HashMap<String, WeightHistoryDetailsDto> aggregated = new HashMap<String, WeightHistoryDetailsDto>();
+    HashMap<String, Integer> counter = new HashMap<String, Integer>();
+    if (dto.getWeightHistoryList() == null) {
+      return new ArrayList<>(aggregated.values());
+    }
+
+    for (WeightHistoryDetailsDto dhd : dto.getWeightHistoryList()) {
+      String date = dhd.getTime().split(" ")[0];
+      if (!aggregated.containsKey(date)) {
+        aggregated.put(date, new WeightHistoryDetailsDto(-1, 0.0, "gram", date));
+        counter.put(date, 0);
+      }
+      WeightHistoryDetailsDto weightByDay = aggregated.get(date);
+      weightByDay.setWeight(weightByDay.getWeight() + dhd.getWeight());
+      counter.put(date, counter.get(date) + 1);
+    }
+    // calculate average
+    for (String date : aggregated.keySet()) {
+      WeightHistoryDetailsDto weightByDay = aggregated.get(date);
+      weightByDay.setWeight(weightByDay.getWeight() / counter.get(date));
+    }
+
+    List<WeightHistoryDetailsDto> result = new ArrayList<>(aggregated.values());
+    SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+    result.sort(Comparator.comparing((WeightHistoryDetailsDto var)
+            -> df.parse(var.getTime(), new ParsePosition(0))));
     return result;
   }
 
