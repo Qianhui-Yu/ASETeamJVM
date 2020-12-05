@@ -1,5 +1,6 @@
 package com.jvm.coms4156.columbia.wehealth.service;
 
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.WEEK;
 import static org.mockito.Mockito.when;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
@@ -43,9 +44,9 @@ public class AdviceServiceTests {
     dietHistory.setDietHistoryId(dietHistoryId);
     dietHistory.setDietTypeId(dietTypeId);
     dietHistory.setTotalProtein(10.0 * dietHistoryId);
-    dietHistory.setTotalFat(5.0 * dietHistoryId);
-    dietHistory.setTotalCarbs(10.0 * dietHistoryId);
-    dietHistory.setTotalCalories(100.0 * dietHistoryId);
+    dietHistory.setTotalFat(7.0* dietHistoryId);
+    dietHistory.setTotalCarbs(30.0 * dietHistoryId);
+    dietHistory.setTotalCalories(200.0 * dietHistoryId);
     dietHistory.setTime(time);
     return dietHistory;
   }
@@ -126,11 +127,37 @@ public class AdviceServiceTests {
             .thenReturn(getValidWeightHistory(100));
 
     AuthenticatedUser au = new AuthenticatedUser(1L);
-    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Optional<String> unit = Optional.of(WEEK);
+    Optional<Integer> length = Optional.of(1);
+    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);
     Assertions.assertEquals(false, adviceDto.getIsEmpty());
     Assertions.assertEquals(100, adviceDto.getDietByDate().size());
     Assertions.assertEquals(100, adviceDto.getExerciseByDate().size());
     Assertions.assertEquals(100, adviceDto.getWeightByDate().size());
+  }
+
+  @Test
+  public void getAdviceValidMidRecordTest() {
+    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
+            Mockito.any(Optional.class), Mockito.any(Optional.class)))
+            .thenReturn(getValidDiestHistory(10));
+
+    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
+            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
+            .thenReturn(getValidExerciseHistory(10));
+
+    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),
+            Mockito.any(Optional.class), Mockito.any(Optional.class)))
+            .thenReturn(getValidWeightHistory(10));
+
+    AuthenticatedUser au = new AuthenticatedUser(1L);
+    Optional<String> unit = Optional.of(WEEK);
+    Optional<Integer> length = Optional.of(1);
+    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);
+    Assertions.assertEquals(false, adviceDto.getIsEmpty());
+    Assertions.assertEquals(10, adviceDto.getDietByDate().size());
+    Assertions.assertEquals(10, adviceDto.getExerciseByDate().size());
+    Assertions.assertEquals(10, adviceDto.getWeightByDate().size());
   }
 
   @Test
@@ -148,7 +175,9 @@ public class AdviceServiceTests {
             .thenReturn(getValidWeightHistory(1));
 
     AuthenticatedUser au = new AuthenticatedUser(1L);
-    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Optional<String> unit = Optional.of(WEEK);
+    Optional<Integer> length = Optional.of(1);
+    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);
     Assertions.assertEquals(false, adviceDto.getIsEmpty());
     Assertions.assertEquals(1, adviceDto.getDietByDate().size());
     Assertions.assertEquals(1, adviceDto.getExerciseByDate().size());
@@ -169,7 +198,9 @@ public class AdviceServiceTests {
             .thenReturn(getValidWeightHistory(1));
 
     AuthenticatedUser au = new AuthenticatedUser(1L);
-    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Optional<String> unit = Optional.of(WEEK);
+    Optional<Integer> length = Optional.of(1);
+    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);
 
     Assertions.assertEquals(false, adviceDto.getIsEmpty());
     Assertions.assertEquals(adviceDto.getDietByDate().get(0).getTotalCalories(),
@@ -195,7 +226,9 @@ public class AdviceServiceTests {
             .thenReturn(getValidWeightHistory(1));
 
     AuthenticatedUser au = new AuthenticatedUser(1L);
-    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Optional<String> unit = Optional.of(WEEK);
+    Optional<Integer> length = Optional.of(1);
+    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);
     Assertions.assertEquals(false, adviceDto.getIsEmpty());
   }
 
@@ -212,26 +245,12 @@ public class AdviceServiceTests {
             .thenReturn(new WeightHistoryResponseDto());
 
     AuthenticatedUser au = new AuthenticatedUser(1L);
-    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Optional<String> unit = Optional.of(WEEK);
+    Optional<Integer> length = Optional.of(1);
+    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);
     Assertions.assertEquals(false, adviceDto.getIsEmpty());
   }
-//
-//
-//  @Test
-//  public void getAdviceInvalidBothTest() {
-//    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
-//            Mockito.any(Optional.class), Mockito.any(Optional.class)))
-//            .thenReturn(new DietHistoryResponseDto());
-//
-//    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),
-//            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))
-//            .thenReturn(new ExerciseHistoryResponseDto());
-//
-//    AuthenticatedUser au = new AuthenticatedUser(1L);
-//    AdviceDto adviceDto = adviceService.getAdvice(au);
-//    Assertions.assertEquals(true, adviceDto.getIsEmpty());
-//  }
-//
+
   @Test
   public void getAdviceInvalidUserTest() {
     when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),
@@ -247,7 +266,9 @@ public class AdviceServiceTests {
             .thenReturn(new WeightHistoryResponseDto());
 
     AuthenticatedUser au = new AuthenticatedUser(-1L);
-    AdviceDto adviceDto = adviceService.getAdvice(au);
+    Optional<String> unit = Optional.of(WEEK);
+    Optional<Integer> length = Optional.of(1);
+    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);
     Assertions.assertEquals(true, adviceDto.getIsEmpty());
   }
 }

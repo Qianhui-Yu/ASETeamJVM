@@ -1,5 +1,6 @@
 package com.jvm.coms4156.columbia.wehealth.service;
 
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.DEFAULT_WEIGHT;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_CALORIES;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_CARBS;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_FAT;
@@ -8,15 +9,14 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_DURATION;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.*;
-
-import java.text.DateFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+
 
 @Service
 @Log4j2
@@ -34,11 +34,11 @@ public class AdviceService {
    * @param user authenticated user
    * @return adviceDto generated advice
    */
-  public AdviceDto getAdvice(AuthenticatedUser user) {
+  public AdviceDto getAdvice(AuthenticatedUser user,
+                             Optional<Integer> length,
+                             Optional<String> unit) {
     AdviceDto adviceDto = new AdviceDto();
     adviceDto.setIsEmpty(true);
-    Optional<String> unit = Optional.of("month");
-    Optional<Integer> length = Optional.of(1);
 
     DietHistoryResponseDto dietHistory = dietService.getDietHistory(user, unit, length);
     List<DietByDayDto> dietByDayDtos = groupDietByDate(dietHistory);
@@ -71,53 +71,102 @@ public class AdviceService {
 
   private void generateAdvice(AdviceDto adviceDto) {
     String suggestion;
-    if (adviceDto.getAvgCalories() < GOOD_AVG_CALORIES * 0.7) {
-      suggestion = "You avg calories intake is 30% lower than the recommended level."
-              + " Please eat more to control your weight.";
-    } else if (adviceDto.getAvgCalories() > GOOD_AVG_CALORIES * 1.3) {
-      suggestion = "You avg calories intake is 30% higher than the recommended level."
-              + " Please eat less to control your weight.";
+    Double weightProportion = 1.0;
+    Random rand = new Random();
+    if (!adviceDto.getAvgWeight().isNaN()) {
+      weightProportion = adviceDto.getAvgWeight() / DEFAULT_WEIGHT;
+    }
+
+    if (!adviceDto.getAvgCalories().isNaN()) {
+      if (adviceDto.getAvgCalories() < GOOD_AVG_CALORIES * 0.7 * weightProportion) {
+        Double extra = 1 - adviceDto.getAvgCalories() / (GOOD_AVG_CALORIES *  weightProportion);
+        suggestion = String.format("You avg calories intake is %.1f%% lower than "
+                + "the recommended level. Please eat more!", extra * 100);
+
+      } else if (adviceDto.getAvgCalories() > GOOD_AVG_CALORIES * 1.3 * weightProportion) {
+        Double cut = adviceDto.getAvgCalories() / (GOOD_AVG_CALORIES *  weightProportion) - 1;
+        suggestion = String.format("You avg calories intake is %.1f%% higher than"
+                + " the recommended level. Please eat less to control your weight.", cut * 100);
+      } else {
+        suggestion = " Your calories intake is just about right!";
+      }
     } else {
-      suggestion = " Your calories intake is just about right!";
+      suggestion = "No record";
     }
     adviceDto.setCaloriesAdvice(suggestion);
 
     // protein recommendation
-    if (adviceDto.getAvgProtein() < GOOD_AVG_PROTEIN * 0.7) {
-      suggestion = "Low protein intake, recommended food for you: Eggs, "
-              + "Roasted Chicken, Lean Beef.";
-    } else if (adviceDto.getAvgProtein() > GOOD_AVG_PROTEIN * 1.3) {
-      suggestion = "Too much protein intake, recommended cutting 30% of high protein food intake.";
+    if (! adviceDto.getAvgProtein().isNaN()) {
+      String[] proteinFood = new String[]{"Eggs", "Chicken Breast", "Lean Beef", "Beans"};
+      if (adviceDto.getAvgProtein() < GOOD_AVG_PROTEIN * 0.7 * weightProportion) {
+        Double extra = 1 - adviceDto.getAvgProtein() / (GOOD_AVG_PROTEIN * weightProportion);
+        suggestion = String.format("Low protein intake (%.1f%% less than recommended)"
+                + ", some food idea for you: ", extra * 100);
+        suggestion += proteinFood[rand.nextInt(proteinFood.length)];
+
+      } else if (adviceDto.getAvgProtein() > GOOD_AVG_PROTEIN * 1.3 * weightProportion) {
+        Double cut = adviceDto.getAvgProtein() / (GOOD_AVG_PROTEIN * weightProportion) - 1;
+        suggestion = String.format("Too much protein intake, recommended cutting"
+                + " %.1f%% of high protein food intake.", cut * 100);
+      } else {
+        suggestion = " Your protein intake is just about right!";
+      }
     } else {
-      suggestion = " Your protein intake is just about right!";
+      suggestion = "No record";
     }
     adviceDto.setProteinAdvice(suggestion);
 
     // fat recommendation
-    if (adviceDto.getAvgFat() < GOOD_AVG_FAT * 0.7) {
-      suggestion = "Low fat intake, recommended food for you: Avocado, Eggs, Fish.";
-    } else if (adviceDto.getAvgFat() > GOOD_AVG_FAT * 1.3) {
-      suggestion = "Too much fat intake, recommended cutting 30% of high fat food intake.";
+    if (! adviceDto.getAvgFat().isNaN()) {
+      String[] fatFood = new String[] { "Avocado", "Eggs", "Fish", "Assorted Nuts"};
+      if (adviceDto.getAvgFat() < GOOD_AVG_FAT * 0.7 * weightProportion) {
+        Double extra = 1 - adviceDto.getAvgFat() / (GOOD_AVG_FAT * weightProportion);
+        suggestion = String.format("Low fat intake (%.1f%% less than recommended)"
+                + ", some food idea for you: ", extra * 100);
+        suggestion += fatFood[rand.nextInt(fatFood.length)];
+
+      } else if (adviceDto.getAvgFat() > GOOD_AVG_FAT * 1.3 * weightProportion) {
+        Double cut = adviceDto.getAvgFat() / (GOOD_AVG_FAT * weightProportion) - 1;
+        suggestion = String.format("Too much fat intake, recommended cutting"
+                + " %.1f%% of high fat food intake.", cut * 100);
+      } else {
+        suggestion = " Your fat intake is just about right!";
+      }
     } else {
-      suggestion = " Your fat intake is just about right!";
+      suggestion = "No record";
     }
     adviceDto.setFatAdvice(suggestion);
 
     // carbs recommendation
-    if (adviceDto.getAvgCarbs() < GOOD_AVG_CARBS * 0.8) {
-      suggestion = "Low carbs intake, recommended food for you: Bread, Rice, Oats.";
-    } else if (adviceDto.getAvgCarbs() > GOOD_AVG_CARBS * 1.2) {
-      suggestion = "Too much carbs intake, recommended cutting 30% of high fat carbs intake.";
+    if (! adviceDto.getAvgCarbs().isNaN()) {
+      String[] carbFood = new String[]{"Bread", "Rice", "Oats"};
+      if (adviceDto.getAvgCarbs() < GOOD_AVG_CARBS * 0.7 * weightProportion) {
+        Double extra = 1 - adviceDto.getAvgCarbs() / (GOOD_AVG_CARBS * weightProportion);
+        suggestion = String.format("Low carbs intake (%.1f%% less than recommended)"
+                + ", some food idea for you: ", extra * 100);
+        suggestion += carbFood[rand.nextInt(carbFood.length)];
+
+      } else if (adviceDto.getAvgCarbs() > GOOD_AVG_CARBS * 1.3 * weightProportion) {
+        Double cut = adviceDto.getAvgCarbs() / (GOOD_AVG_CARBS * weightProportion) - 1;
+        suggestion = String.format("Too much carbs intake, recommended cutting"
+                + " %.1f%% of high carbs food intake.", cut * 100);
+      } else {
+        suggestion = " Your carbs intake is just about right!";
+      }
     } else {
-      suggestion = " Your carbs intake is just about right!";
+      suggestion = "No record";
     }
     adviceDto.setCarbsAdvice(suggestion);
 
     // exercise recommendation
-    if (adviceDto.getAvgDuration() < GOOD_DURATION) {
-      suggestion = "We recommend 30 mins of mild to medium intensity exercise every day!";
+    if (! adviceDto.getAvgDuration().isNaN()) {
+      if (adviceDto.getAvgDuration() < GOOD_DURATION) {
+        suggestion = "We recommend 30 mins of mild to medium intensity exercise every day!";
+      } else {
+        suggestion = "You are killing the daily exercises target!";
+      }
     } else {
-      suggestion = "You are killing the daily exercises target!";
+      suggestion = "No record";
     }
     adviceDto.setExerciseAdvice(suggestion);
   }
@@ -140,7 +189,8 @@ public class AdviceService {
     }
     List<DietByDayDto> result = new ArrayList<>(aggregated.values());
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    result.sort(Comparator.comparing((DietByDayDto var) -> df.parse(var.getDate(), new ParsePosition(0))));
+    result.sort(Comparator.comparing((DietByDayDto var)
+            -> df.parse(var.getDate(), new ParsePosition(0))));
     return result;
   }
 
@@ -160,12 +210,14 @@ public class AdviceService {
     }
     List<ExerciseByDayDto> result = new ArrayList<>(aggregated.values());
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-    result.sort(Comparator.comparing((ExerciseByDayDto var) -> df.parse(var.getDate(), new ParsePosition(0))));
+    result.sort(Comparator.comparing((ExerciseByDayDto var)
+            -> df.parse(var.getDate(), new ParsePosition(0))));
     return result;
   }
 
   private List<WeightHistoryDetailsDto> groupWeightByDate(WeightHistoryResponseDto dto) {
-    HashMap<String, WeightHistoryDetailsDto> aggregated = new HashMap<String, WeightHistoryDetailsDto>();
+    HashMap<String, WeightHistoryDetailsDto> aggregated = new HashMap<String,
+            WeightHistoryDetailsDto>();
     HashMap<String, Integer> counter = new HashMap<String, Integer>();
 
     for (WeightHistoryDetailsDto dhd : dto.getWeightHistoryList()) {
@@ -199,6 +251,7 @@ public class AdviceService {
     Double avgCarbs = 0.0;
     Double avgDuration = 0.0;
     Double avgExerciseCal = 0.0;
+    Double avgWeight = 0.0;
 
     List<DietByDayDto> dietHist = adviceDto.getDietByDate();
     for (DietByDayDto oneDay : dietHist) {
@@ -220,5 +273,11 @@ public class AdviceService {
     }
     adviceDto.setAvgDuration(avgDuration / exerciseHist.size());
     adviceDto.setAvgExerciseCal(avgExerciseCal / exerciseHist.size());
+
+    List<WeightHistoryDetailsDto> weightHist = adviceDto.getWeightByDate();
+    for (WeightHistoryDetailsDto oneDay : weightHist) {
+      avgWeight += oneDay.getWeight();
+    }
+    adviceDto.setAvgWeight(avgWeight / weightHist.size());
   }
 }

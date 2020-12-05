@@ -22,6 +22,7 @@ public class AdviceDto {
   private Double avgCarbs;
   private Double avgDuration;
   private Double avgExerciseCal;
+  private Double avgWeight;
 
   private List<DietByDayDto> dietByDate;
   private List<ExerciseByDayDto> exerciseByDate;
