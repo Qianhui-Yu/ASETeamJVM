@@ -249,7 +249,7 @@ public class AdviceService {
     //      WeightHistoryDetailsDto weightByDay = aggregated.get(date);
     //      weightByDay.setWeight(weightByDay.getWeight() / counter.get(date));
     //    }
-    for (Map.Entry<String, WeightHistoryDetailsDto> entry: aggregated.entrySet()) {
+    for (Map.Entry<String, WeightHistoryDetailsDto> entry : aggregated.entrySet()) {
       WeightHistoryDetailsDto weightByDay = entry.getValue();
       weightByDay.setWeight(weightByDay.getWeight() / counter.get(entry.getKey()));
     }

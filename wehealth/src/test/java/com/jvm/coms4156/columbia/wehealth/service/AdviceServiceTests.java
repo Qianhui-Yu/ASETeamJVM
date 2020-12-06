@@ -5,15 +5,13 @@ import static org.mockito.Mockito.when;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.*;
-
+import com.jvm.coms4156.columbia.wehealth.entity.WeightHistory;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import com.jvm.coms4156.columbia.wehealth.entity.WeightHistory;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
@@ -44,7 +42,7 @@ public class AdviceServiceTests {
     dietHistory.setDietHistoryId(dietHistoryId);
     dietHistory.setDietTypeId(dietTypeId);
     dietHistory.setTotalProtein(10.0 * dietHistoryId);
-    dietHistory.setTotalFat(7.0* dietHistoryId);
+    dietHistory.setTotalFat(7.0 * dietHistoryId);
     dietHistory.setTotalCarbs(30.0 * dietHistoryId);
     dietHistory.setTotalCalories(200.0 * dietHistoryId);
     dietHistory.setTime(time);

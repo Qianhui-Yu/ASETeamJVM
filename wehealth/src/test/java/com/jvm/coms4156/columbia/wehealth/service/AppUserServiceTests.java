@@ -23,7 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 
 /**
- * Created by Ethan 11/15/2020
+ * Created by Ethan 11/15/2020.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -50,7 +50,7 @@ public class AppUserServiceTests {
 
     assertNotNull(testUserInfo.getLookupToken());
     LoginResponse resp = appUserService.verifyUser(testUserInfo.getLookupToken());
-    System.out.println("response token: "+resp.getToken());
+    System.out.println("response token: " + resp.getToken());
 
     assertNotNull(resp.getToken());
     AuthenticatedUser au = jwtService.verify(resp.getToken());
@@ -64,20 +64,20 @@ public class AppUserServiceTests {
 
   @Test(expected = DuplicateException.class)
   public void registerTestExistingUser() throws Exception {
-    appUserService.register(new UserInput( "testUsername", "1", "1"));
-    appUserService.register(new UserInput( "testUsername", "1", "1"));
+    appUserService.register(new UserInput("testUsername", "1", "1"));
+    appUserService.register(new UserInput("testUsername", "1", "1"));
   }
 
   @Test(expected = MissingDataException.class)
   public void registerTestMissingUsername() throws Exception {
-    appUserService.register(new UserInput( "", "1", "1"));
+    appUserService.register(new UserInput("", "1", "1"));
   }
 
   @Test(expected = MissingDataException.class)
   public void registerTestMissingPassword() throws Exception {
     Faker faker = new Faker();
     String name = faker.name().fullName();
-    appUserService.register(new UserInput( name, "", ""));
+    appUserService.register(new UserInput(name, "", ""));
   }
 
   @Test
@@ -124,14 +124,14 @@ public class AppUserServiceTests {
     appUserService.verifyUser("InvalidLoopUpToken");
   }
 
-//  @Test
-//  public void deleteUserValidTest() throws DuplicateException {
-//    String name = "Delete Test";
-//    AppUserInfo userInfo = appUserService.register(
-//        new UserInput(name, "123456", "123456")
-//    );
-//    appUserService.deleteUser(new DbUser(name, userInfo.getLookupToken()));
-//    assertNull(appUserDao.findByUsername(name));
-//  }
+  //  @Test
+  //  public void deleteUserValidTest() throws DuplicateException {
+  //    String name = "Delete Test";
+  //    AppUserInfo userInfo = appUserService.register(
+  //        new UserInput(name, "123456", "123456")
+  //    );
+  //    appUserService.deleteUser(new DbUser(name, userInfo.getLookupToken()));
+  //    assertNull(appUserDao.findByUsername(name));
+  //  }
 
 }
