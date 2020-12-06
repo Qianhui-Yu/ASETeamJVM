@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Utility.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.utility</a> &gt; <span class="el_source">Utility.java</span></div><h1>Utility.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.utility;
+
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.MONTH;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.WEEK;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.YEAR;
+
+import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+<span class="nc" id="L12">public class Utility {</span>
+  /**
+   * Convert a date to string of format &quot;yyyy-MM-dd HH:mm:ss&quot;.
+   *
+   * @param date The date to convert.
+   * @return String containing the formatted date.
+   */
+  public static String getStringFromDate(Date date) {
+<span class="fc" id="L20">    String pattern = &quot;yyyy-MM-dd HH:mm:ss&quot;;</span>
+<span class="fc" id="L21">    SimpleDateFormat df = new SimpleDateFormat(pattern);</span>
+<span class="fc" id="L22">    return df.format(date);</span>
+  }
+
+  public static String getStringOfCurrentDateTime() {
+<span class="fc" id="L26">    Date currentDate = new Date();</span>
+<span class="fc" id="L27">    return getStringFromDate(currentDate);</span>
+  }
+
+  /**
+   * Calculate the date that is equal to (current time - timeUnit * timeLength).
+   *
+   * @param timeUnit Unit for time. One of {YEAR, WEEK, MONTH}.
+   * @param timeLength Length of time.
+   * @return String describing the result date.
+   */
+  public static String getStringOfStartDateTime(String timeUnit, int timeLength) {
+<span class="fc" id="L38">    Date currentDate = new Date();</span>
+<span class="fc" id="L39">    Calendar targetDateTime = Calendar.getInstance();</span>
+<span class="fc" id="L40">    targetDateTime.setTime(currentDate);</span>
+<span class="fc bfc" id="L41" title="All 4 branches covered.">    switch (timeUnit) {</span>
+      case YEAR:
+<span class="fc" id="L43">        targetDateTime.add(Calendar.YEAR, -timeLength);</span>
+<span class="fc" id="L44">        break;</span>
+      case WEEK:
+<span class="fc" id="L46">        targetDateTime.add(Calendar.DAY_OF_YEAR, -7 * timeLength);</span>
+<span class="fc" id="L47">        break;</span>
+      case MONTH:
+<span class="fc" id="L49">        targetDateTime.add(Calendar.MONTH, -timeLength);</span>
+<span class="fc" id="L50">        break;</span>
+      default:
+<span class="fc" id="L52">        throw new BadRequestException(&quot;Invalid time unit.&quot;);</span>
+    }
+<span class="fc" id="L54">    Date startDateTime = targetDateTime.getTime();</span>
+<span class="fc" id="L55">    return getStringFromDate(startDateTime);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

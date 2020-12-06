@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeightController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.controller</a> &gt; <span class="el_source">WeightController.java</span></div><h1>WeightController.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.controller;
+
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.SUCCESS_MSG;
+
+import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
+import com.jvm.coms4156.columbia.wehealth.service.WeightService;
+import java.util.Optional;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+
+@CrossOrigin
+@RestController
+<span class="fc" id="L19">@Log4j2</span>
+<span class="fc" id="L20">public class WeightController extends BaseController {</span>
+  @Autowired
+  private WeightService weightService;
+
+  /**
+   * Hanlder for adding a weight record into the database.
+   *
+   * @param weightRecordDto Input weight record object. Refer to dto/WeightRecordDto for details.
+   * @return Return 200 for success and 401 for unauthorized.
+   */
+  @PostMapping(path = &quot;/weight/records&quot;,
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;String&gt; addWeightRecord(
+          @RequestBody WeightRecordDto weightRecordDto) {
+<span class="nc" id="L35">    log.info(&quot;New Weight Record: {}&quot;, weightRecordDto.toString());</span>
+<span class="nc" id="L36">    weightService.addWeightRecordToDb(au(), weightRecordDto);</span>
+<span class="nc" id="L37">    log.info(&quot;Successfully added a new weight record.&quot;);</span>
+<span class="nc" id="L38">    return new ResponseEntity&lt;&gt;(SUCCESS_MSG, HttpStatus.OK);</span>
+  }
+
+  /**
+   * Handler for getting weight records based on input criteria.
+   *
+   * @param unit Unit of the time span. Among [&quot;day&quot;, &quot;week&quot;, &quot;month&quot;, &quot;year&quot;]
+   * @param length Number of units to data back from current date.
+   * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
+   *         unauthorized access.
+   */
+  @GetMapping(path = &quot;/weight/records&quot;,
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;WeightHistoryResponseDto&gt; getWeightRecords(
+          @RequestParam Optional&lt;String&gt; unit,
+          @RequestParam Optional&lt;Integer&gt; length) {
+<span class="nc" id="L55">    WeightHistoryResponseDto weightHistoryResponseDto = weightService</span>
+<span class="nc" id="L56">            .getWeightHistory(au(), unit, length);</span>
+<span class="nc" id="L57">    return new ResponseEntity&lt;&gt;(weightHistoryResponseDto, HttpStatus.OK);</span>
+  }
+
+  /**
+   * Hanlder for editing a weight record.
+   *
+   * @param weightId ID of the record to be edited.
+   * @param weightRecordDto Target weight record after editing.
+   * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
+   *         unauthorized access.
+   */
+  @PutMapping(path = &quot;/weight/records/{weightId}&quot;,
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;String&gt; editWeightRecord(
+          @PathVariable Integer weightId,
+          @RequestBody WeightRecordDto weightRecordDto) {
+<span class="nc" id="L74">    log.info(&quot;Edit Weight Record ID: {}. Result Record: {}&quot;, weightId, weightRecordDto.toString());</span>
+<span class="nc" id="L75">    weightService.editWeightRecord(au(), weightId, weightRecordDto);</span>
+<span class="nc" id="L76">    log.info(&quot;Successfully edited weight record {}.&quot;, weightId);</span>
+<span class="nc" id="L77">    return new ResponseEntity&lt;&gt;(SUCCESS_MSG, HttpStatus.OK);</span>
+  }
+
+  /**
+   * Hanlder for deleting a weight record from the database.
+   *
+   * @param weightId ID of the weight record to be deleted.
+   * @return Return 200 for success, 400 for bad request (invalid user ID), and 401 for
+   *         unauthorized access.
+   */
+  @DeleteMapping(path = &quot;weight/records/{weightId}&quot;,
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;String&gt; deleteWeightRecord(
+          @PathVariable Integer weightId) {
+<span class="nc" id="L92">    log.info(&quot;Delete Weight Record ID: {}.&quot;, weightId);</span>
+<span class="nc" id="L93">    weightService.deleteWeightRecord(au(), weightId);</span>
+<span class="nc" id="L94">    log.info(&quot;Successfully deleted weight record {}.&quot;, weightId);</span>
+<span class="nc" id="L95">    return new ResponseEntity&lt;&gt;(SUCCESS_MSG, HttpStatus.OK);</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
