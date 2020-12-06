@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeHealthWeightServiceTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.service</a> &gt; <span class="el_source">WeHealthWeightServiceTests.java</span></div><h1>WeHealthWeightServiceTests.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.service;
+
+import static org.mockito.Mockito.when;
+
+import com.jvm.coms4156.columbia.wehealth.common.Constants;
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
+import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
+import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.WeightRecordDto;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import com.jvm.coms4156.columbia.wehealth.entity.WeightHistory;
+import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
+import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
+import com.jvm.coms4156.columbia.wehealth.repository.DbUserRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.WeightHistoryRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+<span class="fc" id="L30">public class WeHealthWeightServiceTests {</span>
+
+  @InjectMocks
+  private WeightService weightService;
+
+  @Mock
+  private DbUserRepository dbUserRepoMock;
+
+  @Mock
+  private WeightHistoryRepository dbWeightHistoryRepoMock;
+
+  private DbUser getValidUser() {
+<span class="fc" id="L42">    DbUser dbUser = new DbUser(&quot;1&quot;, &quot;1&quot;);</span>
+<span class="fc" id="L43">    dbUser.setUserId((long) 1);</span>
+<span class="fc" id="L44">    return dbUser;</span>
+  }
+
+  private AuthenticatedUser getValidUserAu() {
+<span class="fc" id="L48">    AuthenticatedUser au = new AuthenticatedUser((long)1, 1, &quot;1&quot;);</span>
+<span class="fc" id="L49">    return au;</span>
+  }
+
+  private Optional&lt;DbUser&gt; validUser() {
+<span class="fc" id="L53">    DbUser user = new DbUser(&quot;a&quot;, &quot;a&quot;);</span>
+<span class="fc" id="L54">    return Optional.of(user);</span>
+  }
+
+  private Optional&lt;DbUser&gt; invalidUser() {
+<span class="fc" id="L58">    return Optional.empty();</span>
+  }
+
+  private List&lt;WeightHistory&gt; getHistories(int num) {
+<span class="fc" id="L62">    List&lt;WeightHistory&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    for(int i = 0; i &lt; num; i++) {</span>
+<span class="fc" id="L64">      list.add(new WeightHistory());</span>
+    }
+<span class="fc" id="L66">    return list;</span>
+  }
+
+  private Optional&lt;WeightHistory&gt; validHistoryId() {
+<span class="fc" id="L70">    WeightHistory weightHistory = new WeightHistory();</span>
+<span class="fc" id="L71">    DbUser dbUser = getValidUser();</span>
+<span class="fc" id="L72">    weightHistory.setUser(dbUser);</span>
+<span class="fc" id="L73">    return Optional.of(weightHistory);</span>
+  }
+
+  private Optional&lt;WeightHistory&gt; invalidHistoryId() {
+<span class="fc" id="L77">    return Optional.empty();</span>
+  }
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void addWeightRecordToDBInvalidUserTest() {
+<span class="fc" id="L83">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(invalidUser());</span>
+<span class="fc" id="L84">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L85">    Assertions.assertThrows(NotFoundException.class, () -&gt;</span>
+<span class="nc" id="L86">            weightService.addWeightRecordToDb(au, new WeightRecordDto())</span>
+    );
+<span class="fc" id="L88">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void addWeightRecordToDBInvalidUnitTest() {
+<span class="fc" id="L93">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());</span>
+<span class="fc" id="L94">    WeightRecordDto weightRecordDto = new WeightRecordDto(60000.0, &quot;unit&quot;);</span>
+<span class="fc" id="L95">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L96">    Assertions.assertThrows(BadRequestException.class, () -&gt;</span>
+<span class="nc" id="L97">            weightService.addWeightRecordToDb(au, weightRecordDto)</span>
+    );
+<span class="fc" id="L99">  }</span>
+
+  @Test
+  public void addWeightRecordToDBInvalidWeightTest() {
+<span class="fc" id="L103">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());</span>
+<span class="fc" id="L104">    WeightRecordDto weightRecordDto = new WeightRecordDto(-60000.0, &quot;gram&quot;);</span>
+<span class="fc" id="L105">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L106">    Assertions.assertThrows(BadRequestException.class, () -&gt;</span>
+<span class="nc" id="L107">        weightService.addWeightRecordToDb(au, weightRecordDto)</span>
+    );
+<span class="fc" id="L109">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void addWeightRecordToDBGramTest() {
+<span class="fc" id="L114">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());</span>
+<span class="fc" id="L115">    WeightRecordDto weightRecordDto = new WeightRecordDto(60000.0, Constants.GRAM);</span>
+<span class="fc" id="L116">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L117">    weightService.addWeightRecordToDb(au, weightRecordDto);</span>
+<span class="fc" id="L118">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void addWeightRecordToDBPoundTest() {
+<span class="fc" id="L123">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());</span>
+<span class="fc" id="L124">    WeightRecordDto weightRecordDto = new WeightRecordDto(60000.0, Constants.POUND);</span>
+<span class="fc" id="L125">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L126">    weightService.addWeightRecordToDb(au, weightRecordDto);</span>
+<span class="fc" id="L127">  }</span>
+
+  @Test
+  public void getWeightHistoryInvalidUserTest() {
+<span class="fc" id="L131">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(invalidUser());</span>
+<span class="fc" id="L132">    UserIdDto userIdDto = new UserIdDto();</span>
+<span class="fc" id="L133">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L134">    Assertions.assertThrows(NotFoundException.class, () -&gt;</span>
+<span class="nc" id="L135">            weightService.getWeightHistory(au, Optional.of(Constants.ALL), Optional.of(1))</span>
+    );
+<span class="fc" id="L137">  }</span>
+
+  @Test
+  public void getWeightHistoryInvalidTimeLengthTest() {
+<span class="fc" id="L141">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());</span>
+<span class="fc" id="L142">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L143">    Assertions.assertThrows(BadRequestException.class, () -&gt;</span>
+<span class="nc" id="L144">            weightService.getWeightHistory(au, Optional.of(Constants.ALL), Optional.of(-1))</span>
+    );
+<span class="fc" id="L146">  }</span>
+
+  @Test
+  public void getWeightHistoryTimeLengthAllTest() {
+<span class="fc" id="L150">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());</span>
+<span class="fc" id="L151">    when(dbWeightHistoryRepoMock.findAllByUser(Mockito.any(DbUser.class)))</span>
+<span class="fc" id="L152">            .thenReturn(getHistories(10));</span>
+<span class="fc" id="L153">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L154">    WeightHistoryResponseDto weightHistoryResponseDto =</span>
+<span class="fc" id="L155">            weightService.getWeightHistory(au, Optional.of(Constants.ALL), Optional.of(1));</span>
+<span class="fc" id="L156">    Assertions.assertEquals(weightHistoryResponseDto.getWeightHistoryList().size(), 10);</span>
+<span class="fc" id="L157">  }</span>
+
+  @Test
+  public void getWeightHistoryTimeLengthNotAllTest() {
+<span class="fc" id="L161">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());</span>
+<span class="fc" id="L162">    when(dbWeightHistoryRepoMock.findAllByUserAndCreatedTimeAfter(</span>
+<span class="fc" id="L163">            Mockito.any(DbUser.class), Mockito.any(String.class)))</span>
+<span class="fc" id="L164">            .thenReturn(getHistories(5));</span>
+<span class="fc" id="L165">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L166">    WeightHistoryResponseDto weightHistoryResponseDto =</span>
+<span class="fc" id="L167">            weightService.getWeightHistory(au, Optional.of(Constants.WEEK), Optional.of(1));</span>
+<span class="fc" id="L168">    Assertions.assertEquals(weightHistoryResponseDto.getWeightHistoryList().size(), 5);</span>
+<span class="fc" id="L169">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void editWeightRecordInvalidWeightIdTest() {
+<span class="fc" id="L174">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L175">            .thenReturn(invalidHistoryId());</span>
+<span class="fc" id="L176">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L177">    Assertions.assertThrows(NotFoundException.class, () -&gt;</span>
+<span class="nc" id="L178">            weightService.editWeightRecord(au, 1, new WeightRecordDto())</span>
+    );
+<span class="fc" id="L180">  }</span>
+
+  @Test
+  public void editWeightRecordInvalidWeightTest() {
+<span class="fc" id="L184">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L185">        .thenReturn(validHistoryId());</span>
+<span class="fc" id="L186">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L187">    Assertions.assertThrows(BadRequestException.class, () -&gt;</span>
+<span class="nc" id="L188">        weightService.editWeightRecord(au, 1, new WeightRecordDto(-60000.0, Constants.GRAM))</span>
+    );
+<span class="fc" id="L190">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void editWeightRecordNotBelongedTest() {
+<span class="fc" id="L195">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L196">            .thenReturn(validHistoryId());</span>
+<span class="fc" id="L197">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L198">    au.setUserId((long) 2);</span>
+<span class="fc" id="L199">    WeightRecordDto weightRecordDto = new WeightRecordDto();</span>
+<span class="fc" id="L200">    Assertions.assertThrows(BadRequestException.class, () -&gt;</span>
+<span class="nc" id="L201">            weightService.editWeightRecord(au, 1, weightRecordDto)</span>
+    );
+<span class="fc" id="L203">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void editWeightRecordValidGRAMTest() {
+<span class="fc" id="L208">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L209">            .thenReturn(validHistoryId());</span>
+<span class="fc" id="L210">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L211">    WeightRecordDto weightRecordDto = new WeightRecordDto(60000.0, Constants.GRAM);</span>
+<span class="fc" id="L212">    weightService.editWeightRecord(au, 1, weightRecordDto);</span>
+<span class="fc" id="L213">  }</span>
+
+  @Test
+  public void editWeightRecordValidPOUNDTest() {
+<span class="fc" id="L217">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L218">        .thenReturn(validHistoryId());</span>
+<span class="fc" id="L219">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L220">    WeightRecordDto weightRecordDto = new WeightRecordDto(60000.0, Constants.POUND);</span>
+<span class="fc" id="L221">    weightService.editWeightRecord(au, 1, weightRecordDto);</span>
+<span class="fc" id="L222">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void deleteWeightRecordInvalidWeightIdTest() {
+<span class="fc" id="L227">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L228">            .thenReturn(invalidHistoryId());</span>
+<span class="fc" id="L229">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L230">    Assertions.assertThrows(NotFoundException.class, () -&gt;</span>
+<span class="nc" id="L231">            weightService.deleteWeightRecord(au, 1)</span>
+    );
+<span class="fc" id="L233">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void deleteWeightRecordNotBelongedTest() {
+<span class="fc" id="L238">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L239">            .thenReturn(validHistoryId());</span>
+<span class="fc" id="L240">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L241">    au.setUserId((long) 2);</span>
+<span class="fc" id="L242">    Assertions.assertThrows(BadRequestException.class, () -&gt;</span>
+<span class="nc" id="L243">            weightService.deleteWeightRecord(au, 1)</span>
+    );
+<span class="fc" id="L245">  }</span>
+
+  // TODO: (Chengchen Li) Modify to use jwt.au() instead of query db for user info
+  @Test
+  public void deleteWeightRecordTest() {
+<span class="fc" id="L250">    when(dbWeightHistoryRepoMock.findByWeightHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L251">            .thenReturn(validHistoryId());</span>
+<span class="fc" id="L252">    AuthenticatedUser au = getValidUserAu();</span>
+<span class="fc" id="L253">    weightService.deleteWeightRecord(au, 1);</span>
+<span class="fc" id="L254">  }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.service</a> &gt; <span class="el_source">JwtService.java</span></div><h1>JwtService.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.service;
+
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
+import com.jvm.coms4156.columbia.wehealth.exception.BadAuthException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+
+/**
+ * Created by Ethan on 11/04/2020.
+ */
+@Service
+<span class="fc" id="L21">@Slf4j</span>
+public class JwtService {
+  private final String secret;
+  private final long expiration;
+
+  public JwtService(@Value(&quot;${jwt.secret}&quot;) String secret,
+<span class="fc" id="L27">                    @Value(&quot;${jwt.expiration}&quot;) int expiration) {</span>
+<span class="fc" id="L28">    this.secret = secret;</span>
+<span class="fc" id="L29">    this.expiration = expiration;</span>
+<span class="fc" id="L30">  }</span>
+
+  public long getExpiration() {
+<span class="fc" id="L33">    return System.currentTimeMillis() + (expiration * 60L * 1000L);</span>
+  }
+
+  /**
+   * Generate jwt token.
+   *
+   * @param id Long
+   * @param userType int
+   * @param exp long
+   * @return String
+   */
+  public String generate(String username, Long id, int userType, long exp) {
+<span class="fc" id="L45">    return JWT.create()</span>
+<span class="fc" id="L46">        .withSubject(username)</span>
+<span class="fc" id="L47">        .withClaim(&quot;userId&quot;, id)</span>
+<span class="fc" id="L48">        .withClaim(&quot;userType&quot;, userType)</span>
+<span class="fc" id="L49">        .withExpiresAt(new Date(exp))</span>
+<span class="fc" id="L50">        .sign(Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8)));</span>
+  }
+
+  /**
+   * Verify token.
+   *
+   * @param token String
+   * @return AuthticatedUser
+   * @throws BadAuthException Authentication Exception
+   */
+  public AuthenticatedUser verify(String token) throws BadAuthException {
+    try {
+<span class="fc" id="L62">      DecodedJWT jwt = JWT.require(Algorithm.HMAC512(secret.getBytes(StandardCharsets.UTF_8)))</span>
+<span class="fc" id="L63">          .build()</span>
+<span class="fc" id="L64">          .verify(token);</span>
+<span class="fc" id="L65">      return new AuthenticatedUser(jwt.getClaim(&quot;userId&quot;).asLong(),</span>
+<span class="fc" id="L66">              jwt.getClaim(&quot;userType&quot;).asInt(), jwt.getSubject());</span>
+<span class="fc" id="L67">    } catch (TokenExpiredException e) {</span>
+<span class="fc" id="L68">      log.error(&quot;Expired token&quot;);</span>
+<span class="fc" id="L69">      throw new BadAuthException();</span>
+<span class="nc" id="L70">    } catch (Throwable t) {</span>
+<span class="nc" id="L71">      log.error(&quot;Error while verifying JWT token&quot;, t);</span>
+<span class="nc" id="L72">      throw new BadAuthException();</span>
+    }
+  }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

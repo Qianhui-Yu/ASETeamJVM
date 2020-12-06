@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DietService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.service</a> &gt; <span class="el_source">DietService.java</span></div><h1>DietService.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.service;
+
+
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.ALL;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.CALORIES;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.CARBS;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.DEVELOPER;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.FAT;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.GRAM;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.POUND_TO_GRAM;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.PROTEIN;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.UNIT;
+
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import com.jvm.coms4156.columbia.wehealth.entity.DietHistory;
+import com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping;
+import com.jvm.coms4156.columbia.wehealth.entity.DietType;
+import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
+import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
+import com.jvm.coms4156.columbia.wehealth.repository.DbUserRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietHistoryRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietNutrientMappingRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietTypeRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.NutrientTypeRepository;
+import com.jvm.coms4156.columbia.wehealth.utility.Utility;
+import java.util.List;
+import java.util.Optional;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+<span class="fc" id="L40">@Log4j2</span>
+<span class="fc" id="L41">public class DietService {</span>
+
+  @Autowired
+  private DbUserRepository dbUserRepo;
+
+  @Autowired
+  private DietHistoryRepository dietHistoryRepo;
+
+  @Autowired
+  private DietNutrientMappingRepository dietNutrientMappingRepo;
+
+  @Autowired
+  private DietTypeRepository dietTypeRepo;
+
+  @Autowired
+  private NutrientTypeRepository nutrientTypeRepo;
+
+  /**
+   * Backend logic for adding a diet record into the database.
+   *
+   * @param au Authenticated user indicating which user performs this.
+   * @param dietRecordDto Input diet record object. Refer to dto/DietRecordDto for details.
+   */
+  @Transactional
+  public void addDietRecordToDb(AuthenticatedUser au, DietRecordDto dietRecordDto) {
+    // add diet record to diet_history table
+<span class="fc" id="L67">    DietHistory dietHistory = new DietHistory();</span>
+<span class="fc" id="L68">    Optional&lt;DbUser&gt; user = dbUserRepo.findByUserId(au.getUserId());</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">    if (user.isEmpty()) {</span>
+<span class="fc" id="L70">      throw new NotFoundException(&quot;User not found with provided user id.&quot;);</span>
+    }
+<span class="fc" id="L72">    dietHistory.setUser(user.get());</span>
+
+<span class="fc bfc" id="L74" title="All 2 branches covered.">    if (dietRecordDto.getWeight() &lt;= 0) {</span>
+<span class="fc" id="L75">      throw new BadRequestException(&quot;Weight should be larger than zero.&quot;);</span>
+    }
+
+<span class="fc" id="L78">    Optional&lt;DietType&gt; dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">    if (dietType.isEmpty()) {</span>
+      // add new diet type to diet_type table
+<span class="fc" id="L81">      addDietType(dietRecordDto.getDietTypeId(), dietRecordDto.getDietTypeName());</span>
+      // add 4 nutrients' info to diet_nutrient_mapping table
+<span class="nc" id="L83">      addAllNutrientsInfoToDietNutrientMapping(dietRecordDto);</span>
+    }
+<span class="fc" id="L85">    dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());</span>
+<span class="fc" id="L86">    dietHistory.setDietType(dietType.get());</span>
+
+
+    // In diet_history table, the default unit of weight is gram
+<span class="fc" id="L90">    dietHistory.setUnit(GRAM);</span>
+
+<span class="fc bfc" id="L92" title="All 2 branches covered.">    if (dietRecordDto.getUnit().toLowerCase().equals(POUND)) {</span>
+<span class="fc" id="L93">      dietHistory.setWeight(dietRecordDto.getWeight() * POUND_TO_GRAM);</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    } else if (dietRecordDto.getUnit().toLowerCase().equals(GRAM)) {</span>
+<span class="fc" id="L95">      dietHistory.setWeight(dietRecordDto.getWeight());</span>
+    } else {
+<span class="fc" id="L97">      throw new BadRequestException(&quot;Illegal weight unit, please use gram or pound.&quot;);</span>
+    }
+
+<span class="fc" id="L100">    String currentDateTime = Utility.getStringOfCurrentDateTime();</span>
+<span class="fc" id="L101">    dietHistory.setCreatedBy(user.get().getUsername());</span>
+<span class="fc" id="L102">    dietHistory.setCreatedTime(currentDateTime);</span>
+<span class="fc" id="L103">    dietHistory.setUpdatedBy(user.get().getUsername());</span>
+<span class="fc" id="L104">    dietHistory.setUpdatedTime(currentDateTime);</span>
+
+<span class="fc" id="L106">    dietHistoryRepo.save(dietHistory);</span>
+
+<span class="fc" id="L108">  }</span>
+
+  /**
+   * Add a new diet type into the database.
+   *
+   * @param dietTypeId ID of the diet type.
+   * @param dietTypeName Name of the diet type.
+   */
+  public void addDietType(int dietTypeId, String dietTypeName) {
+<span class="fc" id="L117">    String currentDateTime = Utility.getStringOfCurrentDateTime();</span>
+<span class="fc" id="L118">    DietType dietType = new DietType();</span>
+<span class="fc" id="L119">    dietType.setDietTypeId(dietTypeId);</span>
+<span class="fc" id="L120">    dietType.setDietTypeName(dietTypeName);</span>
+<span class="fc" id="L121">    dietType.setCreatedBy(DEVELOPER);</span>
+<span class="fc" id="L122">    dietType.setCreatedTime(currentDateTime);</span>
+<span class="fc" id="L123">    dietType.setUpdatedBy(DEVELOPER);</span>
+<span class="fc" id="L124">    dietType.setUpdatedTime(currentDateTime);</span>
+<span class="fc" id="L125">    dietTypeRepo.save(dietType);</span>
+<span class="fc" id="L126">  }</span>
+
+  /**
+   * Associate the four nutrition types to a diet type.
+   *
+   * @param dietRecordDto Input diet record object. Refer to dto/DietRecordDto for details.
+   */
+  public void addAllNutrientsInfoToDietNutrientMapping(DietRecordDto dietRecordDto) {
+<span class="fc" id="L134">    Optional&lt;DietType&gt; dietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">    if (dietType.isEmpty()) {</span>
+<span class="fc" id="L136">      throw new BadRequestException(&quot;Diet type not found: Please insert diet type first.&quot;);</span>
+    }
+    // Insert 4 diet_nutrient mappings
+<span class="fc" id="L139">    String currentDateTime = Utility.getStringOfCurrentDateTime();</span>
+<span class="fc" id="L140">    addOneNutrientInfoToDietNutrientMapping(dietType.get(), PROTEIN,</span>
+<span class="fc" id="L141">            dietRecordDto.getProtein(), currentDateTime);</span>
+<span class="fc" id="L142">    addOneNutrientInfoToDietNutrientMapping(dietType.get(), FAT,</span>
+<span class="fc" id="L143">            dietRecordDto.getFat(), currentDateTime);</span>
+<span class="fc" id="L144">    addOneNutrientInfoToDietNutrientMapping(dietType.get(), CARBS,</span>
+<span class="fc" id="L145">            dietRecordDto.getCarbs(), currentDateTime);</span>
+<span class="fc" id="L146">    addOneNutrientInfoToDietNutrientMapping(dietType.get(), CALORIES,</span>
+<span class="fc" id="L147">            dietRecordDto.getCalories(), currentDateTime);</span>
+<span class="fc" id="L148">  }</span>
+
+  /**
+   * Associate one nutrition to a diet type.
+   *
+   * @param dietType Input diet type.
+   * @param nutrientTypeId Input nutrietion type ID.
+   * @param value Input value of the nutrition per 100 gram.
+   * @param currentDateTime Input date and time.
+   */
+  public void addOneNutrientInfoToDietNutrientMapping(DietType dietType, int nutrientTypeId,
+                                                      double value,
+                                                      String currentDateTime) {
+<span class="fc" id="L161">    DietNutrientMapping dietNutrientMapping = new DietNutrientMapping();</span>
+<span class="fc" id="L162">    dietNutrientMapping.setDietType(dietType);</span>
+<span class="fc" id="L163">    dietNutrientMapping.setNutrientType(nutrientTypeRepo.findByNutrientTypeId(nutrientTypeId));</span>
+<span class="fc" id="L164">    dietNutrientMapping.setValue(value);</span>
+<span class="fc" id="L165">    dietNutrientMapping.setCreatedBy(DEVELOPER);</span>
+<span class="fc" id="L166">    dietNutrientMapping.setCreatedTime(currentDateTime);</span>
+<span class="fc" id="L167">    dietNutrientMapping.setUpdatedBy(DEVELOPER);</span>
+<span class="fc" id="L168">    dietNutrientMapping.setUpdatedTime(currentDateTime);</span>
+<span class="fc" id="L169">    dietNutrientMappingRepo.save(dietNutrientMapping);</span>
+<span class="fc" id="L170">  }</span>
+
+  /**
+   * Get a list of diet history records based on input criterion.
+   *
+   * @param au Authenticated user indicating which user performs this.
+   * @param unit Unit type of the span. Among [&quot;all&quot;, &quot;week&quot;, &quot;month&quot;, &quot;year&quot;].
+   * @param length Date the number units back.
+   * @return Return a list of records. Refer to dto/DietHistoryResponseDto for details.
+   */
+  public DietHistoryResponseDto getDietHistory(AuthenticatedUser au,
+                                               Optional&lt;String&gt; unit, Optional&lt;Integer&gt; length) {
+<span class="fc" id="L182">    Optional&lt;DbUser&gt; user = dbUserRepo.findByUserId(au.getUserId());</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">    if (user.isEmpty()) {</span>
+<span class="fc" id="L184">      throw new BadRequestException(&quot;User not found with provided user id.&quot;);</span>
+    }
+
+<span class="fc" id="L187">    String timeUnit = unit.orElse(ALL); // Default: find all diet history</span>
+<span class="fc" id="L188">    int timeLength = length.orElse(ONE); // Default: 1 time unit e.g. 1 week, 1 month...</span>
+<span class="fc" id="L189">    log.info(&quot;**********time length = {}**********&quot;, timeLength);</span>
+<span class="fc bfc" id="L190" title="All 2 branches covered.">    if (timeLength &lt; 0) {</span>
+<span class="fc" id="L191">      throw new BadRequestException(&quot;Invalid time length: Duration must be positive.&quot;);</span>
+    }
+
+    List&lt;DietHistory&gt; dietHistoryList;
+<span class="fc" id="L195">    log.info(&quot;**********Get diet history by selected duration**********&quot;);</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">    if (timeUnit.equals(ALL)) {</span>
+<span class="fc" id="L197">      dietHistoryList = dietHistoryRepo.findAllByUser(user.get());</span>
+    } else {
+      // Calculate starting datetime for diet history by selected duration
+<span class="fc" id="L200">      String startDateTime = Utility.getStringOfStartDateTime(timeUnit, timeLength);</span>
+<span class="fc" id="L201">      dietHistoryList = dietHistoryRepo.findAllByUserAndCreatedTimeAfter(user.get(), startDateTime);</span>
+    }
+<span class="fc" id="L203">    DietHistoryResponseDto dietHistoryResponseDto = new DietHistoryResponseDto();</span>
+<span class="fc" id="L204">    log.info(&quot;**********Add every diet history to responseDto**********&quot;);</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">    for (DietHistory dietHistory : dietHistoryList) {</span>
+<span class="fc" id="L206">      DietHistoryDetailsDto dietHistoryDetailsDto = getDietHistoryDetails(dietHistory);</span>
+<span class="fc" id="L207">      dietHistoryResponseDto.getDietHistoryList().add(dietHistoryDetailsDto);</span>
+<span class="fc" id="L208">    }</span>
+<span class="fc" id="L209">    return dietHistoryResponseDto;</span>
+  }
+
+  /**
+   * Pack a diet history record into the return type DeitHisotryDetailsDto.
+   *
+   * @param dietHistory The record to be packed.
+   * @return Refer to dto/DietHistoryDetailsDto for details.
+   */
+  private DietHistoryDetailsDto getDietHistoryDetails(DietHistory dietHistory) {
+<span class="fc" id="L219">    DietHistoryDetailsDto dietHistoryDetailsDto = new DietHistoryDetailsDto();</span>
+<span class="fc" id="L220">    dietHistoryDetailsDto.setDietHistoryId(dietHistory.getDietHistoryId());</span>
+<span class="fc" id="L221">    dietHistoryDetailsDto.setDietTypeId(dietHistory.getDietType().getDietTypeId());</span>
+<span class="fc" id="L222">    dietHistoryDetailsDto.setDietTypeName(dietHistory.getDietType().getDietTypeName());</span>
+<span class="fc" id="L223">    dietHistoryDetailsDto.setWeight(dietHistory.getWeight());</span>
+<span class="fc" id="L224">    dietHistoryDetailsDto.setUnit(dietHistory.getUnit()); // default: gram</span>
+<span class="fc" id="L225">    dietHistoryDetailsDto.setTime(dietHistory.getCreatedTime());</span>
+<span class="fc" id="L226">    log.info(&quot;**********Get this diet's 4 nutrients' unit amount (per 100 gram)**********&quot;);</span>
+<span class="fc" id="L227">    List&lt;DietNutrientMapping&gt; nutrientsList =</span>
+<span class="fc" id="L228">            dietNutrientMappingRepo.findAllByDietTypeOrderByNutrientType(dietHistory.getDietType());</span>
+<span class="fc" id="L229">    log.info(&quot;**********Set this diet's 4 nutrients' total amount**********&quot;);</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">    for (DietNutrientMapping nutrient : nutrientsList) {</span>
+<span class="fc" id="L231">      double totalAmount = dietHistory.getWeight() / UNIT * nutrient.getValue();</span>
+<span class="fc" id="L232">      log.info(&quot;nutrient: {}, unit amount: {}, total amount: {}&quot;,</span>
+<span class="fc" id="L233">              nutrient.getNutrientType().getNutrientTypeName(), nutrient.getValue(), totalAmount);</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">      if (nutrient.getNutrientType().getNutrientTypeId() == PROTEIN) {</span>
+<span class="fc" id="L235">        dietHistoryDetailsDto.setTotalProtein(totalAmount);</span>
+<span class="fc" id="L236">        log.info(&quot;Set totalProtein.&quot;);</span>
+<span class="fc bfc" id="L237" title="All 2 branches covered.">      } else if (nutrient.getNutrientType().getNutrientTypeId() == FAT) {</span>
+<span class="fc" id="L238">        dietHistoryDetailsDto.setTotalFat(totalAmount);</span>
+<span class="fc" id="L239">        log.info(&quot;Set totalFat.&quot;);</span>
+<span class="fc bfc" id="L240" title="All 2 branches covered.">      } else if (nutrient.getNutrientType().getNutrientTypeId() == CARBS) {</span>
+<span class="fc" id="L241">        dietHistoryDetailsDto.setTotalCarbs(totalAmount);</span>
+<span class="fc" id="L242">        log.info(&quot;Set totalCarbs.&quot;);</span>
+<span class="fc bfc" id="L243" title="All 2 branches covered.">      } else if (nutrient.getNutrientType().getNutrientTypeId() == CALORIES) {</span>
+<span class="fc" id="L244">        dietHistoryDetailsDto.setTotalCalories(totalAmount);</span>
+<span class="fc" id="L245">        log.info(&quot;Set totalCalories.&quot;);</span>
+      } else {
+<span class="fc" id="L247">        throw new BadRequestException(&quot;Invalid nutrient type.&quot;);</span>
+      }
+<span class="fc" id="L249">    }</span>
+<span class="fc" id="L250">    return dietHistoryDetailsDto;</span>
+  }
+
+  /**
+   * Edit a diet record in the database.
+   *
+   * @param au Authenticated user indicating which user performs this.
+   * @param recordId ID of the record to be edited.
+   * @param dietRecordDto Target record after editing. Refer to dto/DietRecordDto for details.
+   */
+  @Transactional
+  public void updateDietHistory(AuthenticatedUser au, Integer recordId,
+                                DietRecordDto dietRecordDto) {
+    // Check and get the old record
+<span class="fc" id="L264">    Optional&lt;DietHistory&gt; dietHistory = dietHistoryRepo.findByDietHistoryId(recordId);</span>
+<span class="fc bfc" id="L265" title="All 2 branches covered.">    if (dietHistory.isEmpty()) {</span>
+<span class="fc" id="L266">      throw new BadRequestException(&quot;Invalid recordId.&quot;);</span>
+    }
+    // Check and get the user
+<span class="fc" id="L269">    Optional&lt;DbUser&gt; user = dbUserRepo.findByUserId(au.getUserId());</span>
+<span class="fc bfc" id="L270" title="All 2 branches covered.">    if (user.isEmpty()) {</span>
+<span class="fc" id="L271">      throw new BadRequestException(&quot;User not found with provided user id.&quot;);</span>
+    }
+<span class="fc bfc" id="L273" title="All 2 branches covered.">    if (!dietHistory.get().getUser().getUserId().equals(user.get().getUserId())) {</span>
+<span class="fc" id="L274">      throw new BadRequestException(&quot;You can't update other user's diet record.&quot;);</span>
+    }
+<span class="fc bfc" id="L276" title="All 2 branches covered.">    if (dietRecordDto.getWeight() &lt;= 0) {</span>
+<span class="fc" id="L277">      throw new BadRequestException(&quot;Weight should be larger than zero.&quot;);</span>
+    }
+
+    // Check if need to update diet type
+<span class="fc" id="L281">    DietType dietType = dietHistory.get().getDietType();</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">    if (dietType.getDietTypeId() != dietRecordDto.getDietTypeId()) {</span>
+      // Update diet type for this record
+      // Check if the new diet type exists
+<span class="fc" id="L285">      Optional&lt;DietType&gt; newDietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());</span>
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">      if (newDietType.isEmpty()) {</span>
+        // add new diet type to diet_type table
+<span class="nc" id="L288">        addDietType(dietRecordDto.getDietTypeId(), dietRecordDto.getDietTypeName());</span>
+        // add 4 nutrients' info to diet_nutrient_mapping table
+<span class="nc" id="L290">        addAllNutrientsInfoToDietNutrientMapping(dietRecordDto);</span>
+      }
+<span class="fc" id="L292">      newDietType = dietTypeRepo.findByDietTypeId(dietRecordDto.getDietTypeId());</span>
+<span class="fc" id="L293">      dietHistory.get().setDietType(newDietType.get());</span>
+    }
+
+    // should also check weight and unit, but...
+<span class="fc bfc" id="L297" title="All 2 branches covered.">    if (dietRecordDto.getUnit().equals(POUND)) {</span>
+<span class="fc" id="L298">      dietHistory.get().setWeight(dietRecordDto.getWeight() * POUND_TO_GRAM);</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">    } else if (dietRecordDto.getUnit().equals(GRAM)) {</span>
+<span class="fc" id="L300">      dietHistory.get().setWeight(dietRecordDto.getWeight());</span>
+    } else {
+<span class="fc" id="L302">      throw new BadRequestException(&quot;Illegal weight unit, please use gram or pound.&quot;);</span>
+    }
+    //dietHistory.get().setUnit(dietRecordDto.getUnit());
+<span class="fc" id="L305">    dietHistory.get().setUpdatedBy(user.get().getUsername());</span>
+<span class="fc" id="L306">    dietHistory.get().setUpdatedTime(Utility.getStringOfCurrentDateTime());</span>
+<span class="fc" id="L307">    dietHistoryRepo.save(dietHistory.get());</span>
+<span class="fc" id="L308">  }</span>
+
+  /**
+   * Delete a diet record from the database.
+   *
+   * @param recordId ID of the diet record to be deleted.
+   * @param au Authenticated user indicating which user performs this.
+   */
+  @Transactional
+  public void deleteDietHistory(AuthenticatedUser au, Integer recordId) {
+    // Check and get the old record
+<span class="fc" id="L319">    Optional&lt;DietHistory&gt; dietHistory = dietHistoryRepo.findByDietHistoryId(recordId);</span>
+<span class="fc bfc" id="L320" title="All 2 branches covered.">    if (dietHistory.isEmpty()) {</span>
+<span class="fc" id="L321">      throw new BadRequestException(&quot;Invalid recordId.&quot;);</span>
+    }
+    // Check and get the user
+<span class="fc" id="L324">    Optional&lt;DbUser&gt; user = dbUserRepo.findByUserId(au.getUserId());</span>
+<span class="fc bfc" id="L325" title="All 2 branches covered.">    if (user.isEmpty()) {</span>
+<span class="fc" id="L326">      throw new BadRequestException(&quot;User not found with provided user id.&quot;);</span>
+    }
+<span class="fc bfc" id="L328" title="All 2 branches covered.">    if (!dietHistory.get().getUser().getUserId().equals(user.get().getUserId())) {</span>
+<span class="fc" id="L329">      throw new BadRequestException(&quot;You can't delete other user's diet record.&quot;);</span>
+    }
+    // delete the diet record
+<span class="fc" id="L332">    dietHistoryRepo.delete(dietHistory.get());</span>
+<span class="fc" id="L333">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

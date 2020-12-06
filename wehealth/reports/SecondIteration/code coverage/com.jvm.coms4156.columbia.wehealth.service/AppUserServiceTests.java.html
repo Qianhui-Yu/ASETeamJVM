@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AppUserServiceTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.service</a> &gt; <span class="el_source">AppUserServiceTests.java</span></div><h1>AppUserServiceTests.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.service;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import com.github.javafaker.Faker;
+import com.jvm.coms4156.columbia.wehealth.dao.AppUserDao;
+import com.jvm.coms4156.columbia.wehealth.domain.AppUserInfo;
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
+import com.jvm.coms4156.columbia.wehealth.domain.LoginRequest;
+import com.jvm.coms4156.columbia.wehealth.domain.LoginResponse;
+import com.jvm.coms4156.columbia.wehealth.domain.UserInput;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import com.jvm.coms4156.columbia.wehealth.exception.DuplicateException;
+import com.jvm.coms4156.columbia.wehealth.exception.MissingDataException;
+import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+
+/**
+ * Created by Ethan 11/15/2020
+ */
+<span class="nc" id="L28">@RunWith(SpringRunner.class)</span>
+@SpringBootTest
+public class AppUserServiceTests {
+  @Autowired
+  private JwtService jwtService;
+
+  @Autowired
+  private AppUserService appUserService;
+
+  @Autowired
+  private AppUserDao appUserDao;
+
+  @Test
+<span class="nc" id="L41">  public void testRegister() throws Exception {</span>
+<span class="nc" id="L42"></span>
+    Faker faker = new Faker();
+<span class="nc" id="L44">    String name = faker.name().fullName();</span>
+
+<span class="nc" id="L46">    AppUserInfo testUserInfo = appUserService.register(new UserInput(name, &quot;123456&quot;, &quot;123456&quot;));</span>
+<span class="nc" id="L47"></span>
+    assertEquals(0, testUserInfo.getUserType());
+<span class="nc" id="L49">    assertEquals(name, testUserInfo.getUsername());</span>
+<span class="nc" id="L50"></span>
+<span class="nc" id="L51">    assertNotNull(testUserInfo.getLookupToken());</span>
+    LoginResponse resp = appUserService.verifyUser(testUserInfo.getLookupToken());
+<span class="nc" id="L53">    System.out.println(&quot;response token: &quot;+resp.getToken());</span>
+<span class="nc" id="L54"></span>
+    assertNotNull(resp.getToken());
+    AuthenticatedUser au = jwtService.verify(resp.getToken());
+<span class="nc" id="L57"></span>
+<span class="nc" id="L58"></span>
+<span class="nc" id="L59">    String username = appUserDao.findByUserId(au.getUserId()).getUsername();</span>
+    assertEquals(name, username);
+<span class="nc" id="L61">    assertEquals(0, au.getUserType());</span>
+
+  }
+
+<span class="nc" id="L65">  @Test(expected = DuplicateException.class)</span>
+<span class="nc" id="L66">  public void registerTestExistingUser() throws Exception {</span>
+<span class="nc" id="L67">    appUserService.register(new UserInput( &quot;testUsername&quot;, &quot;1&quot;, &quot;1&quot;));</span>
+    appUserService.register(new UserInput( &quot;testUsername&quot;, &quot;1&quot;, &quot;1&quot;));
+  }
+
+<span class="nc" id="L71">  @Test(expected = MissingDataException.class)</span>
+<span class="nc" id="L72">  public void registerTestMissingUsername() throws Exception {</span>
+    appUserService.register(new UserInput( &quot;&quot;, &quot;1&quot;, &quot;1&quot;));
+  }
+
+<span class="nc" id="L76">  @Test(expected = MissingDataException.class)</span>
+<span class="nc" id="L77">  public void registerTestMissingPassword() throws Exception {</span>
+<span class="nc" id="L78">    Faker faker = new Faker();</span>
+<span class="nc" id="L79">    String name = faker.name().fullName();</span>
+    appUserService.register(new UserInput( name, &quot;&quot;, &quot;&quot;));
+  }
+
+<span class="nc" id="L83">  @Test</span>
+<span class="nc" id="L84">  public void loginTest() throws Exception {</span>
+<span class="nc" id="L85">    LoginResponse resp = appUserService.login(new LoginRequest(&quot;Test1&quot;, &quot;123456&quot;));</span>
+    assertNotNull(resp);
+  }
+
+<span class="nc" id="L89">  @Test</span>
+<span class="nc" id="L90">  public void loginTestUserNotFoundTest() throws Exception {</span>
+<span class="nc" id="L91">    LoginResponse resp = appUserService.login(new LoginRequest(&quot;UserName NotFound&quot;, &quot;1&quot;));</span>
+    assertNull(resp);
+  }
+
+  @Test
+  public void loginTestLookUpTokenNotFoundTest() throws Exception {
+    LoginResponse resp = appUserService.login(new LoginRequest(&quot;testuser&quot;, &quot;1&quot;));
+    assertNull(resp);
+  }
+
+  @Test
+  public void loginTestWithWrongPassword() throws Exception {
+    LoginResponse resp = appUserService.login(new LoginRequest(&quot;Test1&quot;, &quot;1&quot;));
+    assertNull(resp);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void getUserInfoWithWrongId() throws Exception {
+    AuthenticatedUser au = new AuthenticatedUser(100000L, 0, &quot;Test&quot;);
+    appUserService.getAppUserInfo(au);
+  }
+
+  @Test
+  public void getUserInfoValidTest() throws Exception {
+    AuthenticatedUser au = new AuthenticatedUser(2L, 0, &quot;Test1&quot;);
+    AppUserInfo userInfo = appUserService.getAppUserInfo(au);
+    assertEquals(userInfo.getUsername(), &quot;Test1&quot;);
+    assertEquals(userInfo.getUserId(), 2L);
+    assertEquals(userInfo.getUserType(), 0);
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void verifyUserLookUpTokenNotFoundTest() throws Exception {
+    appUserService.verifyUser(&quot;InvalidLoopUpToken&quot;);
+  }
+
+//  @Test
+//  public void deleteUserValidTest() throws DuplicateException {
+//    String name = &quot;Delete Test&quot;;
+//    AppUserInfo userInfo = appUserService.register(
+//        new UserInput(name, &quot;123456&quot;, &quot;123456&quot;)
+//    );
+//    appUserService.deleteUser(new DbUser(name, userInfo.getLookupToken()));
+//    assertNull(appUserDao.findByUsername(name));
+//  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

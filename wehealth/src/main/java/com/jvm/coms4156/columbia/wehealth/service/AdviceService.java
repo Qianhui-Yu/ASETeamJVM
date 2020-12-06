@@ -8,10 +8,24 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_PROTE
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_DURATION;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.*;
+import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietByDayDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseByDayDto;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryDetailsDto;
+import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -190,7 +204,7 @@ public class AdviceService {
     List<DietByDayDto> result = new ArrayList<>(aggregated.values());
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     result.sort(Comparator.comparing((DietByDayDto var)
-            -> df.parse(var.getDate(), new ParsePosition(0))));
+        -> df.parse(var.getDate(), new ParsePosition(0))));
     return result;
   }
 
@@ -211,7 +225,7 @@ public class AdviceService {
     List<ExerciseByDayDto> result = new ArrayList<>(aggregated.values());
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     result.sort(Comparator.comparing((ExerciseByDayDto var)
-            -> df.parse(var.getDate(), new ParsePosition(0))));
+        -> df.parse(var.getDate(), new ParsePosition(0))));
     return result;
   }
 
@@ -231,15 +245,19 @@ public class AdviceService {
       counter.put(date, counter.get(date) + 1);
     }
     // calculate average
-    for (String date : aggregated.keySet()) {
-      WeightHistoryDetailsDto weightByDay = aggregated.get(date);
-      weightByDay.setWeight(weightByDay.getWeight() / counter.get(date));
+    //    for (String date : aggregated.keySet()) {
+    //      WeightHistoryDetailsDto weightByDay = aggregated.get(date);
+    //      weightByDay.setWeight(weightByDay.getWeight() / counter.get(date));
+    //    }
+    for (Map.Entry<String, WeightHistoryDetailsDto> entry: aggregated.entrySet()) {
+      WeightHistoryDetailsDto weightByDay = entry.getValue();
+      weightByDay.setWeight(weightByDay.getWeight() / counter.get(entry.getKey()));
     }
 
     List<WeightHistoryDetailsDto> result = new ArrayList<>(aggregated.values());
     SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
     result.sort(Comparator.comparing((WeightHistoryDetailsDto var)
-            -> df.parse(var.getTime(), new ParsePosition(0))));
+        -> df.parse(var.getTime(), new ParsePosition(0))));
     return result;
   }
 

@@ -184,7 +184,6 @@ public class DietService {
       throw new BadRequestException("User not found with provided user id.");
     }
 
-    String timeUnit = unit.orElse(ALL); // Default: find all diet history
     int timeLength = length.orElse(ONE); // Default: 1 time unit e.g. 1 week, 1 month...
     log.info("**********time length = {}**********", timeLength);
     if (timeLength < 0) {
@@ -192,6 +191,7 @@ public class DietService {
     }
 
     List<DietHistory> dietHistoryList;
+    String timeUnit = unit.orElse(ALL); // Default: find all diet history
     log.info("**********Get diet history by selected duration**********");
     if (timeUnit.equals(ALL)) {
       dietHistoryList = dietHistoryRepo.findAllByUser(user.get());

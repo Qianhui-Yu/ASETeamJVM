@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdviceController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.controller</a> &gt; <span class="el_source">AdviceController.java</span></div><h1>AdviceController.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.controller;
+
+import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
+import com.jvm.coms4156.columbia.wehealth.dto.UserIdDto;
+import com.jvm.coms4156.columbia.wehealth.service.AdviceService;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
+
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.MONTH;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
+
+@CrossOrigin
+@RestController
+<span class="fc" id="L20">@Log4j2</span>
+<span class="fc" id="L21">public class AdviceController extends BaseController {</span>
+  @Autowired
+  private AdviceService adviceService;
+
+  /**
+   * Hanlder for getting advice.
+   *
+   * @param userIdDto indicate the user who wants advice.
+   * @return Return 200 for success, 400 for bad request (invalid diet history ID), and 401 for
+   *         unauthorized access.
+   */
+  @GetMapping(path = &quot;/advice&quot;, consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity&lt;AdviceDto&gt; getDietRecords(
+          @RequestParam Optional&lt;String&gt; unit,
+          @RequestParam Optional&lt;Integer&gt; length) {
+
+<span class="nc" id="L38">    log.info(&quot;************Get advice {} {} {}***********&quot;, au().getUsername(),</span>
+<span class="nc" id="L39">            length.orElse(ONE), unit.orElse(MONTH));</span>
+
+<span class="nc" id="L41">    AdviceDto adviceDto = adviceService.getAdvice(au(), length, unit);</span>
+    // AdviceDto adviceDto = new AdviceDto();
+<span class="nc" id="L43">    return new ResponseEntity&lt;&gt;(adviceDto, HttpStatus.OK);</span>
+  }
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

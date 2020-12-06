@@ -72,7 +72,7 @@ public class WeHealthExerciseServiceTests {
   public void validateUserInvalidUserTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());
     Assertions.assertThrows(NotFoundException.class, () ->
-            exerciseService.validateUser(1L, Optional.of(2L))
+            exerciseService.validateUser(-1L, Optional.of(2L))
     );
   }
 
@@ -117,7 +117,7 @@ public class WeHealthExerciseServiceTests {
   }
 
   @Test
-  public void addExerciseRecordToDBTest() {
+  public void addExerciseRecordToDBValidTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseTypeRepoMock.findByExerciseTypeName(Mockito.any(String.class)))
@@ -182,7 +182,7 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.empty());
     AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(MissingDataException.class, () ->
-            exerciseService.editExerciseRecordAtDb(Optional.of(1),
+            exerciseService.editExerciseRecordAtDb(Optional.of(-1),
                     new ExerciseRecordDto(), au)
     );
   }
@@ -197,7 +197,8 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.empty());
     AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(MissingDataException.class, () -> {
-      ExerciseRecordDto newRecord = new ExerciseRecordDto("TestExerciseType", 10.0);
+      ExerciseRecordDto newRecord = new ExerciseRecordDto(
+          "InvalidTestExerciseType", 10.0);
       exerciseService.editExerciseRecordAtDb(Optional.of(1), newRecord, au);
     });
   }
@@ -220,7 +221,7 @@ public class WeHealthExerciseServiceTests {
   }
 
   @Test
-  public void editExerciseRecordTest() {
+  public void editExerciseRecordValidTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
     when(dbExerciseHistoryRepoMock.findByExerciseHistoryId(Mockito.any(Integer.class)))
@@ -242,7 +243,7 @@ public class WeHealthExerciseServiceTests {
             .thenReturn(Optional.empty());
     AuthenticatedUser au = new AuthenticatedUser(1L);
     Assertions.assertThrows(MissingDataException.class, () ->
-            exerciseService.deleteExerciseRecordInDb(Optional.of(1), au)
+            exerciseService.deleteExerciseRecordInDb(Optional.of(-1), au)
     );
   }
 

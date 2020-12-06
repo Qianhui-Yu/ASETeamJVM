@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdviceServiceTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.service</a> &gt; <span class="el_source">AdviceServiceTests.java</span></div><h1>AdviceServiceTests.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.service;
+
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.WEEK;
+import static org.mockito.Mockito.when;
+
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
+import com.jvm.coms4156.columbia.wehealth.dto.*;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import com.jvm.coms4156.columbia.wehealth.entity.WeightHistory;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+<span class="fc" id="L28">public class AdviceServiceTests {</span>
+  @InjectMocks
+  private AdviceService adviceService;
+
+  @Mock
+  private DietService dietService;
+
+  @Mock
+  private ExerciseService exerciseService;
+
+  @Mock
+  private WeightService weightService;
+
+  private DietHistoryDetailsDto validDietHistory(Integer dietHistoryId, Integer dietTypeId,
+                                                 String time) {
+<span class="fc" id="L43">    DietHistoryDetailsDto dietHistory = new DietHistoryDetailsDto();</span>
+<span class="fc" id="L44">    dietHistory.setDietHistoryId(dietHistoryId);</span>
+<span class="fc" id="L45">    dietHistory.setDietTypeId(dietTypeId);</span>
+<span class="fc" id="L46">    dietHistory.setTotalProtein(10.0 * dietHistoryId);</span>
+<span class="fc" id="L47">    dietHistory.setTotalFat(7.0* dietHistoryId);</span>
+<span class="fc" id="L48">    dietHistory.setTotalCarbs(30.0 * dietHistoryId);</span>
+<span class="fc" id="L49">    dietHistory.setTotalCalories(200.0 * dietHistoryId);</span>
+<span class="fc" id="L50">    dietHistory.setTime(time);</span>
+<span class="fc" id="L51">    return dietHistory;</span>
+  }
+
+  private DietHistoryResponseDto getValidDiestHistory(Integer length) {
+<span class="fc" id="L55">    List&lt;DietHistoryDetailsDto&gt; dietHistoryList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L56">    DietHistoryResponseDto dietHistoryResponseDto = new DietHistoryResponseDto();</span>
+<span class="fc" id="L57">    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+    // DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy/MM/dd HH:mm:ss&quot;);
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    for (int i = 0; i &lt; length; i++) {</span>
+<span class="fc" id="L60">      String day = LocalDateTime.now(ZoneId.systemDefault()).minusDays(i).format(formatter);</span>
+<span class="fc" id="L61">      dietHistoryList.add(validDietHistory(i, i, day));</span>
+<span class="fc" id="L62">      dietHistoryList.add(validDietHistory(i, i, day));</span>
+    }
+<span class="fc" id="L64">    dietHistoryResponseDto.setDietHistoryList(dietHistoryList);</span>
+<span class="fc" id="L65">    return dietHistoryResponseDto;</span>
+  }
+
+  private ExerciseHistoryDetailsDto validExercise(Integer exerciseHistoryId,
+                                                  Double duration, String time) {
+<span class="fc" id="L70">    ExerciseHistoryDetailsDto exercise = new ExerciseHistoryDetailsDto();</span>
+<span class="fc" id="L71">    exercise.setExerciseHistoryId(exerciseHistoryId);</span>
+<span class="fc" id="L72">    exercise.setExerciseTypeName(&quot;test&quot;);</span>
+<span class="fc" id="L73">    exercise.setDuration(duration * exerciseHistoryId);</span>
+<span class="fc" id="L74">    exercise.setTime(time);</span>
+<span class="fc" id="L75">    exercise.setTotalCalories(duration * 5);</span>
+<span class="fc" id="L76">    return exercise;</span>
+  }
+
+  private ExerciseHistoryResponseDto getValidExerciseHistory(Integer length) {
+<span class="fc" id="L80">    List&lt;ExerciseHistoryDetailsDto&gt; exerciseHistoryList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L81">    ExerciseHistoryResponseDto dto = new ExerciseHistoryResponseDto();</span>
+<span class="fc" id="L82">    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">    for (int i = 0; i &lt; length; i++) {</span>
+<span class="fc" id="L84">      String day = LocalDateTime.now(ZoneId.systemDefault()).minusDays(i).format(formatter);</span>
+<span class="fc" id="L85">      exerciseHistoryList.add(validExercise(i, 10.0, day));</span>
+<span class="fc" id="L86">      exerciseHistoryList.add(validExercise(i, 10.0, day));</span>
+    }
+<span class="fc" id="L88">    dto.setExerciseHistoryList(exerciseHistoryList);</span>
+<span class="fc" id="L89">    return dto;</span>
+  }
+
+  private WeightHistoryDetailsDto validWeight(Double weight, String time) {
+<span class="fc" id="L93">    WeightHistoryDetailsDto weightDto = new WeightHistoryDetailsDto();</span>
+<span class="fc" id="L94">    weightDto.setWeightHistoryId(1);</span>
+<span class="fc" id="L95">    weightDto.setWeight(weight);</span>
+<span class="fc" id="L96">    weightDto.setTime(time);</span>
+<span class="fc" id="L97">    weightDto.setUnit(&quot;gram&quot;);</span>
+<span class="fc" id="L98">    return weightDto;</span>
+  }
+
+  private WeightHistoryResponseDto getValidWeightHistory(Integer length) {
+<span class="fc" id="L102">    List&lt;WeightHistoryDetailsDto&gt; weightHistory = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L103">    WeightHistoryResponseDto dto = new WeightHistoryResponseDto();</span>
+<span class="fc" id="L104">    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">    for (int i = 0; i &lt; length; i++) {</span>
+<span class="fc" id="L106">      String day = LocalDateTime.now(ZoneId.systemDefault()).minusDays(i).format(formatter);</span>
+<span class="fc" id="L107">      weightHistory.add(validWeight(110000.0 + 10 * i, day));</span>
+<span class="fc" id="L108">      weightHistory.add(validWeight(115000.0 + 10 * i, day));</span>
+    }
+<span class="fc" id="L110">    dto.setWeightHistoryList(weightHistory);</span>
+<span class="fc" id="L111">    return dto;</span>
+  }
+
+
+  @Test
+  public void getAdviceValidLongRecordTest() {
+<span class="fc" id="L117">    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L118">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L119">            .thenReturn(getValidDiestHistory(100));</span>
+
+<span class="fc" id="L121">    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),</span>
+<span class="fc" id="L122">            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))</span>
+<span class="fc" id="L123">            .thenReturn(getValidExerciseHistory(100));</span>
+
+<span class="fc" id="L125">    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L126">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L127">            .thenReturn(getValidWeightHistory(100));</span>
+
+<span class="fc" id="L129">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L130">    Optional&lt;String&gt; unit = Optional.of(WEEK);</span>
+<span class="fc" id="L131">    Optional&lt;Integer&gt; length = Optional.of(1);</span>
+<span class="fc" id="L132">    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);</span>
+<span class="fc" id="L133">    Assertions.assertEquals(false, adviceDto.getIsEmpty());</span>
+<span class="fc" id="L134">    Assertions.assertEquals(100, adviceDto.getDietByDate().size());</span>
+<span class="fc" id="L135">    Assertions.assertEquals(100, adviceDto.getExerciseByDate().size());</span>
+<span class="fc" id="L136">    Assertions.assertEquals(100, adviceDto.getWeightByDate().size());</span>
+<span class="fc" id="L137">  }</span>
+
+  @Test
+  public void getAdviceValidMidRecordTest() {
+<span class="fc" id="L141">    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L142">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L143">            .thenReturn(getValidDiestHistory(10));</span>
+
+<span class="fc" id="L145">    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),</span>
+<span class="fc" id="L146">            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))</span>
+<span class="fc" id="L147">            .thenReturn(getValidExerciseHistory(10));</span>
+
+<span class="fc" id="L149">    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L150">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L151">            .thenReturn(getValidWeightHistory(10));</span>
+
+<span class="fc" id="L153">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L154">    Optional&lt;String&gt; unit = Optional.of(WEEK);</span>
+<span class="fc" id="L155">    Optional&lt;Integer&gt; length = Optional.of(1);</span>
+<span class="fc" id="L156">    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);</span>
+<span class="fc" id="L157">    Assertions.assertEquals(false, adviceDto.getIsEmpty());</span>
+<span class="fc" id="L158">    Assertions.assertEquals(10, adviceDto.getDietByDate().size());</span>
+<span class="fc" id="L159">    Assertions.assertEquals(10, adviceDto.getExerciseByDate().size());</span>
+<span class="fc" id="L160">    Assertions.assertEquals(10, adviceDto.getWeightByDate().size());</span>
+<span class="fc" id="L161">  }</span>
+
+  @Test
+  public void getAdviceValidShortRecordTest() {
+<span class="fc" id="L165">    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L166">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L167">            .thenReturn(getValidDiestHistory(1));</span>
+
+<span class="fc" id="L169">    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),</span>
+<span class="fc" id="L170">            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))</span>
+<span class="fc" id="L171">            .thenReturn(getValidExerciseHistory(1));</span>
+
+<span class="fc" id="L173">    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L174">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L175">            .thenReturn(getValidWeightHistory(1));</span>
+
+<span class="fc" id="L177">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L178">    Optional&lt;String&gt; unit = Optional.of(WEEK);</span>
+<span class="fc" id="L179">    Optional&lt;Integer&gt; length = Optional.of(1);</span>
+<span class="fc" id="L180">    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);</span>
+<span class="fc" id="L181">    Assertions.assertEquals(false, adviceDto.getIsEmpty());</span>
+<span class="fc" id="L182">    Assertions.assertEquals(1, adviceDto.getDietByDate().size());</span>
+<span class="fc" id="L183">    Assertions.assertEquals(1, adviceDto.getExerciseByDate().size());</span>
+<span class="fc" id="L184">    Assertions.assertEquals(1, adviceDto.getWeightByDate().size());</span>
+<span class="fc" id="L185">  }</span>
+
+  @Test
+  public void getAdviceValidCalculationTest() {
+<span class="fc" id="L189">    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L190">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L191">            .thenReturn(getValidDiestHistory(1));</span>
+<span class="fc" id="L192">    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),</span>
+<span class="fc" id="L193">            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))</span>
+<span class="fc" id="L194">            .thenReturn(getValidExerciseHistory(1));</span>
+
+<span class="fc" id="L196">    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L197">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L198">            .thenReturn(getValidWeightHistory(1));</span>
+
+<span class="fc" id="L200">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L201">    Optional&lt;String&gt; unit = Optional.of(WEEK);</span>
+<span class="fc" id="L202">    Optional&lt;Integer&gt; length = Optional.of(1);</span>
+<span class="fc" id="L203">    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);</span>
+
+<span class="fc" id="L205">    Assertions.assertEquals(false, adviceDto.getIsEmpty());</span>
+<span class="fc" id="L206">    Assertions.assertEquals(adviceDto.getDietByDate().get(0).getTotalCalories(),</span>
+<span class="fc" id="L207">            adviceDto.getAvgCalories());</span>
+
+<span class="fc" id="L209">    Assertions.assertEquals(adviceDto.getExerciseByDate().get(0).getTotalDuration(),</span>
+<span class="fc" id="L210">            adviceDto.getAvgDuration());</span>
+
+<span class="fc" id="L212">    Assertions.assertEquals(adviceDto.getWeightByDate().get(0).getWeight(),</span>
+            112500.0);
+<span class="fc" id="L214">  }</span>
+
+  @Test
+  public void getAdviceInvalidDietTest() {
+<span class="fc" id="L218">    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L219">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L220">            .thenReturn(new DietHistoryResponseDto());</span>
+<span class="fc" id="L221">    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),</span>
+<span class="fc" id="L222">            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))</span>
+<span class="fc" id="L223">            .thenReturn(getValidExerciseHistory(1));</span>
+<span class="fc" id="L224">    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L225">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L226">            .thenReturn(getValidWeightHistory(1));</span>
+
+<span class="fc" id="L228">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L229">    Optional&lt;String&gt; unit = Optional.of(WEEK);</span>
+<span class="fc" id="L230">    Optional&lt;Integer&gt; length = Optional.of(1);</span>
+<span class="fc" id="L231">    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);</span>
+<span class="fc" id="L232">    Assertions.assertEquals(false, adviceDto.getIsEmpty());</span>
+<span class="fc" id="L233">  }</span>
+
+  @Test
+  public void getAdviceInvalidExerciseTest() {
+<span class="fc" id="L237">    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L238">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L239">            .thenReturn(getValidDiestHistory(1));</span>
+<span class="fc" id="L240">    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),</span>
+<span class="fc" id="L241">            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))</span>
+<span class="fc" id="L242">            .thenReturn(new ExerciseHistoryResponseDto());</span>
+<span class="fc" id="L243">    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L244">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L245">            .thenReturn(new WeightHistoryResponseDto());</span>
+
+<span class="fc" id="L247">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L248">    Optional&lt;String&gt; unit = Optional.of(WEEK);</span>
+<span class="fc" id="L249">    Optional&lt;Integer&gt; length = Optional.of(1);</span>
+<span class="fc" id="L250">    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);</span>
+<span class="fc" id="L251">    Assertions.assertEquals(false, adviceDto.getIsEmpty());</span>
+<span class="fc" id="L252">  }</span>
+
+  @Test
+  public void getAdviceInvalidUserTest() {
+<span class="fc" id="L256">    when(dietService.getDietHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L257">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L258">            .thenReturn(new DietHistoryResponseDto());</span>
+
+<span class="fc" id="L260">    when(exerciseService.getExerciseHistory(Mockito.any(Optional.class),</span>
+<span class="fc" id="L261">            Mockito.any(Optional.class), Mockito.any(AuthenticatedUser.class)))</span>
+<span class="fc" id="L262">            .thenReturn(new ExerciseHistoryResponseDto());</span>
+
+<span class="fc" id="L264">    when(weightService.getWeightHistory(Mockito.any(AuthenticatedUser.class),</span>
+<span class="fc" id="L265">            Mockito.any(Optional.class), Mockito.any(Optional.class)))</span>
+<span class="fc" id="L266">            .thenReturn(new WeightHistoryResponseDto());</span>
+
+<span class="fc" id="L268">    AuthenticatedUser au = new AuthenticatedUser(-1L);</span>
+<span class="fc" id="L269">    Optional&lt;String&gt; unit = Optional.of(WEEK);</span>
+<span class="fc" id="L270">    Optional&lt;Integer&gt; length = Optional.of(1);</span>
+<span class="fc" id="L271">    AdviceDto adviceDto = adviceService.getAdvice(au, length, unit);</span>
+<span class="fc" id="L272">    Assertions.assertEquals(true, adviceDto.getIsEmpty());</span>
+<span class="fc" id="L273">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

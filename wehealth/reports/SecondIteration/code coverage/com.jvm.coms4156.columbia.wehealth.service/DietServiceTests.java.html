@@ -1,0 +1,495 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DietServiceTests.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.service</a> &gt; <span class="el_source">DietServiceTests.java</span></div><h1>DietServiceTests.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.service;
+
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.CALORIES;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.CARBS;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.FAT;
+import static com.jvm.coms4156.columbia.wehealth.common.Constants.PROTEIN;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
+import com.jvm.coms4156.columbia.wehealth.dto.DietRecordDto;
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import com.jvm.coms4156.columbia.wehealth.entity.DietHistory;
+import com.jvm.coms4156.columbia.wehealth.entity.DietNutrientMapping;
+import com.jvm.coms4156.columbia.wehealth.entity.DietType;
+import com.jvm.coms4156.columbia.wehealth.entity.NutrientType;
+import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
+import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
+import com.jvm.coms4156.columbia.wehealth.repository.DbUserRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietHistoryRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietNutrientMappingRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietTypeRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.NutrientTypeRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+
+@RunWith(SpringRunner.class)
+@SpringBootTest
+<span class="fc" id="L39">public class DietServiceTests {</span>
+
+  @InjectMocks
+  private DietService dietService;
+
+  @Mock
+  private DbUserRepository dbUserRepoMock;
+
+  @Mock
+  private DietHistoryRepository dietHistoryRepoMock;
+
+  @Mock
+  private DietTypeRepository dietTypeRepoMock;
+
+  @Mock
+  private NutrientTypeRepository nutrientTypeRepoMock;
+
+  @Mock
+  private DietNutrientMappingRepository dietNutrientMappingRepoMock;
+
+  private DbUser validUser(Long userId) {
+<span class="fc" id="L60">    DbUser dbUser = new DbUser(&quot;1&quot;, &quot;1&quot;);</span>
+<span class="fc" id="L61">    dbUser.setUserId(userId);</span>
+<span class="fc" id="L62">    return dbUser;</span>
+  }
+
+  private AuthenticatedUser getValidAU() {
+<span class="fc" id="L66">    AuthenticatedUser au = new AuthenticatedUser(1L, 1, &quot;a&quot;);</span>
+<span class="fc" id="L67">    return au;</span>
+  }
+
+  private DietType validDiet(Integer dietTypeId) {
+<span class="fc" id="L71">    DietType dietType = new DietType();</span>
+<span class="fc" id="L72">    dietType.setDietTypeId(dietTypeId);</span>
+<span class="fc" id="L73">    dietType.setDietTypeName(&quot;test&quot;);</span>
+<span class="fc" id="L74">    return dietType;</span>
+  }
+
+
+  private NutrientType validNutrient(Integer nutrientTypeId) {
+<span class="fc" id="L79">    NutrientType nutrientType = new NutrientType();</span>
+<span class="fc" id="L80">    nutrientType.setNutrientTypeId(nutrientTypeId);</span>
+<span class="fc" id="L81">    nutrientType.setNutrientTypeName(&quot;test&quot;);</span>
+<span class="fc" id="L82">    nutrientType.setUnit(&quot;gram&quot;);</span>
+<span class="fc" id="L83">    return nutrientType;</span>
+  }
+
+  private DietHistory validDietHistory(Integer dietHistoryId, Integer dietTypeId) {
+<span class="fc" id="L87">    DietHistory dietHistory = new DietHistory();</span>
+<span class="fc" id="L88">    dietHistory.setDietHistoryId(dietHistoryId);</span>
+<span class="fc" id="L89">    dietHistory.setDietType(validDiet(dietTypeId));</span>
+<span class="fc" id="L90">    dietHistory.setUser(validUser(1L));</span>
+<span class="fc" id="L91">    return dietHistory;</span>
+  }
+
+  private DietHistory inValidDietHistory(Integer dietHistoryId, Integer dietTypeId) {
+<span class="fc" id="L95">    DietHistory dietHistory = new DietHistory();</span>
+<span class="fc" id="L96">    dietHistory.setDietHistoryId(dietHistoryId);</span>
+<span class="fc" id="L97">    dietHistory.setDietType(validDiet(dietTypeId));</span>
+<span class="fc" id="L98">    dietHistory.setUser(validUser(1L));</span>
+<span class="fc" id="L99">    return dietHistory;</span>
+  }
+
+  private List&lt;DietHistory&gt; validDietHistoryList(Long userId) {
+<span class="fc" id="L103">    List&lt;DietHistory&gt; dietHistoryList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">    for (Integer i = 1; i &lt; 5; ++i) {</span>
+<span class="fc" id="L105">      dietHistoryList.add(validDietHistory(i, 1));</span>
+    }
+<span class="fc" id="L107">    return dietHistoryList;</span>
+  }
+
+  private List&lt;DietHistory&gt; inValidDietHistoryList(Long userId) {
+<span class="fc" id="L111">    List&lt;DietHistory&gt; dietHistoryList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L112">    dietHistoryList.add(inValidDietHistory(1, -1));</span>
+<span class="fc" id="L113">    return dietHistoryList;</span>
+  }
+
+  private DietNutrientMapping validDietNutrientMapping(Integer dietNutrientMappingId,
+                                                       Integer dietTypeId,
+                                                       Integer nutrientTypeId) {
+<span class="fc" id="L119">    DietNutrientMapping dietNutrientMapping = new DietNutrientMapping();</span>
+<span class="fc" id="L120">    dietNutrientMapping.setDietNutrientMappingId(dietNutrientMappingId);</span>
+<span class="fc" id="L121">    dietNutrientMapping.setDietType(validDiet(dietTypeId));</span>
+<span class="fc" id="L122">    dietNutrientMapping.setNutrientType(validNutrient(nutrientTypeId));</span>
+<span class="fc" id="L123">    dietNutrientMapping.setValue(100.0);</span>
+<span class="fc" id="L124">    return dietNutrientMapping;</span>
+  }
+
+  private List&lt;DietNutrientMapping&gt; validDietNutrientMappingList(Integer dietTypeId) {
+<span class="fc" id="L128">    List&lt;DietNutrientMapping&gt; dietNutrientMappingList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L129">    dietNutrientMappingList.add(validDietNutrientMapping(1, 1, PROTEIN));</span>
+<span class="fc" id="L130">    dietNutrientMappingList.add(validDietNutrientMapping(2, 1, CALORIES));</span>
+<span class="fc" id="L131">    dietNutrientMappingList.add(validDietNutrientMapping(3, 1, FAT));</span>
+<span class="fc" id="L132">    dietNutrientMappingList.add(validDietNutrientMapping(4, 1, CARBS));</span>
+<span class="fc" id="L133">    return dietNutrientMappingList;</span>
+  }
+
+  private List&lt;DietNutrientMapping&gt; inValidDietNutrientMappingList(Integer dietTypeId) {
+<span class="fc" id="L137">    List&lt;DietNutrientMapping&gt; dietNutrientMappingList = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L138">    dietNutrientMappingList.add(validDietNutrientMapping(1, 1, -1));</span>
+<span class="fc" id="L139">    return dietNutrientMappingList;</span>
+  }
+
+  @Test
+  public void addDietTypeTest() {
+<span class="fc" id="L144">    dietService.addDietType(1, &quot;test_diet&quot;);</span>
+<span class="fc" id="L145">  }</span>
+
+  @Test
+  public void addDietRecordValidTest() {
+<span class="fc" id="L149">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L150">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L151">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L152">            .thenReturn(Optional.of(validDiet(1)));</span>
+<span class="fc" id="L153">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L154">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0, &quot;gram&quot;,</span>
+<span class="fc" id="L155">            10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L156">    dietService.addDietRecordToDb(au, dietRecordDto);</span>
+<span class="fc" id="L157">  }</span>
+
+  @Test
+  public void addDietRecordValid2Test() {
+<span class="fc" id="L161">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L162">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L163">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L164">            .thenReturn(Optional.of(validDiet(1)));</span>
+<span class="fc" id="L165">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L166">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L167">            &quot;pound&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L168">    dietService.addDietRecordToDb(au, dietRecordDto);</span>
+<span class="fc" id="L169">  }</span>
+
+  @Test
+  public void addDietRecordInvalidUserIdTest() {
+<span class="fc" id="L173">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());</span>
+<span class="fc" id="L174">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L175">            .thenReturn(Optional.of(validDiet(1)));</span>
+    //AuthenticatedUser au = getValidAU();
+<span class="fc" id="L177">    AuthenticatedUser au = new AuthenticatedUser(-1L);</span>
+<span class="fc" id="L178">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L179">            &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L180">    Assertions.assertThrows(NotFoundException.class, () -&gt; {</span>
+<span class="nc" id="L181">      dietService.addDietRecordToDb(au, dietRecordDto);</span>
+<span class="nc" id="L182">    });</span>
+<span class="fc" id="L183">  }</span>
+
+  @Test
+  public void addDietRecordInvalidDietTypeIdTest() {
+<span class="fc" id="L187">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L188">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L189">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L190">            .thenReturn(Optional.empty());</span>
+<span class="fc" id="L191">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L192">    DietRecordDto dietRecordDto = new DietRecordDto(-1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L193">            &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L194">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L195">      dietService.addDietRecordToDb(au, dietRecordDto);</span>
+<span class="nc" id="L196">    });</span>
+<span class="fc" id="L197">  }</span>
+
+  @Test
+  public void addDietRecordInvalidUnitTest() {
+<span class="fc" id="L201">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L202">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L203">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L204">            .thenReturn(Optional.of(validDiet(1)));</span>
+<span class="fc" id="L205">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L206">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L207">            &quot;random&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L208">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L209">      dietService.addDietRecordToDb(au, dietRecordDto);</span>
+<span class="nc" id="L210">    });</span>
+<span class="fc" id="L211">  }</span>
+
+  @Test
+  public void addDietRecordInvalidWeightTest() {
+<span class="fc" id="L215">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L216">        .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L217">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L218">        .thenReturn(Optional.of(validDiet(1)));</span>
+<span class="fc" id="L219">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L220">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, -10.0,</span>
+<span class="fc" id="L221">        &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L222">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L223">      dietService.addDietRecordToDb(au, dietRecordDto);</span>
+<span class="nc" id="L224">    });</span>
+<span class="fc" id="L225">  }</span>
+
+  @Test
+  public void addDietNutrientMappingValidTest() {
+<span class="fc" id="L229">    when(nutrientTypeRepoMock.findByNutrientTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L230">            .thenReturn(validNutrient(FAT));</span>
+<span class="fc" id="L231">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L232">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L233">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L234">            .thenReturn(Optional.of(validDiet(1)));</span>
+
+<span class="fc" id="L236">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L237">            &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L238">    dietService.addAllNutrientsInfoToDietNutrientMapping(dietRecordDto);</span>
+<span class="fc" id="L239">  }</span>
+
+  @Test
+  public void addDietNutrientMappingInvalidTest() {
+<span class="fc" id="L243">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L244">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L245">    when(dietTypeRepoMock.findByDietTypeId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L246">            .thenReturn(Optional.empty());</span>
+<span class="fc" id="L247">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L248">    DietRecordDto dietRecordDto = new DietRecordDto(-1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L249">            &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L250">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L251">      dietService.addDietRecordToDb(au, dietRecordDto);</span>
+<span class="nc" id="L252">    });</span>
+<span class="fc" id="L253">  }</span>
+
+  @Test
+  public void getDietHistoryValidTest() {
+<span class="fc" id="L257">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L258">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L259">    when(dietHistoryRepoMock.findAllByUser(Mockito.any(DbUser.class)))</span>
+<span class="fc" id="L260">            .thenReturn(validDietHistoryList(1L));</span>
+<span class="fc" id="L261">    when(dietNutrientMappingRepoMock</span>
+<span class="fc" id="L262">            .findAllByDietTypeOrderByNutrientType(Mockito.any(DietType.class)))</span>
+<span class="fc" id="L263">            .thenReturn(validDietNutrientMappingList(1));</span>
+
+<span class="fc" id="L265">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L266">    String unit = &quot;all&quot;;</span>
+<span class="fc" id="L267">    Integer length = 1;</span>
+<span class="fc" id="L268">    dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));</span>
+<span class="fc" id="L269">  }</span>
+
+  @Test
+  public void getDietHistoryValid2Test() {
+<span class="fc" id="L273">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L274">        .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L275">    when(dietHistoryRepoMock.findAllByUserAndCreatedTimeAfter(Mockito.any(DbUser.class), Mockito.anyString()))</span>
+<span class="fc" id="L276">        .thenReturn(validDietHistoryList(1L));</span>
+<span class="fc" id="L277">    when(dietNutrientMappingRepoMock</span>
+<span class="fc" id="L278">        .findAllByDietTypeOrderByNutrientType(Mockito.any(DietType.class)))</span>
+<span class="fc" id="L279">        .thenReturn(validDietNutrientMappingList(1));</span>
+
+<span class="fc" id="L281">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L282">    String unit = &quot;month&quot;;</span>
+<span class="fc" id="L283">    Integer length = 2;</span>
+<span class="fc" id="L284">    dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));</span>
+<span class="fc" id="L285">  }</span>
+
+  @Test
+  public void getDietHistoryInvalidNutrientTypeTest() {
+<span class="fc" id="L289">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L290">        .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L291">    when(dietHistoryRepoMock.findAllByUser(Mockito.any(DbUser.class)))</span>
+<span class="fc" id="L292">        .thenReturn(inValidDietHistoryList(1L));</span>
+<span class="fc" id="L293">    when(dietNutrientMappingRepoMock</span>
+<span class="fc" id="L294">        .findAllByDietTypeOrderByNutrientType(Mockito.any(DietType.class)))</span>
+<span class="fc" id="L295">        .thenReturn(inValidDietNutrientMappingList(1));</span>
+
+<span class="fc" id="L297">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L298">    String unit = &quot;all&quot;;</span>
+<span class="fc" id="L299">    Integer length = 1;</span>
+<span class="fc" id="L300">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L301">      dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));</span>
+<span class="nc" id="L302">    });</span>
+<span class="fc" id="L303">  }</span>
+
+  @Test
+  public void getDietHistoryInvalidUserIdTest() {
+<span class="fc" id="L307">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());</span>
+<span class="fc" id="L308">    AuthenticatedUser au = new AuthenticatedUser(-1L);</span>
+<span class="fc" id="L309">    String unit = &quot;all&quot;;</span>
+<span class="fc" id="L310">    Integer length = 1;</span>
+<span class="fc" id="L311">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L312">      dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));</span>
+<span class="nc" id="L313">    });</span>
+<span class="fc" id="L314">  }</span>
+
+  @Test
+  public void getDietHistoryInvalidTimeLengthTest() {
+<span class="fc" id="L318">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L319">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L320">    String unit = &quot;all&quot;;</span>
+<span class="fc" id="L321">    Integer length = -1;</span>
+<span class="fc" id="L322">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L323">      dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));</span>
+<span class="nc" id="L324">    });</span>
+<span class="fc" id="L325">  }</span>
+
+  @Test
+  public void getDietHistoryInvalidTimeUnitTest() {
+<span class="fc" id="L329">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L330">    AuthenticatedUser au = new AuthenticatedUser(1L);</span>
+<span class="fc" id="L331">    String unit = &quot;quarter&quot;;</span>
+<span class="fc" id="L332">    Integer length = 1;</span>
+<span class="fc" id="L333">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L334">      dietService.getDietHistory(au, Optional.of(unit), Optional.of(length));</span>
+<span class="nc" id="L335">    });</span>
+<span class="fc" id="L336">  }</span>
+
+  @Test
+  public void updateDietHistoryValidTest() {
+<span class="fc" id="L340">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L341">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L342">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L343">            .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L344">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L345">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L346">            &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L347">    dietService.updateDietHistory(au, 1, dietRecordDto);</span>
+<span class="fc" id="L348">  }</span>
+
+  @Test
+  public void updateDietHistoryValidPOUNDTest() {
+<span class="fc" id="L352">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L353">        .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L354">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L355">        .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L356">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L357">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L358">        &quot;pound&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L359">    dietService.updateDietHistory(au, 1, dietRecordDto);</span>
+<span class="fc" id="L360">  }</span>
+
+  @Test
+  public void updateDietHistoryValidUpdateDietTypeTest() {
+<span class="fc" id="L364">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L365">        .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L366">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L367">        .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L368">    when(dietTypeRepoMock.findByDietTypeId(2))</span>
+<span class="fc" id="L369">        .thenReturn(Optional.of(validDiet(2)));</span>
+
+<span class="fc" id="L371">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L372">    DietRecordDto dietRecordDto = new DietRecordDto(2, &quot;test222&quot;, 10.0,</span>
+<span class="fc" id="L373">        &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L374">    dietService.updateDietHistory(au, 1, dietRecordDto);</span>
+<span class="fc" id="L375">  }</span>
+
+  @Test
+  public void updateDietHistoryUserNotFoundTest() {
+<span class="fc" id="L379">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(Optional.empty());</span>
+<span class="fc" id="L380">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L381">            .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L382">    AuthenticatedUser au = new AuthenticatedUser(-1L);</span>
+<span class="fc" id="L383">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L384">            &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L385">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L386">      dietService.updateDietHistory(au, 1, dietRecordDto);</span>
+<span class="nc" id="L387">    });</span>
+
+<span class="fc" id="L389">  }</span>
+
+  @Test
+  public void updateDietHistoryInvalidRecordIdTest() {
+<span class="fc" id="L393">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L394">        .thenReturn(Optional.of(validUser(2L)));</span>
+<span class="fc" id="L395">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L396">        .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L397">    AuthenticatedUser au = new AuthenticatedUser(2L);</span>
+<span class="fc" id="L398">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L399">        &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L400">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L401">      dietService.updateDietHistory(au, 1, dietRecordDto);</span>
+<span class="nc" id="L402">    });</span>
+
+<span class="fc" id="L404">  }</span>
+
+  @Test
+  public void updateDietHistoryInvalidWeightTest() {
+<span class="fc" id="L408">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L409">        .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L410">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L411">        .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L412">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L413">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, -10.0,</span>
+<span class="fc" id="L414">        &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L415">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L416">      dietService.updateDietHistory(au, 1, dietRecordDto);</span>
+<span class="nc" id="L417">    });</span>
+<span class="fc" id="L418">  }</span>
+
+  @Test
+  public void updateDietHistoryInvalidWeightUnitTest() {
+<span class="fc" id="L422">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L423">        .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L424">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L425">        .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L426">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L427">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L428">        &quot;kilogram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L429">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L430">      dietService.updateDietHistory(au, 1, dietRecordDto);</span>
+<span class="nc" id="L431">    });</span>
+<span class="fc" id="L432">  }</span>
+
+  @Test
+  public void updateDietHistoryRecordIdNotFoundTest() {
+<span class="fc" id="L436">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L437">        .thenReturn(Optional.empty());</span>
+<span class="fc" id="L438">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L439">    DietRecordDto dietRecordDto = new DietRecordDto(1, &quot;test&quot;, 10.0,</span>
+<span class="fc" id="L440">        &quot;gram&quot;, 10.0, 10.0, 10.0, 10.0);</span>
+<span class="fc" id="L441">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L442">      dietService.updateDietHistory(au, -1, dietRecordDto);</span>
+<span class="nc" id="L443">    });</span>
+
+<span class="fc" id="L445">  }</span>
+
+
+  @Test
+  public void deleteDietHistoryValidTest() {
+<span class="fc" id="L450">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L451">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L452">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L453">            .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L454">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L455">    dietService.deleteDietHistory(au, 1);</span>
+<span class="fc" id="L456">  }</span>
+
+  @Test
+  public void deleteDietHistoryRecordIdNotFoundTest() {
+<span class="fc" id="L460">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L461">            .thenReturn(Optional.of(validUser(1L)));</span>
+<span class="fc" id="L462">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L463">            .thenReturn(Optional.empty());</span>
+<span class="fc" id="L464">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L465">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L466">      dietService.deleteDietHistory(au, -1);</span>
+<span class="nc" id="L467">    });</span>
+<span class="fc" id="L468">  }</span>
+
+  @Test
+  public void deleteDietHistoryUserNotFoundTest() {
+<span class="fc" id="L472">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L473">            .thenReturn(Optional.empty());</span>
+<span class="fc" id="L474">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L475">            .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L476">    AuthenticatedUser au = new AuthenticatedUser(-1L);</span>
+<span class="fc" id="L477">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L478">      dietService.deleteDietHistory(au, 1);</span>
+<span class="nc" id="L479">    });</span>
+<span class="fc" id="L480">  }</span>
+
+  @Test
+  public void deleteDietHistoryInvalidRecordIdTest() {
+<span class="fc" id="L484">    when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))</span>
+<span class="fc" id="L485">        .thenReturn(Optional.of(validUser(2L)));</span>
+<span class="fc" id="L486">    when(dietHistoryRepoMock.findByDietHistoryId(Mockito.any(Integer.class)))</span>
+<span class="fc" id="L487">        .thenReturn(Optional.of(validDietHistory(1, 1)));</span>
+<span class="fc" id="L488">    AuthenticatedUser au = getValidAU();</span>
+<span class="fc" id="L489">    Assertions.assertThrows(BadRequestException.class, () -&gt; {</span>
+<span class="nc" id="L490">      dietService.deleteDietHistory(au, 1);</span>
+<span class="nc" id="L491">    });</span>
+<span class="fc" id="L492">  }</span>
+  
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

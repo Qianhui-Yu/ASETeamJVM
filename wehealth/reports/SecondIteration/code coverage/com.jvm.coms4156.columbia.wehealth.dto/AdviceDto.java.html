@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdviceDto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">wehealth$All_in_wehealth.exec</a> &gt; <a href="index.source.html" class="el_package">com.jvm.coms4156.columbia.wehealth.dto</a> &gt; <span class="el_source">AdviceDto.java</span></div><h1>AdviceDto.java</h1><pre class="source lang-java linenums">package com.jvm.coms4156.columbia.wehealth.dto;
+
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+<span class="pc bnc" id="L8" title="All 134 branches missed.">@Data</span>
+<span class="fc" id="L9">@NoArgsConstructor</span>
+<span class="nc" id="L10">@AllArgsConstructor</span>
+public class AdviceDto {
+<span class="nc" id="L12">  private String caloriesAdvice;</span>
+<span class="nc" id="L13">  private String fatAdvice;</span>
+<span class="nc" id="L14">  private String proteinAdvice;</span>
+<span class="nc" id="L15">  private String carbsAdvice;</span>
+<span class="nc" id="L16">  private String exerciseAdvice;</span>
+<span class="fc" id="L17">  private Boolean isEmpty;</span>
+
+<span class="fc" id="L19">  private Double avgCalories;</span>
+<span class="fc" id="L20">  private Double avgFat;</span>
+<span class="fc" id="L21">  private Double avgProtein;</span>
+<span class="fc" id="L22">  private Double avgCarbs;</span>
+<span class="fc" id="L23">  private Double avgDuration;</span>
+<span class="nc" id="L24">  private Double avgExerciseCal;</span>
+<span class="fc" id="L25">  private Double avgWeight;</span>
+
+<span class="fc" id="L27">  private List&lt;DietByDayDto&gt; dietByDate;</span>
+<span class="fc" id="L28">  private List&lt;ExerciseByDayDto&gt; exerciseByDate;</span>
+<span class="fc" id="L29">  private List&lt;WeightHistoryDetailsDto&gt; weightByDate;</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
