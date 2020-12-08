@@ -15,4 +15,6 @@ public interface WeightHistoryRepository extends JpaRepository<WeightHistory, In
   List<WeightHistory> findAllByUserAndCreatedTimeAfterOrderByCreatedTime(DbUser user, String startDateTime);
 
   Optional<WeightHistory> findByWeightHistoryId(Integer weightHistoryId);
+
+  WeightHistory findFirstByUserOrderByCreatedTime(DbUser user);
 }

@@ -15,4 +15,6 @@ public interface ExerciseHistoryRepository extends JpaRepository<ExerciseHistory
   List<ExerciseHistory> findAllByUserAndCreatedTimeAfterOrderByCreatedTime(DbUser user, String startDateTime);
 
   Optional<ExerciseHistory> findByExerciseHistoryId(Integer exerciseHistoryId);
+
+  ExerciseHistory findFirstByUserOrderByCreatedTime(DbUser user);
 }

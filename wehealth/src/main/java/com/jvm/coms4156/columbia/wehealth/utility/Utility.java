@@ -5,6 +5,8 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.WEEK;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.YEAR;
 
 import com.jvm.coms4156.columbia.wehealth.exception.BadRequestException;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,5 +55,24 @@ public class Utility {
     }
     Date startDateTime = targetDateTime.getTime();
     return getStringFromDate(startDateTime);
+  }
+
+  /**
+   * Calculate days between two days in String format.
+   *
+   * @param date1 The first date.
+   * @param date2 The second date.
+   * @return Integer days between two days.
+   */
+  public static int getDaysBetween(String date1, String date2) throws ParseException {
+    String pattern = "yyyy-MM-dd HH:mm:ss";
+    SimpleDateFormat df = new SimpleDateFormat(pattern);
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(df.parse(date1));
+    long time1 = cal.getTimeInMillis();
+    cal.setTime(df.parse(date2));
+    long time2 = cal.getTimeInMillis();
+    long betweenDays = (time2 - time1) / (1000 * 3600 * 24);
+    return Math.abs(Integer.parseInt(String.valueOf(betweenDays)));
   }
 }

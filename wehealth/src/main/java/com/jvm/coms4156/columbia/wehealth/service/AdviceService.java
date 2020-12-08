@@ -8,24 +8,27 @@ import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_AVG_PROTE
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.GOOD_DURATION;
 
 import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
-import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietByDayDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryDetailsDto;
-import com.jvm.coms4156.columbia.wehealth.dto.DietHistoryResponseDto;
-import com.jvm.coms4156.columbia.wehealth.dto.ExerciseByDayDto;
-import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryDetailsDto;
-import com.jvm.coms4156.columbia.wehealth.dto.ExerciseHistoryResponseDto;
-import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryDetailsDto;
-import com.jvm.coms4156.columbia.wehealth.dto.WeightHistoryResponseDto;
+import com.jvm.coms4156.columbia.wehealth.dto.*;
+
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+
+import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
+import com.jvm.coms4156.columbia.wehealth.repository.DbUserRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.DietHistoryRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.ExerciseHistoryRepository;
+import com.jvm.coms4156.columbia.wehealth.repository.WeightHistoryRepository;
+import com.jvm.coms4156.columbia.wehealth.utility.Utility;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,6 +44,14 @@ public class AdviceService {
   private ExerciseService exerciseService;
   @Autowired
   private WeightService weightService;
+  @Autowired
+  private DietHistoryRepository dietHistoryRepo;
+  @Autowired
+  private WeightHistoryRepository weightHistoryRepo;
+  @Autowired
+  private ExerciseHistoryRepository exerciseHistoryRepo;
+  @Autowired
+  private DbUserRepository dbUserRepo;
 
   /**
    * generate diet and exercise advice for a given user.
@@ -297,5 +308,31 @@ public class AdviceService {
       avgWeight += oneDay.getWeight();
     }
     adviceDto.setAvgWeight(avgWeight / weightHist.size());
+  }
+
+  public UsingDaysDto getUsingDays(AuthenticatedUser au) throws ParseException {
+    Optional<DbUser> user = dbUserRepo.findByUserId(au.getUserId());
+    if (user.isEmpty()) {
+      throw new NotFoundException("User not found with provided user id.");
+    }
+
+    String weightFirstDay = weightHistoryRepo
+        .findFirstByUserOrderByCreatedTime(user.get())
+        .getCreatedTime();
+    String exerciseFirstDay = exerciseHistoryRepo
+        .findFirstByUserOrderByCreatedTime(user.get())
+        .getCreatedTime();
+    String dietFirstDay = dietHistoryRepo
+        .findFirstByUserOrderByCreatedTime(user.get())
+        .getCreatedTime();
+
+    int weightDays = Utility.getDaysBetween(weightFirstDay,
+        Utility.getStringOfCurrentDateTime());
+    int exerciseDays = Utility.getDaysBetween(exerciseFirstDay,
+        Utility.getStringOfCurrentDateTime());
+    int dietDays = Utility.getDaysBetween(dietFirstDay,
+        Utility.getStringOfCurrentDateTime());
+
+    return new UsingDaysDto(weightDays, exerciseDays, dietDays);
   }
 }

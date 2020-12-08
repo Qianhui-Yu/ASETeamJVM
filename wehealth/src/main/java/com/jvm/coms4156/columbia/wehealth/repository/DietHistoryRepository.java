@@ -16,4 +16,6 @@ public interface DietHistoryRepository extends JpaRepository<DietHistory, Intege
   List<DietHistory> findAllByUserAndCreatedTimeAfterOrderByCreatedTime(DbUser user, String startDateTime);
 
   Optional<DietHistory> findByDietHistoryId(int dietHistoryId);
+
+  DietHistory findFirstByUserOrderByCreatedTime(DbUser user);
 }

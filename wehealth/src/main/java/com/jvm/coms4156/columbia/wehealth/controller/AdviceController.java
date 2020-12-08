@@ -3,8 +3,12 @@ package com.jvm.coms4156.columbia.wehealth.controller;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.MONTH;
 import static com.jvm.coms4156.columbia.wehealth.common.Constants.ONE;
 
+import com.jvm.coms4156.columbia.wehealth.domain.AuthenticatedUser;
 import com.jvm.coms4156.columbia.wehealth.dto.AdviceDto;
+import com.jvm.coms4156.columbia.wehealth.dto.UsingDaysDto;
 import com.jvm.coms4156.columbia.wehealth.service.AdviceService;
+
+import java.text.ParseException;
 import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +48,13 @@ public class AdviceController extends BaseController {
     return new ResponseEntity<>(adviceDto, HttpStatus.OK);
   }
 
+  @GetMapping(path = "/advice/days", consumes = MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<UsingDaysDto> getUsingDays() throws ParseException {
+    log.info("************Get using days***********");
 
+    UsingDaysDto usingDaysDto = adviceService.getUsingDays(au());
+    return new ResponseEntity<>(usingDaysDto, HttpStatus.OK);
+  }
 
 }
