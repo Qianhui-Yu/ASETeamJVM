@@ -113,12 +113,12 @@ public class ExerciseService {
     List<ExerciseHistory> exerciseHistoryList;
     log.info("**********Get exercise history by selected duration**********");
     if (timeUnit.equals(ALL)) {
-      exerciseHistoryList = exerciseHistoryRepo.findAllByUser(user);
+      exerciseHistoryList = exerciseHistoryRepo.findAllByUserOrderByCreatedTime(user);
     } else {
       // Calculate starting datetime for exercise history by selected duration
       String startDateTime = Utility.getStringOfStartDateTime(timeUnit, timeLength);
       exerciseHistoryList = exerciseHistoryRepo
-              .findAllByUserAndCreatedTimeAfter(user, startDateTime);
+              .findAllByUserAndCreatedTimeAfterOrderByCreatedTime(user, startDateTime);
     }
     ExerciseHistoryResponseDto exerciseHistoryResponseDto = new ExerciseHistoryResponseDto();
     log.info("**********Add every exercise history to responseDto**********");

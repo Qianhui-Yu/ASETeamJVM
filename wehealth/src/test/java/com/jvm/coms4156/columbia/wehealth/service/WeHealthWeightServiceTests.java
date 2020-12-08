@@ -148,8 +148,9 @@ public class WeHealthWeightServiceTests {
   @Test
   public void getWeightHistoryTimeLengthAllTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
-    when(dbWeightHistoryRepoMock.findAllByUser(Mockito.any(DbUser.class)))
-            .thenReturn(getHistories(10));
+    when(dbWeightHistoryRepoMock
+        .findAllByUserOrderByCreatedTime(Mockito.any(DbUser.class)))
+        .thenReturn(getHistories(10));
     AuthenticatedUser au = getValidUserAu();
     WeightHistoryResponseDto weightHistoryResponseDto =
             weightService.getWeightHistory(au, Optional.of(Constants.ALL), Optional.of(1));
@@ -159,9 +160,10 @@ public class WeHealthWeightServiceTests {
   @Test
   public void getWeightHistoryTimeLengthNotAllTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class))).thenReturn(validUser());
-    when(dbWeightHistoryRepoMock.findAllByUserAndCreatedTimeAfter(
+    when(dbWeightHistoryRepoMock
+        .findAllByUserAndCreatedTimeAfterOrderByCreatedTime(
             Mockito.any(DbUser.class), Mockito.any(String.class)))
-            .thenReturn(getHistories(5));
+        .thenReturn(getHistories(5));
     AuthenticatedUser au = getValidUserAu();
     WeightHistoryResponseDto weightHistoryResponseDto =
             weightService.getWeightHistory(au, Optional.of(Constants.WEEK), Optional.of(1));

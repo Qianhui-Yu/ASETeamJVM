@@ -100,12 +100,12 @@ public class WeightService {
     List<WeightHistory> weightHistoryList;
     log.info("**********Get weight history by selected duration**********");
     if (timeUnit.equals(ALL)) {
-      weightHistoryList = weightHistoryRepo.findAllByUser(user.get());
+      weightHistoryList = weightHistoryRepo.findAllByUserOrderByCreatedTime(user.get());
     } else {
       // Calculate starting datetime for weight history by selected duration
       String startDateTime = Utility.getStringOfStartDateTime(timeUnit, timeLength);
       weightHistoryList = weightHistoryRepo
-              .findAllByUserAndCreatedTimeAfter(user.get(), startDateTime);
+              .findAllByUserAndCreatedTimeAfterOrderByCreatedTime(user.get(), startDateTime);
     }
     WeightHistoryResponseDto weightHistoryResponseDto = new WeightHistoryResponseDto();
     List<WeightHistoryDetailsDto> weightHistoryDetailsDtoList = new ArrayList<>();

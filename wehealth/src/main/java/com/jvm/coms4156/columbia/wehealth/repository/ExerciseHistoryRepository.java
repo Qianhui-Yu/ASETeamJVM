@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ExerciseHistoryRepository extends JpaRepository<ExerciseHistory, Integer> {
 
-  List<ExerciseHistory> findAllByUser(DbUser user);
+  List<ExerciseHistory> findAllByUserOrderByCreatedTime(DbUser user);
 
-  List<ExerciseHistory> findAllByUserAndCreatedTimeAfter(DbUser user, String startDateTime);
+  List<ExerciseHistory> findAllByUserAndCreatedTimeAfterOrderByCreatedTime(DbUser user, String startDateTime);
 
   Optional<ExerciseHistory> findByExerciseHistoryId(Integer exerciseHistoryId);
 }

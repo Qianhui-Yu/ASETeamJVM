@@ -256,7 +256,7 @@ public class DietServiceTests {
   public void getDietHistoryValidTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
-    when(dietHistoryRepoMock.findAllByUser(Mockito.any(DbUser.class)))
+    when(dietHistoryRepoMock.findAllByUserOrderByCreatedTime(Mockito.any(DbUser.class)))
             .thenReturn(validDietHistoryList(1L));
     when(dietNutrientMappingRepoMock
             .findAllByDietTypeOrderByNutrientType(Mockito.any(DietType.class)))
@@ -272,7 +272,8 @@ public class DietServiceTests {
   public void getDietHistoryValid2Test() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
         .thenReturn(Optional.of(validUser(1L)));
-    when(dietHistoryRepoMock.findAllByUserAndCreatedTimeAfter(Mockito.any(DbUser.class), Mockito.anyString()))
+    when(dietHistoryRepoMock
+        .findAllByUserAndCreatedTimeAfterOrderByCreatedTime(Mockito.any(DbUser.class), Mockito.anyString()))
         .thenReturn(validDietHistoryList(1L));
     when(dietNutrientMappingRepoMock
         .findAllByDietTypeOrderByNutrientType(Mockito.any(DietType.class)))
@@ -288,7 +289,7 @@ public class DietServiceTests {
   public void getDietHistoryInvalidNutrientTypeTest() {
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
         .thenReturn(Optional.of(validUser(1L)));
-    when(dietHistoryRepoMock.findAllByUser(Mockito.any(DbUser.class)))
+    when(dietHistoryRepoMock.findAllByUserOrderByCreatedTime(Mockito.any(DbUser.class)))
         .thenReturn(inValidDietHistoryList(1L));
     when(dietNutrientMappingRepoMock
         .findAllByDietTypeOrderByNutrientType(Mockito.any(DietType.class)))

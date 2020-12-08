@@ -144,7 +144,9 @@ public class WeHealthExerciseServiceTests {
     List<ExerciseHistory> historyDetailList = validExerciseHistoryList();
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
-    when(dbExerciseHistoryRepoMock.findAllByUser(user)).thenReturn(historyDetailList);
+    when(dbExerciseHistoryRepoMock
+        .findAllByUserOrderByCreatedTime(user))
+        .thenReturn(historyDetailList);
     AuthenticatedUser au = new AuthenticatedUser(1L);
     ExerciseHistoryResponseDto retDto = exerciseService.getExerciseHistory(
             Optional.empty(), Optional.empty(), au);
@@ -161,8 +163,10 @@ public class WeHealthExerciseServiceTests {
     List<ExerciseHistory> historyDetailList = validExerciseHistoryList();
     when(dbUserRepoMock.findByUserId(Mockito.any(Long.class)))
             .thenReturn(Optional.of(validUser(1L)));
-    when(dbExerciseHistoryRepoMock.findAllByUserAndCreatedTimeAfter(Mockito.any(DbUser.class),
-            Mockito.any(String.class))).thenReturn(historyDetailList);
+    when(dbExerciseHistoryRepoMock
+        .findAllByUserAndCreatedTimeAfterOrderByCreatedTime(Mockito.any(DbUser.class),
+            Mockito.any(String.class)))
+        .thenReturn(historyDetailList);
     AuthenticatedUser au = new AuthenticatedUser(1L);
     ExerciseHistoryResponseDto retDto = exerciseService.getExerciseHistory(
             Optional.of(MONTH), Optional.of(1), au);

@@ -194,11 +194,12 @@ public class DietService {
     String timeUnit = unit.orElse(ALL); // Default: find all diet history
     log.info("**********Get diet history by selected duration**********");
     if (timeUnit.equals(ALL)) {
-      dietHistoryList = dietHistoryRepo.findAllByUser(user.get());
+      dietHistoryList = dietHistoryRepo.findAllByUserOrderByCreatedTime(user.get());
     } else {
       // Calculate starting datetime for diet history by selected duration
       String startDateTime = Utility.getStringOfStartDateTime(timeUnit, timeLength);
-      dietHistoryList = dietHistoryRepo.findAllByUserAndCreatedTimeAfter(user.get(), startDateTime);
+      dietHistoryList = dietHistoryRepo
+          .findAllByUserAndCreatedTimeAfterOrderByCreatedTime(user.get(), startDateTime);
     }
     DietHistoryResponseDto dietHistoryResponseDto = new DietHistoryResponseDto();
     log.info("**********Add every diet history to responseDto**********");

@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WeightHistoryRepository extends JpaRepository<WeightHistory, Integer> {
 
-  List<WeightHistory> findAllByUser(DbUser user);
+  List<WeightHistory> findAllByUserOrderByCreatedTime(DbUser user);
 
-  List<WeightHistory> findAllByUserAndCreatedTimeAfter(DbUser user, String startDateTime);
+  List<WeightHistory> findAllByUserAndCreatedTimeAfterOrderByCreatedTime(DbUser user, String startDateTime);
 
   Optional<WeightHistory> findByWeightHistoryId(Integer weightHistoryId);
 }

@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DietHistoryRepository extends JpaRepository<DietHistory, Integer> {
-  List<DietHistory> findAllByUser(DbUser user);
+  List<DietHistory> findAllByUserOrderByCreatedTime(DbUser user);
 
-  List<DietHistory> findAllByUserAndCreatedTimeAfter(DbUser user, String startDateTime);
+  List<DietHistory> findAllByUserAndCreatedTimeAfterOrderByCreatedTime(DbUser user, String startDateTime);
 
   Optional<DietHistory> findByDietHistoryId(int dietHistoryId);
 }
