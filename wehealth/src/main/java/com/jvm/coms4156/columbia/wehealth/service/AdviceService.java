@@ -23,6 +23,9 @@ import java.util.Optional;
 import java.util.Random;
 
 import com.jvm.coms4156.columbia.wehealth.entity.DbUser;
+import com.jvm.coms4156.columbia.wehealth.entity.DietHistory;
+import com.jvm.coms4156.columbia.wehealth.entity.ExerciseHistory;
+import com.jvm.coms4156.columbia.wehealth.entity.WeightHistory;
 import com.jvm.coms4156.columbia.wehealth.exception.NotFoundException;
 import com.jvm.coms4156.columbia.wehealth.repository.DbUserRepository;
 import com.jvm.coms4156.columbia.wehealth.repository.DietHistoryRepository;
@@ -316,22 +319,27 @@ public class AdviceService {
       throw new NotFoundException("User not found with provided user id.");
     }
 
-    String weightFirstDay = weightHistoryRepo
-        .findFirstByUserOrderByCreatedTime(user.get())
-        .getCreatedTime();
-    String exerciseFirstDay = exerciseHistoryRepo
-        .findFirstByUserOrderByCreatedTime(user.get())
-        .getCreatedTime();
-    String dietFirstDay = dietHistoryRepo
-        .findFirstByUserOrderByCreatedTime(user.get())
-        .getCreatedTime();
-
-    int weightDays = Utility.getDaysBetween(weightFirstDay,
-        Utility.getStringOfCurrentDateTime());
-    int exerciseDays = Utility.getDaysBetween(exerciseFirstDay,
-        Utility.getStringOfCurrentDateTime());
-    int dietDays = Utility.getDaysBetween(dietFirstDay,
-        Utility.getStringOfCurrentDateTime());
+    int weightDays = 0;
+    Optional<WeightHistory> weightFirstDay = weightHistoryRepo
+        .findFirstByUserOrderByCreatedTime(user.get());
+    if (weightFirstDay.isPresent()) {
+      weightDays = Utility.getDaysBetween(weightFirstDay.get().getCreatedTime(),
+          Utility.getStringOfCurrentDateTime());
+    }
+    int exerciseDays = 0;
+    Optional<ExerciseHistory> exerciseFirstDay = exerciseHistoryRepo
+        .findFirstByUserOrderByCreatedTime(user.get());
+    if (exerciseFirstDay.isPresent()) {
+      exerciseDays = Utility.getDaysBetween(exerciseFirstDay.get().getCreatedTime(),
+          Utility.getStringOfCurrentDateTime());
+    }
+    int dietDays = 0;
+    Optional<DietHistory> dietFirstDay = dietHistoryRepo
+        .findFirstByUserOrderByCreatedTime(user.get());
+    if (dietFirstDay.isPresent()) {
+      dietDays = Utility.getDaysBetween(dietFirstDay.get().getCreatedTime(),
+          Utility.getStringOfCurrentDateTime());
+    }
 
     return new UsingDaysDto(weightDays, exerciseDays, dietDays);
   }
