@@ -72,7 +72,7 @@ public class Utility {
     long time1 = cal.getTimeInMillis();
     cal.setTime(df.parse(date2));
     long time2 = cal.getTimeInMillis();
-    long betweenDays = (time2 - time1) / (1000 * 3600 * 24);
-    return 1 + Math.abs(Integer.parseInt(String.valueOf(betweenDays)));
+    long betweenDays = 1 + Math.abs(time2 - time1) / (1000 * 3600 * 24);
+    return Integer.parseInt(String.valueOf(betweenDays));
   }
 }
