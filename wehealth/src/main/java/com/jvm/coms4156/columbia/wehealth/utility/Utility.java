@@ -73,6 +73,6 @@ public class Utility {
     cal.setTime(df.parse(date2));
     long time2 = cal.getTimeInMillis();
     long betweenDays = (time2 - time1) / (1000 * 3600 * 24);
-    return Math.abs(Integer.parseInt(String.valueOf(betweenDays)));
+    return 1 + Math.abs(Integer.parseInt(String.valueOf(betweenDays)));
   }
 }
